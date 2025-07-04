@@ -1,0 +1,371 @@
+/* Color Flood Game Styles */
+.color-flood-game {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Game HUD Styles */
+.game-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hud-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.moves-display,
+.stars-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.moves-counter {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+}
+
+.moves-current {
+  color: #4ade80;
+}
+
+.moves-divider {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.moves-max {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.moves-label,
+.stars-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stars-container {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.star {
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.star.filled {
+  color: #fbbf24;
+  text-shadow: 0 0 8px #fbbf24;
+}
+
+.star.empty {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.control-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.control-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.control-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hud-status {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.status-message {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.status-message.won {
+  color: #4ade80;
+  font-weight: bold;
+}
+
+.status-message.game-over {
+  color: #f87171;
+  font-weight: bold;
+}
+
+/* Game Scene Styles */
+.game-scene {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  cursor: grab;
+}
+
+.game-canvas:active {
+  cursor: grabbing;
+}
+
+/* Color Palette Styles */
+.color-palette {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.color-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.color-button {
+  width: 100%;
+  height: 3rem;
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1rem;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.color-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.color-button:hover::before {
+  transform: translateX(100%);
+}
+
+.color-button:active {
+  transform: scale(0.95);
+}
+
+.color-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.color-button.disabled::before {
+  display: none;
+}
+
+.color-number {
+  position: relative;
+  z-index: 1;
+}
+
+.color-palette-hint {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.keyboard-hints {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.keyboard-hints span {
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+  font-family: monospace;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .game-hud {
+    padding: 0.75rem;
+  }
+  
+  .hud-top {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .moves-counter {
+    font-size: 1.2rem;
+  }
+  
+  .control-button {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+  
+  .color-palette {
+    padding: 0.75rem;
+  }
+  
+  .color-palette-grid {
+    gap: 0.5rem;
+  }
+  
+  .color-button {
+    height: 2.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .keyboard-hints {
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-hud {
+    padding: 0.5rem;
+  }
+  
+  .hud-top {
+    font-size: 0.9rem;
+  }
+  
+  .moves-counter {
+    font-size: 1rem;
+  }
+  
+  .color-button {
+    height: 2rem;
+    font-size: 0.8rem;
+  }
+  
+  .keyboard-hints {
+    display: none;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .game-hud,
+  .color-palette {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: white;
+  }
+  
+  .control-button {
+    background: white;
+    color: black;
+  }
+  
+  .color-button {
+    border: 2px solid white;
+  }
+}
