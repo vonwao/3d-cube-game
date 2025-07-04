@@ -75,9 +75,23 @@ export const useGameStore = create<GameStore>()(
           animationProgress: 0,
         });
         
-        setTimeout(() => {
-          get().actions.completeAnimation();
-        }, 200);
+        let startTime = Date.now();
+        const animate = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / 200, 1);
+          
+          const currentState = get();
+          if (currentState.isAnimating) {
+            currentState.actions.setAnimationProgress(progress);
+            
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              currentState.actions.completeAnimation();
+            }
+          }
+        };
+        requestAnimationFrame(animate);
       },
       
       undo: () => {
@@ -158,22 +172,3 @@ export const useGameStats = () => useGameStore(state => {
   };
 });
 
-useGameStore.subscribe(
-  (state) => state.isAnimating,
-  (isAnimating) => {
-    if (isAnimating) {
-      let startTime = Date.now();
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / 200, 1);
-        
-        useGameStore.getState().actions.setAnimationProgress(progress);
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        }
-      };
-      requestAnimationFrame(animate);
-    }
-  }
-);

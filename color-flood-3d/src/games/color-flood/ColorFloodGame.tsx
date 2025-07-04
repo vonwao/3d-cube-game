@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
-import { useGameActions, useGameState, usePalette, useAnimationState } from './logic/gameStore';
+import { useGameActions, useGameState, usePalette, useAnimationState, useGameStore } from './logic/gameStore';
 import { ColorPalette } from './ui/ColorPalette';
 import { GameHUD } from './ui/GameHUD';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
@@ -29,8 +29,8 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
       if (key >= '1' && key <= '6') {
         const colorIndex = parseInt(key) - 1;
         if (colorIndex >= 0 && colorIndex < 6) {
-          const { applyColor } = useGameActions();
-          applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
+          const state = useGameStore.getState();
+          state.actions.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
         }
       }
     };

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useGameActions, useGameState, useGameStats } from '../logic/gameStore';
+import { useGameActions, useGameState, useGameStats, useGameStore } from '../logic/gameStore';
 
 interface GameHUDProps {
   className?: string;
@@ -13,18 +13,20 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'u' || event.key === 'U') {
-        if (canUndo) {
-          undo();
+        const state = useGameStore.getState();
+        if (state.undoStack.length > 0) {
+          state.actions.undo();
         }
       }
       if (event.key === 'r' || event.key === 'R') {
-        reset();
+        const state = useGameStore.getState();
+        state.actions.reset();
       }
     };
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canUndo, undo, reset]);
+  }, []);
   
   const renderStars = () => {
     return Array.from({ length: 3 }, (_, i) => (
