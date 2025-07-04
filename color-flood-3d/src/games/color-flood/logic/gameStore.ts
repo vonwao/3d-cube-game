@@ -9,15 +9,13 @@ interface GameStore extends GameState {
   isAnimating: boolean;
   animationProgress: number;
   
-  actions: {
-    loadLevel: (level: Level) => void;
-    applyColor: (color: ColorIndex) => void;
-    undo: () => void;
-    reset: () => void;
-    setPalette: (palette: ColorPalette) => void;
-    setAnimationProgress: (progress: number) => void;
-    completeAnimation: () => void;
-  };
+  loadLevel: (level: Level) => void;
+  applyColor: (color: ColorIndex) => void;
+  undo: () => void;
+  reset: () => void;
+  setPalette: (palette: ColorPalette) => void;
+  setAnimationProgress: (progress: number) => void;
+  completeAnimation: () => void;
 }
 
 export const useGameStore = create<GameStore>()(
@@ -37,113 +35,110 @@ export const useGameStore = create<GameStore>()(
     isAnimating: false,
     animationProgress: 1,
     
-    actions: {
-      loadLevel: (level: Level) => {
-        const cubeState = createInitialState(level.cells, level.maxMoves);
-        set({
-          currentLevel: level,
-          cubeState,
-          undoStack: [],
-          isWon: false,
-          isGameOver: false,
-          selectedColor: null,
-          isAnimating: false,
-          animationProgress: 1,
-        });
-      },
+    loadLevel: (level: Level) => {
+      const cubeState = createInitialState(level.cells, level.maxMoves);
+      set({
+        currentLevel: level,
+        cubeState,
+        undoStack: [],
+        isWon: false,
+        isGameOver: false,
+        selectedColor: null,
+        isAnimating: false,
+        animationProgress: 1,
+      });
+    },
+    
+    applyColor: (color: ColorIndex) => {
+      const { cubeState, undoStack, isWon, isGameOver } = get();
       
-      applyColor: (color: ColorIndex) => {
-        const { cubeState, undoStack, isWon, isGameOver } = get();
+      if (isWon || isGameOver) return;
+      
+      const newState = floodFill(cubeState, color);
+      
+      if (newState === cubeState) return;
+      
+      const newUndoStack = [...undoStack, cubeState];
+      const won = isWin(newState);
+      const gameOver = newState.moves >= newState.maxMoves && !won;
+      
+      set({
+        cubeState: newState,
+        undoStack: newUndoStack,
+        isWon: won,
+        isGameOver: gameOver,
+        selectedColor: color,
+        isAnimating: true,
+        animationProgress: 0,
+      });
+      
+      let startTime = Date.now();
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / 200, 1);
         
-        if (isWon || isGameOver) return;
-        
-        const newState = floodFill(cubeState, color);
-        
-        if (newState === cubeState) return;
-        
-        const newUndoStack = [...undoStack, cubeState];
-        const won = isWin(newState);
-        const gameOver = newState.moves >= newState.maxMoves && !won;
-        
-        set({
-          cubeState: newState,
-          undoStack: newUndoStack,
-          isWon: won,
-          isGameOver: gameOver,
-          selectedColor: color,
-          isAnimating: true,
-          animationProgress: 0,
-        });
-        
-        let startTime = Date.now();
-        const animate = () => {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / 200, 1);
+        const currentState = get();
+        if (currentState.isAnimating) {
+          set({ animationProgress: progress });
           
-          const currentState = get();
-          if (currentState.isAnimating) {
-            currentState.actions.setAnimationProgress(progress);
-            
-            if (progress < 1) {
-              requestAnimationFrame(animate);
-            } else {
-              currentState.actions.completeAnimation();
-            }
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            set({ isAnimating: false, animationProgress: 1 });
           }
-        };
-        requestAnimationFrame(animate);
-      },
+        }
+      };
+      requestAnimationFrame(animate);
+    },
+    
+    undo: () => {
+      const { undoStack } = get();
+      if (undoStack.length === 0) return;
       
-      undo: () => {
-        const { undoStack } = get();
-        if (undoStack.length === 0) return;
-        
-        const previousState = undoStack[undoStack.length - 1];
-        const newUndoStack = undoStack.slice(0, -1);
-        
-        set({
-          cubeState: previousState,
-          undoStack: newUndoStack,
-          isWon: false,
-          isGameOver: false,
-          selectedColor: null,
-          isAnimating: false,
-          animationProgress: 1,
-        });
-      },
+      const previousState = undoStack[undoStack.length - 1];
+      const newUndoStack = undoStack.slice(0, -1);
       
-      reset: () => {
-        const { currentLevel } = get();
-        if (!currentLevel) return;
-        
-        const cubeState = createInitialState(currentLevel.cells, currentLevel.maxMoves);
-        set({
-          cubeState,
-          undoStack: [],
-          isWon: false,
-          isGameOver: false,
-          selectedColor: null,
-          isAnimating: false,
-          animationProgress: 1,
-        });
-      },
+      set({
+        cubeState: previousState,
+        undoStack: newUndoStack,
+        isWon: false,
+        isGameOver: false,
+        selectedColor: null,
+        isAnimating: false,
+        animationProgress: 1,
+      });
+    },
+    
+    reset: () => {
+      const { currentLevel } = get();
+      if (!currentLevel) return;
       
-      setPalette: (palette: ColorPalette) => {
-        set({ currentPalette: palette });
-      },
-      
-      setAnimationProgress: (progress: number) => {
-        set({ animationProgress: progress });
-      },
-      
-      completeAnimation: () => {
-        set({ isAnimating: false, animationProgress: 1 });
-      },
+      const cubeState = createInitialState(currentLevel.cells, currentLevel.maxMoves);
+      set({
+        cubeState,
+        undoStack: [],
+        isWon: false,
+        isGameOver: false,
+        selectedColor: null,
+        isAnimating: false,
+        animationProgress: 1,
+      });
+    },
+    
+    setPalette: (palette: ColorPalette) => {
+      set({ currentPalette: palette });
+    },
+    
+    setAnimationProgress: (progress: number) => {
+      set({ animationProgress: progress });
+    },
+    
+    completeAnimation: () => {
+      set({ isAnimating: false, animationProgress: 1 });
     },
   }))
 );
 
-export const useGameActions = () => useGameStore(state => state.actions);
 export const useGameState = () => useGameStore(state => ({
   currentLevel: state.currentLevel,
   cubeState: state.cubeState,
@@ -171,4 +166,3 @@ export const useGameStats = () => useGameStore(state => {
     movesRemaining: Math.max(0, cubeState.maxMoves - cubeState.moves),
   };
 });
-

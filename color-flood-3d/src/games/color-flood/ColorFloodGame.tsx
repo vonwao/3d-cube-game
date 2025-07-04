@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
-import { useGameActions, useGameState, usePalette, useAnimationState, useGameStore } from './logic/gameStore';
+import { useGameState, usePalette, useAnimationState, useGameStore } from './logic/gameStore';
 import { ColorPalette } from './ui/ColorPalette';
 import { GameHUD } from './ui/GameHUD';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
@@ -30,7 +30,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
         const colorIndex = parseInt(key) - 1;
         if (colorIndex >= 0 && colorIndex < 6) {
           const state = useGameStore.getState();
-          state.actions.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
+          state.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
         }
       }
     };
@@ -74,14 +74,14 @@ const LoadingSpinner: React.FC = () => (
 );
 
 export const ColorFloodGame: React.FC = () => {
-  const { loadLevel } = useGameActions();
   const { currentLevel } = useGameState();
   
   useEffect(() => {
     if (!currentLevel) {
-      loadLevel(SAMPLE_LEVELS[0]);
+      const state = useGameStore.getState();
+      state.loadLevel(SAMPLE_LEVELS[0]);
     }
-  }, [currentLevel, loadLevel]);
+  }, [currentLevel]);
   
   const handleCellClick = (index: number) => {
     console.log(`Cell clicked: ${index}`);

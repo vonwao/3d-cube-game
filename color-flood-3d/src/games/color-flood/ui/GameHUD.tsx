@@ -1,31 +1,24 @@
-import { useEffect } from 'react';
-import { useGameActions, useGameState, useGameStats, useGameStore } from '../logic/gameStore';
+import { useCallback } from 'react';
+import { useGameState, useGameStats, useGameStore } from '../logic/gameStore';
 
 interface GameHUDProps {
   className?: string;
 }
 
 export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
-  const { undo, reset } = useGameActions();
   const { canUndo, isWon, isGameOver } = useGameState();
   const { moves, maxMoves, stars, movesRemaining } = useGameStats();
   
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'u' || event.key === 'U') {
-        const state = useGameStore.getState();
-        if (state.undoStack.length > 0) {
-          state.actions.undo();
-        }
-      }
-      if (event.key === 'r' || event.key === 'R') {
-        const state = useGameStore.getState();
-        state.actions.reset();
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+  const handleUndo = useCallback(() => {
+    const state = useGameStore.getState();
+    if (state.undoStack.length > 0) {
+      state.undo();
+    }
+  }, []);
+  
+  const handleReset = useCallback(() => {
+    const state = useGameStore.getState();
+    state.reset();
   }, []);
   
   const renderStars = () => {
@@ -72,7 +65,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
         <div className="controls">
           <button
             className="control-button undo-button"
-            onClick={undo}
+            onClick={handleUndo}
             disabled={!canUndo}
             aria-label="Undo last move"
             title="Undo (U)"
@@ -82,7 +75,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
           
           <button
             className="control-button reset-button"
-            onClick={reset}
+            onClick={handleReset}
             aria-label="Reset level"
             title="Reset (R)"
           >
