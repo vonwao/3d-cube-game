@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { InstancedMesh, Object3D, Color } from 'three';
 
@@ -21,6 +21,7 @@ interface CubeMeshProps {
   spacing?: number;
   animationProgress?: number;
   onCellClick?: (index: number) => void;
+  enableHover?: boolean;
 }
 
 const tempObject = new Object3D();
@@ -33,9 +34,12 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
   spacing = 1.1,
   animationProgress = 1,
   onCellClick,
+  enableHover = true,
 }) => {
   const meshRef = useRef<InstancedMesh>(null);
   const highlightMeshRef = useRef<InstancedMesh>(null);
+  const hoverMeshRef = useRef<InstancedMesh>(null);
+  const [hoveredCell, setHoveredCell] = useState<number | null>(null);
   
   const positions = useMemo(() => {
     const positions: [number, number, number][] = [];
@@ -99,6 +103,37 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       highlightMeshRef.current.instanceColor.needsUpdate = true;
     }
   }, [floodRegion, positions]);
+
+  // Update hover mesh
+  useEffect(() => {
+    if (!hoverMeshRef.current) return;
+    
+    for (let i = 0; i < TOTAL_CELLS; i++) {
+      const [x, y, z] = positions[i];
+      const isHovered = hoveredCell === i;
+      
+      tempObject.position.set(x, y, z);
+      tempObject.scale.setScalar(isHovered ? 1.08 : 0.001);
+      tempObject.updateMatrix();
+      
+      hoverMeshRef.current.setMatrixAt(i, tempObject.matrix);
+      
+      // Use the cell's color but brighter for hover
+      if (isHovered) {
+        const colorIndex = cells[i];
+        const cellColor = colorArray[colorIndex];
+        tempColor.copy(cellColor).multiplyScalar(1.5); // Brighten the color
+      } else {
+        tempColor.setRGB(0, 0, 0);
+      }
+      hoverMeshRef.current.setColorAt(i, tempColor);
+    }
+    
+    hoverMeshRef.current.instanceMatrix.needsUpdate = true;
+    if (hoverMeshRef.current.instanceColor) {
+      hoverMeshRef.current.instanceColor.needsUpdate = true;
+    }
+  }, [hoveredCell, positions, cells, colorArray]);
   
   useFrame(() => {
     if (meshRef.current && animationProgress < 1) {
@@ -119,6 +154,23 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       onCellClick(instanceId);
     }
   };
+
+  const handlePointerEnter = (event: any) => {
+    if (!enableHover) return;
+    
+    const instanceId = event.instanceId;
+    if (instanceId !== undefined) {
+      setHoveredCell(instanceId);
+      document.body.style.cursor = 'pointer';
+    }
+  };
+
+  const handlePointerLeave = () => {
+    if (!enableHover) return;
+    
+    setHoveredCell(null);
+    document.body.style.cursor = 'default';
+  };
   
   return (
     <>
@@ -126,6 +178,8 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
         ref={meshRef}
         args={[undefined, undefined, TOTAL_CELLS]}
         onClick={handleClick}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
         castShadow
         receiveShadow
       >
@@ -150,6 +204,21 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
           wireframe={true}
         />
       </instancedMesh>
+      
+      {enableHover && (
+        <instancedMesh
+          ref={hoverMeshRef}
+          args={[undefined, undefined, TOTAL_CELLS]}
+          renderOrder={2}
+        >
+          <boxGeometry args={[1.02, 1.02, 1.02]} />
+          <meshBasicMaterial
+            transparent
+            opacity={0.4}
+            wireframe={false}
+          />
+        </instancedMesh>
+      )}
     </>
   );
 };

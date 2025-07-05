@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { SAMPLE_LEVELS, getRandomLevel } from '../levels/sampleLevels';
+import { SAMPLE_LEVELS, getUnlockedLevels, getUnlockedTiers, LEVEL_TIERS, type ExtendedLevel } from '../levels/sampleLevels';
 import { CubeMesh } from '../../../engine/CubeMesh';
-import { useCurrentPalette } from '../logic/simpleGameStore';
+import { useCurrentPalette, useTotalStars, useLevelStars } from '../logic/simpleGameStore';
 import { createInitialState } from '../logic/flood';
 import type { Level } from '../logic/types';
 
@@ -48,46 +48,68 @@ const MiniCubePreview: React.FC<MiniCubePreviewProps> = ({ level, size = 80 }) =
 };
 
 interface LevelCardProps {
-  level: Level;
+  level: ExtendedLevel;
   isSelected?: boolean;
+  isLocked?: boolean;
   onClick: () => void;
 }
 
-const LevelCard: React.FC<LevelCardProps> = ({ level, isSelected, onClick }) => {
+const StarDisplay: React.FC<{ stars: number }> = ({ stars }) => (
+  <div className="star-display">
+    {[1, 2, 3].map(i => (
+      <span key={i} className={`star ${i <= stars ? 'filled' : 'empty'}`}>
+        ★
+      </span>
+    ))}
+  </div>
+);
+
+const LevelCard: React.FC<LevelCardProps> = ({ level, isSelected, isLocked, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const stars = useLevelStars(level.id);
   
-  const difficulty = useMemo(() => {
-    if (level.id.startsWith('tutorial')) return { name: 'Tutorial', color: '#4CAF50' };
-    if (level.id.startsWith('easy')) return { name: 'Easy', color: '#2196F3' };
-    if (level.id.startsWith('medium')) return { name: 'Medium', color: '#FF9800' };
-    if (level.id.startsWith('hard')) return { name: 'Hard', color: '#F44336' };
-    if (level.id.startsWith('expert')) return { name: 'Expert', color: '#9C27B0' };
-    return { name: 'Unknown', color: '#666' };
-  }, [level.id]);
+  const tier = useMemo(() => {
+    return LEVEL_TIERS.find(t => t.id === level.tier) || LEVEL_TIERS[0];
+  }, [level.tier]);
 
   const uniqueColors = useMemo(() => {
     return new Set(level.cells).size;
   }, [level.cells]);
 
+  const handleClick = () => {
+    if (!isLocked) {
+      onClick();
+    }
+  };
+
   return (
     <div 
-      className={`level-card ${isSelected ? 'selected' : ''} ${isHovered ? 'hovered' : ''}`}
-      onClick={onClick}
+      className={`level-card ${isSelected ? 'selected' : ''} ${isHovered ? 'hovered' : ''} ${isLocked ? 'locked' : ''}`}
+      onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="level-preview">
-        <MiniCubePreview level={level} size={isHovered ? 100 : 80} />
+        {isLocked ? (
+          <div className="locked-overlay">
+            <span className="lock-icon">🔒</span>
+          </div>
+        ) : (
+          <MiniCubePreview level={level} size={isHovered ? 100 : 80} />
+        )}
       </div>
       
       <div className="level-info">
         <div className="level-header">
-          <h3 className="level-title">{level.id}</h3>
+          <div className="level-title-section">
+            <h3 className="level-title">{level.name}</h3>
+            <p className="level-description">{level.description}</p>
+          </div>
           <div 
             className="difficulty-badge"
-            style={{ backgroundColor: difficulty.color }}
+            style={{ backgroundColor: tier.color }}
           >
-            {difficulty.name}
+            {tier.name}
           </div>
         </div>
         
@@ -102,9 +124,17 @@ const LevelCard: React.FC<LevelCardProps> = ({ level, isSelected, onClick }) => 
           </div>
         </div>
         
-        {/* TODO: Add completed status and star rating */}
         <div className="level-progress">
-          <span className="play-hint">Click to play →</span>
+          {isLocked ? (
+            <span className="locked-hint">🔒 Earn more stars to unlock</span>
+          ) : stars > 0 ? (
+            <div className="completed-status">
+              <StarDisplay stars={stars} />
+              <span className="completion-text">Completed!</span>
+            </div>
+          ) : (
+            <span className="play-hint">Click to play →</span>
+          )}
         </div>
       </div>
     </div>
@@ -119,13 +149,22 @@ interface LevelSelectorProps {
 export const LevelSelector: React.FC<LevelSelectorProps> = ({ onLevelSelect, onClose }) => {
   const [selectedLevelId, setSelectedLevelId] = useState<string | null>(null);
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
+  const totalStars = useTotalStars();
+
+  const unlockedLevels = useMemo(() => {
+    return getUnlockedLevels(totalStars);
+  }, [totalStars]);
+
+  const unlockedTiers = useMemo(() => {
+    return getUnlockedTiers(totalStars);
+  }, [totalStars]);
 
   const filteredLevels = useMemo(() => {
-    if (filterDifficulty === 'all') return SAMPLE_LEVELS;
-    return SAMPLE_LEVELS.filter(level => level.id.startsWith(filterDifficulty));
+    const levels = filterDifficulty === 'all' ? SAMPLE_LEVELS : SAMPLE_LEVELS.filter(level => level.tier === filterDifficulty);
+    return levels;
   }, [filterDifficulty]);
 
-  const handleLevelClick = (level: Level) => {
+  const handleLevelClick = (level: ExtendedLevel) => {
     setSelectedLevelId(level.id);
     // Small delay to show selection before starting level
     setTimeout(() => {
@@ -134,24 +173,52 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ onLevelSelect, onC
   };
 
   const handleRandomLevel = () => {
-    const randomLevel = getRandomLevel();
+    const availableLevels = unlockedLevels.length > 0 ? unlockedLevels : [SAMPLE_LEVELS[0]];
+    const randomLevel = availableLevels[Math.floor(Math.random() * availableLevels.length)];
     handleLevelClick(randomLevel);
   };
 
-  const difficulties = [
-    { key: 'all', name: 'All Levels', count: SAMPLE_LEVELS.length },
-    { key: 'tutorial', name: 'Tutorial', count: SAMPLE_LEVELS.filter(l => l.id.startsWith('tutorial')).length },
-    { key: 'easy', name: 'Easy', count: SAMPLE_LEVELS.filter(l => l.id.startsWith('easy')).length },
-    { key: 'medium', name: 'Medium', count: SAMPLE_LEVELS.filter(l => l.id.startsWith('medium')).length },
-    { key: 'hard', name: 'Hard', count: SAMPLE_LEVELS.filter(l => l.id.startsWith('hard')).length },
-    { key: 'expert', name: 'Expert', count: SAMPLE_LEVELS.filter(l => l.id.startsWith('expert')).length },
-  ];
+  const tierFilters = useMemo(() => {
+    const allUnlocked = unlockedLevels.length;
+    const filters: Array<{
+      key: string;
+      name: string;
+      count: number;
+      unlocked: number;
+      isLocked?: boolean;
+      color?: string;
+    }> = [
+      { key: 'all', name: 'All Levels', count: SAMPLE_LEVELS.length, unlocked: allUnlocked }
+    ];
+    
+    LEVEL_TIERS.forEach(tier => {
+      const tierLevels = SAMPLE_LEVELS.filter(l => l.tier === tier.id);
+      const unlockedCount = tierLevels.filter(l => unlockedLevels.includes(l)).length;
+      const isUnlocked = unlockedTiers.some(t => t.id === tier.id);
+      
+      filters.push({
+        key: tier.id,
+        name: tier.name,
+        count: tierLevels.length,
+        unlocked: unlockedCount,
+        isLocked: !isUnlocked,
+        color: tier.color,
+      });
+    });
+    
+    return filters;
+  }, [unlockedLevels, unlockedTiers]);
 
   return (
     <div className="level-selector-overlay">
       <div className="level-selector-modal">
         <div className="level-selector-header">
-          <h2>🎲 Select a Level</h2>
+          <div className="header-content">
+            <h2>🎲 Select a Level</h2>
+            <div className="progress-display">
+              <span className="star-count">⭐ {totalStars} stars earned</span>
+            </div>
+          </div>
           <button 
             className="close-button"
             onClick={onClose}
@@ -163,13 +230,22 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ onLevelSelect, onC
 
         <div className="level-selector-controls">
           <div className="difficulty-filters">
-            {difficulties.map(diff => (
+            {tierFilters.map(filter => (
               <button
-                key={diff.key}
-                className={`difficulty-filter ${filterDifficulty === diff.key ? 'active' : ''}`}
-                onClick={() => setFilterDifficulty(diff.key)}
+                key={filter.key}
+                className={`difficulty-filter ${filterDifficulty === filter.key ? 'active' : ''} ${filter.isLocked ? 'locked' : ''}`}
+                onClick={() => !filter.isLocked && setFilterDifficulty(filter.key)}
+                style={{ borderColor: filter.color }}
+                disabled={filter.isLocked}
               >
-                {diff.name} ({diff.count})
+                <div className="filter-content">
+                  <span className="filter-name">
+                    {filter.isLocked ? '🔒' : ''} {filter.name}
+                  </span>
+                  <span className="filter-count">
+                    {filter.unlocked}/{filter.count}
+                  </span>
+                </div>
               </button>
             ))}
           </div>
@@ -177,20 +253,25 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ onLevelSelect, onC
           <button 
             className="random-level-button"
             onClick={handleRandomLevel}
+            disabled={unlockedLevels.length === 0}
           >
             🎲 Random Level
           </button>
         </div>
 
         <div className="levels-grid">
-          {filteredLevels.map(level => (
-            <LevelCard
-              key={level.id}
-              level={level}
-              isSelected={selectedLevelId === level.id}
-              onClick={() => handleLevelClick(level)}
-            />
-          ))}
+          {filteredLevels.map(level => {
+            const isLocked = !unlockedLevels.includes(level);
+            return (
+              <LevelCard
+                key={level.id}
+                level={level}
+                isSelected={selectedLevelId === level.id}
+                isLocked={isLocked}
+                onClick={() => handleLevelClick(level)}
+              />
+            );
+          })}
         </div>
 
         {filteredLevels.length === 0 && (

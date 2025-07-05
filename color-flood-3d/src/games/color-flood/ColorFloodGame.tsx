@@ -2,6 +2,7 @@ import { Suspense, useEffect, useState, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { Group } from 'three';
+import type { SpringValue } from '@react-spring/three';
 import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
 import { useKeyboardManager, isColorKey } from '../../engine/useKeyboardManager';
@@ -11,6 +12,9 @@ import { ColorPalette } from './ui/ColorPalette';
 import { GameHUD } from './ui/GameHUD';
 import { Instructions } from './ui/Instructions';
 import { LevelSelector } from './ui/LevelSelector';
+import { MoveToast } from './ui/MoveToast';
+import { MoveEffects } from './ui/MoveEffects';
+import { ComboTracker } from './ui/ComboTracker';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
 import type { Level } from './logic/types';
 
@@ -19,7 +23,7 @@ interface CubeSceneProps {
 }
 
 interface AnimatedGroupProps {
-  rotation: [any, any, any];
+  rotation: [SpringValue<number>, SpringValue<number>, SpringValue<number>];
   children: React.ReactNode;
 }
 
@@ -33,25 +37,17 @@ const AnimatedGroup: React.FC<AnimatedGroupProps> = ({ rotation, children }) => 
       const y = rotation[1].get();
       const z = rotation[2].get();
       
-      // Only log and update if values changed significantly
+      // Only update if values changed significantly
       if (Math.abs(x - lastValues.current.x) > 0.001 || 
           Math.abs(y - lastValues.current.y) > 0.001 || 
           Math.abs(z - lastValues.current.z) > 0.001) {
-        
-        console.log('🟢 AnimatedGroup applying rotation:', { x, y, z });
-        console.log('🟢 Group ref exists:', !!groupRef.current);
-        console.log('🟢 Previous group rotation:', groupRef.current.rotation.x, groupRef.current.rotation.y, groupRef.current.rotation.z);
         
         groupRef.current.rotation.x = x;
         groupRef.current.rotation.y = y;
         groupRef.current.rotation.z = z;
         
-        console.log('🟢 New group rotation:', groupRef.current.rotation.x, groupRef.current.rotation.y, groupRef.current.rotation.z);
-        
         lastValues.current = { x, y, z };
       }
-    } else {
-      console.log('🔴 AnimatedGroup: groupRef.current is null');
     }
   });
   
@@ -71,11 +67,6 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   // Initialize the game animation system
   useGameAnimation();
   
-  // Debug rotation values
-  useEffect(() => {
-    console.log('🔵 Rotation springs:', rotation);
-    console.log('🔵 Rotation values:', rotation[0].get(), rotation[1].get(), rotation[2].get());
-  }, [rotation]);
   
   return (
     <>
@@ -96,6 +87,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
           spacing={1.1}
           animationProgress={animationProgress}
           onCellClick={onCellClick}
+          enableHover={true}
         />
       </AnimatedGroup>
       
@@ -190,9 +182,16 @@ export const ColorFloodGame: React.FC = () => {
               <CubeScene onCellClick={handleCellClick} />
             </Suspense>
           </Canvas>
+          
+          {/* Visual feedback overlays */}
+          <MoveEffects />
+          <ComboTracker />
         </div>
         
         <ColorPalette className="color-palette" />
+        
+        {/* Toast notifications */}
+        <MoveToast />
         
         {showInstructions && (
           <Instructions onClose={() => setShowInstructions(false)} />

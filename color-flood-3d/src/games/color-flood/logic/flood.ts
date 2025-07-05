@@ -28,14 +28,16 @@ export const floodFill = (state: CubeState, newColor: ColorIndex): CubeState => 
   const newCells = [...state.cells];
   const newFloodRegion = [...state.floodRegion];
   
-  const currentColor = newCells[0];
+  // Get the current color of the flood region (before changing it)
+  const currentColor = state.cells.find((_, i) => state.floodRegion[i]);
   if (currentColor === newColor) {
-    return state;
+    return state; // No change if selecting the same color
   }
   
   const queue: number[] = [];
   const visited = new Set<number>();
   
+  // First, change all current flood region cells to the new color
   for (let i = 0; i < TOTAL_CELLS; i++) {
     if (state.floodRegion[i]) {
       queue.push(i);
@@ -44,12 +46,14 @@ export const floodFill = (state: CubeState, newColor: ColorIndex): CubeState => 
     }
   }
   
+  // Then expand into adjacent cells that have the new color
   while (queue.length > 0) {
     const current = queue.shift()!;
     const neighbors = getNeighbors(current);
     
     for (const neighbor of neighbors) {
-      if (!visited.has(neighbor) && newCells[neighbor] === newColor) {
+      // Expand into neighbors that have the new color (but weren't part of our region yet)
+      if (!visited.has(neighbor) && state.cells[neighbor] === newColor) {
         visited.add(neighbor);
         queue.push(neighbor);
         newFloodRegion[neighbor] = true;

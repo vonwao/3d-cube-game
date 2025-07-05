@@ -55,16 +55,12 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   // Keep track of target rotation values to avoid spring conflicts
   const targetRotation = useRef({ x: 0, y: 0, z: 0 });
   
-  // Add a setter that logs when targetRotation changes
   const setTargetRotation = (newTarget: { x: number, y: number, z: number }) => {
-    console.log('🎯 TARGET ROTATION CHANGING FROM:', targetRotation.current, 'TO:', newTarget);
     targetRotation.current = newTarget;
   };
   
   
   const handlePointerDown = (event: PointerEvent) => {
-    console.log('🖱️ Pointer down:', event.pointerType, 'enableMouse:', enableMouse, 'enableTouch:', enableTouch);
-    
     if (!enableMouse && event.pointerType === 'mouse') return;
     if (!enableTouch && event.pointerType === 'touch') return;
     
@@ -74,8 +70,6 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     
     gl.domElement.setPointerCapture(event.pointerId);
     event.preventDefault();
-    
-    console.log('🖱️ Drag started at:', event.clientX, event.clientY);
   };
   
   const handlePointerMove = (event: PointerEvent) => {
@@ -84,9 +78,6 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     const deltaX = event.clientX - lastPointer.current.x;
     const deltaY = event.clientY - lastPointer.current.y;
     
-    if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
-      console.log('🖱️ Mouse drag:', deltaX, deltaY);
-    }
     
     velocity.current.set(deltaX, deltaY);
     
@@ -104,7 +95,6 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
       z: targetRotation.current.z,
     });
     
-    console.log('🎯 New rotation from mouse:', targetRotation.current.x, targetRotation.current.y);
     
     lastPointer.current.set(event.clientX, event.clientY);
     
@@ -144,8 +134,6 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   // Keyboard handler using the centralized keyboard manager
   useKeyboardManager(
     (event: KeyboardEvent) => {
-      console.log('⌨️ Cube controls received key:', event.key, 'enableKeyboard:', enableKeyboard);
-      
       if (!enableKeyboard) return false;
       
       const radians = (keyboardSpeed * Math.PI) / 180;
@@ -153,61 +141,33 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
       const rotationKey = isRotationKey(event.key);
       
       if (arrowKey) {
-        console.log('⬆️ Arrow key detected:', arrowKey, 'applying rotation:', radians);
-        
-        console.log('🎯 Before assignment - targetRotation.current:', targetRotation.current);
         switch (arrowKey) {
           case 'ArrowUp':
-            console.log('🎯 ArrowUp - subtracting', radians, 'from x');
             targetRotation.current.x -= radians;
-            console.log('🎯 ArrowUp - new x:', targetRotation.current.x);
             break;
           case 'ArrowDown':
-            console.log('🎯 ArrowDown - adding', radians, 'to x');
             targetRotation.current.x += radians;
-            console.log('🎯 ArrowDown - new x:', targetRotation.current.x);
             break;
           case 'ArrowLeft':
-            console.log('🎯 ArrowLeft - subtracting', radians, 'from y');
             targetRotation.current.y -= radians;
-            console.log('🎯 ArrowLeft - new y:', targetRotation.current.y);
             break;
           case 'ArrowRight':
-            console.log('🎯 ArrowRight - adding', radians, 'to y');
             targetRotation.current.y += radians;
-            console.log('🎯 ArrowRight - new y:', targetRotation.current.y);
             break;
         }
-        console.log('🎯 After assignment - targetRotation.current:', targetRotation.current);
         
-        console.log('🎯 ARROW KEY - Setting spring rotation state to:', targetRotation.current);
-        
-        const newSpringRotation = {
+        setSpringRotation({
           x: targetRotation.current.x,
           y: targetRotation.current.y,
           z: targetRotation.current.z,
-        };
-        
-        console.log('🎯 ARROW KEY - Setting springRotation state to:', newSpringRotation);
-        setSpringRotation(newSpringRotation);
+        });
         
         setIsRotating(true);
-        
-        console.log('🎯 Arrow key - New target rotation:', targetRotation.current);
-        console.log('🎯 Arrow key - Spring values before animation:', springs.rotationX.get(), springs.rotationY.get(), springs.rotationZ.get());
-        
-        // Check spring values after a short delay
-        setTimeout(() => {
-          console.log('🎯 Arrow key - Spring values after 100ms:', springs.rotationX.get(), springs.rotationY.get(), springs.rotationZ.get());
-          console.log('🎯 Arrow key - Target should be:', targetRotation.current);
-        }, 100);
-        
         setTimeout(() => setIsRotating(false), 1000);
         return true; // Event handled
       }
       
       if (rotationKey) {
-        console.log('🔄 Q/E rotation:', rotationKey);
         
         switch (rotationKey) {
           case 'q':
@@ -280,7 +240,6 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   };
   
   const reset = () => {
-    console.log('🔄 RESET CALLED - resetting target rotation to 0,0,0');
     setTargetRotation({ x: 0, y: 0, z: 0 });
     setSpringRotation({ x: 0, y: 0, z: 0 });
     setIsRotating(false);
