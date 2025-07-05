@@ -228,9 +228,18 @@
   display: none;
 }
 
-.color-number {
-  position: relative;
-  z-index: 1;
+.color-hotkey {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  z-index: 2;
+  opacity: 0.8;
 }
 
 .color-palette-hint {
@@ -349,6 +358,207 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Instructions Modal */
+.instructions-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.instructions-modal {
+  background: white;
+  border-radius: 1rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.instructions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.instructions-header h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #7f8c8d;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background: #f8f9fa;
+  color: #2c3e50;
+}
+
+.instructions-content {
+  padding: 1.5rem 2rem;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+.instructions-content h3 {
+  color: #34495e;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.instructions-content h3:first-child {
+  margin-top: 0;
+}
+
+.goal p {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #27ae60;
+}
+
+.how-to-play ol {
+  padding-left: 1.2rem;
+}
+
+.how-to-play li {
+  margin-bottom: 0.5rem;
+}
+
+.control-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.control-group h4 {
+  color: #3498db;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.control-group p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.tips ul {
+  padding-left: 1.2rem;
+}
+
+.tips li {
+  margin-bottom: 0.3rem;
+}
+
+.instructions-footer {
+  padding: 1rem 2rem 1.5rem;
+  text-align: center;
+  border-top: 1px solid #eee;
+}
+
+.start-playing-button {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.start-playing-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+}
+
+.help-button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(52, 152, 219, 0.8);
+  color: #3498db;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.help-button:hover {
+  background: #3498db;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Mobile adjustments for instructions */
+@media (max-width: 768px) {
+  .instructions-modal {
+    margin: 0.5rem;
+    max-height: 95vh;
+  }
+  
+  .instructions-header {
+    padding: 1rem 1.5rem 0.5rem;
+  }
+  
+  .instructions-content {
+    padding: 1rem 1.5rem;
+  }
+  
+  .control-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .instructions-footer {
+    padding: 0.8rem 1.5rem 1rem;
+  }
+  
+  .help-button {
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
   }
 }
 

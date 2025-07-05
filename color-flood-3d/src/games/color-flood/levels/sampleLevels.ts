@@ -2,59 +2,63 @@ import type { Level, ColorIndex } from '../logic/types';
 
 export const SAMPLE_LEVELS: Level[] = [
   {
-    id: 'level-01',
+    id: 'tutorial-01',
     cells: [
-      0, 1, 0,
-      1, 1, 1,
-      0, 1, 0,
+      // A simple 2-color cube to teach basics
+      0, 0, 0,
+      0, 0, 0,
+      0, 0, 1,
       
+      0, 0, 0,
+      0, 0, 0,
+      0, 1, 1,
+      
+      0, 0, 0,
+      0, 0, 0,
+      1, 1, 1,
+    ] as ColorIndex[],
+    maxMoves: 2,
+  },
+  {
+    id: 'easy-01',
+    cells: [
+      // Simple pattern with 3 colors
+      0, 1, 1,
+      0, 1, 1,
+      0, 2, 2,
+      
+      0, 1, 1,
+      0, 1, 2,
+      0, 2, 2,
+      
+      0, 0, 1,
+      0, 2, 2,
+      0, 2, 2,
+    ] as ColorIndex[],
+    maxMoves: 4,
+  },
+  {
+    id: 'easy-02',
+    cells: [
+      // Cross pattern
       1, 0, 1,
       0, 0, 0,
       1, 0, 1,
       
-      0, 1, 0,
-      1, 1, 1,
-      0, 1, 0,
+      0, 0, 0,
+      0, 0, 0,
+      0, 0, 0,
+      
+      1, 0, 1,
+      0, 0, 0,
+      1, 0, 1,
     ] as ColorIndex[],
     maxMoves: 3,
   },
   {
-    id: 'level-02',
+    id: 'medium-01',
     cells: [
-      0, 0, 1,
-      0, 1, 1,
-      1, 1, 2,
-      
-      0, 1, 2,
-      1, 2, 2,
-      2, 2, 3,
-      
-      1, 2, 3,
-      2, 3, 3,
-      3, 3, 4,
-    ] as ColorIndex[],
-    maxMoves: 6,
-  },
-  {
-    id: 'level-03',
-    cells: [
-      0, 2, 4,
-      1, 0, 3,
-      5, 1, 2,
-      
-      2, 1, 0,
-      3, 2, 1,
-      4, 3, 0,
-      
-      1, 3, 5,
-      0, 4, 2,
-      2, 0, 1,
-    ] as ColorIndex[],
-    maxMoves: 8,
-  },
-  {
-    id: 'level-04',
-    cells: [
+      // Layer-based challenge
       0, 0, 0,
       0, 1, 0,
       0, 0, 0,
@@ -70,42 +74,27 @@ export const SAMPLE_LEVELS: Level[] = [
     maxMoves: 5,
   },
   {
-    id: 'level-05',
+    id: 'medium-02',
     cells: [
+      // Diagonal pattern
       0, 1, 2,
-      3, 4, 5,
-      0, 1, 2,
-      
-      3, 4, 5,
-      0, 1, 2,
-      3, 4, 5,
-      
-      0, 1, 2,
-      3, 4, 5,
-      0, 1, 2,
-    ] as ColorIndex[],
-    maxMoves: 10,
-  },
-  {
-    id: 'level-06',
-    cells: [
-      0, 0, 1,
-      0, 1, 1,
-      1, 1, 2,
-      
-      0, 1, 2,
-      1, 2, 2,
-      2, 2, 3,
+      1, 2, 3,
+      2, 3, 0,
       
       1, 2, 3,
-      2, 3, 3,
-      3, 3, 0,
+      2, 3, 0,
+      3, 0, 1,
+      
+      2, 3, 0,
+      3, 0, 1,
+      0, 1, 2,
     ] as ColorIndex[],
-    maxMoves: 7,
+    maxMoves: 6,
   },
   {
-    id: 'level-07',
+    id: 'medium-03',
     cells: [
+      // Corners challenge
       0, 1, 0,
       1, 2, 1,
       0, 1, 0,
@@ -121,8 +110,27 @@ export const SAMPLE_LEVELS: Level[] = [
     maxMoves: 4,
   },
   {
-    id: 'level-08',
+    id: 'hard-01',
     cells: [
+      // Complex multicolor
+      0, 1, 2,
+      3, 4, 5,
+      0, 1, 2,
+      
+      3, 4, 5,
+      0, 1, 2,
+      3, 4, 5,
+      
+      0, 1, 2,
+      3, 4, 5,
+      0, 1, 2,
+    ] as ColorIndex[],
+    maxMoves: 8,
+  },
+  {
+    id: 'hard-02',
+    cells: [
+      // Spiral pattern
       0, 0, 0,
       0, 1, 1,
       0, 1, 2,
@@ -138,38 +146,40 @@ export const SAMPLE_LEVELS: Level[] = [
     maxMoves: 9,
   },
   {
-    id: 'level-09',
+    id: 'expert-01',
     cells: [
-      0, 2, 0,
-      2, 1, 2,
-      0, 2, 0,
+      // Checkerboard challenge
+      0, 1, 0,
+      1, 0, 1,
+      0, 1, 0,
       
-      2, 1, 2,
-      1, 3, 1,
-      2, 1, 2,
+      1, 0, 1,
+      0, 1, 0,
+      1, 0, 1,
       
-      0, 2, 0,
-      2, 1, 2,
-      0, 2, 0,
+      0, 1, 0,
+      1, 0, 1,
+      0, 1, 0,
     ] as ColorIndex[],
     maxMoves: 6,
   },
   {
-    id: 'level-10',
+    id: 'expert-02',
     cells: [
+      // Maximum complexity
       0, 1, 2,
-      1, 2, 3,
-      2, 3, 4,
-      
-      1, 2, 3,
-      2, 3, 4,
       3, 4, 5,
+      2, 1, 0,
       
-      2, 3, 4,
-      3, 4, 5,
-      4, 5, 0,
+      5, 0, 3,
+      2, 1, 4,
+      1, 5, 3,
+      
+      4, 3, 1,
+      0, 2, 5,
+      3, 4, 0,
     ] as ColorIndex[],
-    maxMoves: 11,
+    maxMoves: 12,
   },
 ];
 

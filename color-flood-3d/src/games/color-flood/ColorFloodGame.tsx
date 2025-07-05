@@ -6,6 +6,7 @@ import { useCubeControls } from '../../engine/useCubeControls';
 import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore } from './logic/simpleGameStore';
 import { ColorPalette } from './ui/ColorPalette';
 import { GameHUD } from './ui/GameHUD';
+import { Instructions } from './ui/Instructions';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
 
 interface CubeSceneProps {
@@ -26,11 +27,13 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key;
       
+      // Only handle color keys here, let cube controls handle arrow keys
       if (key >= '1' && key <= '6') {
         const colorIndex = parseInt(key) - 1;
         if (colorIndex >= 0 && colorIndex < 6) {
           const state = useSimpleGameStore.getState();
           state.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
+          event.preventDefault(); // Prevent other handlers
         }
       }
     };
@@ -112,6 +115,8 @@ export const ColorFloodGame: React.FC = () => {
         </div>
         
         <ColorPalette className="color-palette" />
+        
+        <Instructions />
       </div>
     </div>
   );

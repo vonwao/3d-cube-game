@@ -60,7 +60,7 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ className = '' }) =>
               aria-label={`Color ${colorIndex + 1}`}
               tabIndex={0}
             >
-              <span className="color-number">{colorIndex + 1}</span>
+              <span className="color-hotkey">{colorIndex + 1}</span>
             </button>
           );
         })}
@@ -68,9 +68,8 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ className = '' }) =>
       
       <div className="color-palette-hint">
         <div className="keyboard-hints">
-          <span>Press 1-6 to select colors</span>
-          <span>Arrow keys to rotate</span>
-          <span>Q/E to roll</span>
+          <span>🎨 Click colors or press 1-6</span>
+          <span>🔄 Drag or use arrow keys to rotate</span>
         </div>
       </div>
     </div>

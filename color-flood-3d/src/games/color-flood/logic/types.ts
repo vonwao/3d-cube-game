@@ -33,34 +33,34 @@ export const DEFAULT_PALETTES: ColorPalette[] = [
   {
     name: 'Vibrant',
     colors: [
-      '#FF6B6B', // Red
-      '#4ECDC4', // Teal
-      '#45B7D1', // Blue
-      '#FFA07A', // Orange
-      '#98D8C8', // Green
-      '#F7DC6F', // Yellow
+      '#E74C3C', // Bright Red
+      '#3498DB', // Bright Blue  
+      '#2ECC71', // Bright Green
+      '#F39C12', // Bright Orange
+      '#9B59B6', // Bright Purple
+      '#F1C40F', // Bright Yellow
     ],
   },
   {
-    name: 'Neon',
+    name: 'Ocean',
     colors: [
-      '#FF073A', // Electric Red
-      '#39FF14', // Electric Green
-      '#0080FF', // Electric Blue
-      '#FF5F00', // Electric Orange
-      '#FF00FF', // Electric Magenta
-      '#FFFF00', // Electric Yellow
+      '#FF6B6B', // Coral Red
+      '#4ECDC4', // Turquoise
+      '#45B7D1', // Sky Blue
+      '#96CEB4', // Mint Green
+      '#FFEAA7', // Peach
+      '#DDA0DD', // Plum
     ],
   },
   {
-    name: 'Pastel',
+    name: 'Sunset',
     colors: [
-      '#FFB3BA', // Pastel Pink
-      '#BAFFC9', // Pastel Green
-      '#BAE1FF', // Pastel Blue
-      '#FFFFBA', // Pastel Yellow
-      '#FFDFBA', // Pastel Orange
-      '#E0BBE4', // Pastel Purple
+      '#FF5722', // Deep Orange
+      '#FF9800', // Orange
+      '#FFC107', // Amber
+      '#8BC34A', // Light Green
+      '#00BCD4', // Cyan
+      '#673AB7', // Deep Purple
     ],
   },
 ];

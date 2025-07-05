@@ -21,13 +21,18 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
   
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle if not already handled by other components
+      if (event.defaultPrevented) return;
+      
       if (event.key === 'u' || event.key === 'U') {
         if (canUndo) {
           handleUndo();
+          event.preventDefault();
         }
       }
       if (event.key === 'r' || event.key === 'R') {
         handleReset();
+        event.preventDefault();
       }
     };
     
