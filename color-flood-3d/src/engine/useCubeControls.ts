@@ -49,6 +49,9 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   const lastPointer = useRef(new Vector2());
   const velocity = useRef(new Vector2());
   
+  // Keep track of target rotation values to avoid spring conflicts
+  const targetRotation = useRef({ x: 0, y: 0, z: 0 });
+  
   
   const handlePointerDown = (event: PointerEvent) => {
     console.log('🖱️ Pointer down:', event.pointerType, 'enableMouse:', enableMouse, 'enableTouch:', enableTouch);
@@ -81,17 +84,17 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     const rotationX = (deltaY * rotationSpeed) / 200;
     const rotationY = (deltaX * rotationSpeed) / 200;
     
-    // Get current rotation and add delta
-    const currentRotX = springs.rotationX.get();
-    const currentRotY = springs.rotationY.get();
+    // Update target rotation values
+    targetRotation.current.x += rotationX;
+    targetRotation.current.y += rotationY;
     
     api.start({
-      rotationX: currentRotX + rotationX,
-      rotationY: currentRotY + rotationY,
+      rotationX: targetRotation.current.x,
+      rotationY: targetRotation.current.y,
       config: { tension: 200, friction: 20 }, // Immediate response for dragging
     });
     
-    console.log('🎯 New rotation from mouse:', currentRotX + rotationX, currentRotY + rotationY);
+    console.log('🎯 New rotation from mouse:', targetRotation.current.x, targetRotation.current.y);
     
     lastPointer.current.set(event.clientX, event.clientY);
     
@@ -111,12 +114,12 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     const momentumY = velocity.current.y * 0.02;
     
     // Apply momentum with smooth deceleration
-    const currentRotX = springs.rotationX.get();
-    const currentRotY = springs.rotationY.get();
+    targetRotation.current.x += momentumY;
+    targetRotation.current.y += momentumX;
     
     api.start({
-      rotationX: currentRotX + momentumY,
-      rotationY: currentRotY + momentumX,
+      rotationX: targetRotation.current.x,
+      rotationY: targetRotation.current.y,
       config: { tension: 120, friction: 14 }, // Smooth deceleration
     });
     
@@ -143,36 +146,28 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
         
         switch (arrowKey) {
           case 'ArrowUp':
-            api.start({
-              rotationX: springs.rotationX.get() - radians,
-              config: { tension: 120, friction: 14 },
-            });
-            setIsRotating(true);
+            targetRotation.current.x -= radians;
             break;
           case 'ArrowDown':
-            api.start({
-              rotationX: springs.rotationX.get() + radians,
-              config: { tension: 120, friction: 14 },
-            });
-            setIsRotating(true);
+            targetRotation.current.x += radians;
             break;
           case 'ArrowLeft':
-            api.start({
-              rotationY: springs.rotationY.get() - radians,
-              config: { tension: 120, friction: 14 },
-            });
-            setIsRotating(true);
+            targetRotation.current.y -= radians;
             break;
           case 'ArrowRight':
-            api.start({
-              rotationY: springs.rotationY.get() + radians,
-              config: { tension: 120, friction: 14 },
-            });
-            setIsRotating(true);
+            targetRotation.current.y += radians;
             break;
         }
         
-        console.log('🎯 New rotation:', springs.rotationX.get(), springs.rotationY.get(), springs.rotationZ.get());
+        api.start({
+          rotationX: targetRotation.current.x,
+          rotationY: targetRotation.current.y,
+          rotationZ: targetRotation.current.z,
+          config: { tension: 120, friction: 14 },
+        });
+        setIsRotating(true);
+        
+        console.log('🎯 New rotation:', targetRotation.current);
         setTimeout(() => setIsRotating(false), 1000);
         return true; // Event handled
       }
@@ -182,22 +177,22 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
         
         switch (rotationKey) {
           case 'q':
-            api.start({
-              rotationZ: springs.rotationZ.get() - radians,
-              config: { tension: 120, friction: 14 },
-            });
-            setIsRotating(true);
+            targetRotation.current.z -= radians;
             break;
           case 'e':
-            api.start({
-              rotationZ: springs.rotationZ.get() + radians,
-              config: { tension: 120, friction: 14 },
-            });
-            setIsRotating(true);
+            targetRotation.current.z += radians;
             break;
         }
         
-        console.log('🎯 New rotation:', springs.rotationX.get(), springs.rotationY.get(), springs.rotationZ.get());
+        api.start({
+          rotationX: targetRotation.current.x,
+          rotationY: targetRotation.current.y,
+          rotationZ: targetRotation.current.z,
+          config: { tension: 120, friction: 14 },
+        });
+        setIsRotating(true);
+        
+        console.log('🎯 New rotation:', targetRotation.current);
         setTimeout(() => setIsRotating(false), 1000);
         return true; // Event handled
       }
@@ -232,30 +227,29 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     
     switch (axis) {
       case 'x':
-        api.start({
-          rotationX: springs.rotationX.get() + radians,
-          config: { tension: 120, friction: 14 },
-        });
+        targetRotation.current.x += radians;
         break;
       case 'y':
-        api.start({
-          rotationY: springs.rotationY.get() + radians,
-          config: { tension: 120, friction: 14 },
-        });
+        targetRotation.current.y += radians;
         break;
       case 'z':
-        api.start({
-          rotationZ: springs.rotationZ.get() + radians,
-          config: { tension: 120, friction: 14 },
-        });
+        targetRotation.current.z += radians;
         break;
     }
+    
+    api.start({
+      rotationX: targetRotation.current.x,
+      rotationY: targetRotation.current.y,
+      rotationZ: targetRotation.current.z,
+      config: { tension: 120, friction: 14 },
+    });
     
     setIsRotating(true);
     setTimeout(() => setIsRotating(false), 800);
   };
   
   const reset = () => {
+    targetRotation.current = { x: 0, y: 0, z: 0 };
     api.start({
       rotationX: 0,
       rotationY: 0,

@@ -31,6 +31,12 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   // Initialize the game animation system
   useGameAnimation();
   
+  // Debug rotation values
+  useEffect(() => {
+    console.log('🔵 Rotation springs:', rotation);
+    console.log('🔵 Rotation values:', rotation[0].get(), rotation[1].get(), rotation[2].get());
+  }, [rotation]);
+  
   return (
     <>
       <ambientLight intensity={0.4} />
