@@ -1,7 +1,7 @@
-import { Suspense, useEffect, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Suspense, useEffect, useState, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
-import { animated } from '@react-spring/three';
+import { Group } from 'three';
 import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
 import { useKeyboardManager, isColorKey } from '../../engine/useKeyboardManager';
@@ -17,6 +17,46 @@ import type { Level } from './logic/types';
 interface CubeSceneProps {
   onCellClick?: (index: number) => void;
 }
+
+interface AnimatedGroupProps {
+  rotation: [any, any, any];
+  children: React.ReactNode;
+}
+
+const AnimatedGroup: React.FC<AnimatedGroupProps> = ({ rotation, children }) => {
+  const groupRef = useRef<Group>(null);
+  const lastValues = useRef({ x: 0, y: 0, z: 0 });
+  
+  useFrame(() => {
+    if (groupRef.current) {
+      const x = rotation[0].get();
+      const y = rotation[1].get();
+      const z = rotation[2].get();
+      
+      // Only log and update if values changed significantly
+      if (Math.abs(x - lastValues.current.x) > 0.001 || 
+          Math.abs(y - lastValues.current.y) > 0.001 || 
+          Math.abs(z - lastValues.current.z) > 0.001) {
+        
+        console.log('🟢 AnimatedGroup applying rotation:', { x, y, z });
+        console.log('🟢 Group ref exists:', !!groupRef.current);
+        console.log('🟢 Previous group rotation:', groupRef.current.rotation.x, groupRef.current.rotation.y, groupRef.current.rotation.z);
+        
+        groupRef.current.rotation.x = x;
+        groupRef.current.rotation.y = y;
+        groupRef.current.rotation.z = z;
+        
+        console.log('🟢 New group rotation:', groupRef.current.rotation.x, groupRef.current.rotation.y, groupRef.current.rotation.z);
+        
+        lastValues.current = { x, y, z };
+      }
+    } else {
+      console.log('🔴 AnimatedGroup: groupRef.current is null');
+    }
+  });
+  
+  return <group ref={groupRef}>{children}</group>;
+};
 
 const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   const cubeState = useCubeState();
@@ -48,7 +88,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
         shadow-mapSize-height={2048}
       />
       
-      <animated.group rotation-x={rotation[0]} rotation-y={rotation[1]} rotation-z={rotation[2]}>
+      <AnimatedGroup rotation={rotation}>
         <CubeMesh
           cells={cubeState.cells}
           colors={palette.colors}
@@ -57,7 +97,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
           animationProgress={animationProgress}
           onCellClick={onCellClick}
         />
-      </animated.group>
+      </AnimatedGroup>
       
       <Environment preset="studio" />
     </>

@@ -34,23 +34,32 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   const [isRotating, setIsRotating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   
+  // State-driven approach - spring automatically follows these values
+  const [springRotation, setSpringRotation] = useState({ x: 0, y: 0, z: 0 });
+
   // React Spring animation for smooth rotation
-  const [springs, api] = useSpring(() => ({
-    rotationX: 0,
-    rotationY: 0,
-    rotationZ: 0,
+  const springs = useSpring({
+    rotationX: springRotation.x,
+    rotationY: springRotation.y,
+    rotationZ: springRotation.z,
     config: {
-      tension: 120,
-      friction: 14,
+      tension: 200,
+      friction: 25,
       mass: 1,
     },
-  }));
+  });
   
   const lastPointer = useRef(new Vector2());
   const velocity = useRef(new Vector2());
   
   // Keep track of target rotation values to avoid spring conflicts
   const targetRotation = useRef({ x: 0, y: 0, z: 0 });
+  
+  // Add a setter that logs when targetRotation changes
+  const setTargetRotation = (newTarget: { x: number, y: number, z: number }) => {
+    console.log('🎯 TARGET ROTATION CHANGING FROM:', targetRotation.current, 'TO:', newTarget);
+    targetRotation.current = newTarget;
+  };
   
   
   const handlePointerDown = (event: PointerEvent) => {
@@ -70,6 +79,9 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   };
   
   const handlePointerMove = (event: PointerEvent) => {
+    console.log('🖱️ MOUSE MOVE - DISABLED FOR TESTING');
+    return; // Temporarily disable mouse drag
+    
     if (!isDragging) return;
     
     const deltaX = event.clientX - lastPointer.current.x;
@@ -106,6 +118,9 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   };
   
   const handlePointerUp = (event: PointerEvent) => {
+    console.log('🖱️ MOUSE UP - DISABLED FOR TESTING');
+    return; // Temporarily disable mouse up processing
+    
     if (!isDragging) return;
     
     setIsDragging(false);
@@ -144,57 +159,60 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
       if (arrowKey) {
         console.log('⬆️ Arrow key detected:', arrowKey, 'applying rotation:', radians);
         
+        console.log('🎯 Before assignment - targetRotation.current:', targetRotation.current);
         switch (arrowKey) {
           case 'ArrowUp':
+            console.log('🎯 ArrowUp - subtracting', radians, 'from x');
             targetRotation.current.x -= radians;
+            console.log('🎯 ArrowUp - new x:', targetRotation.current.x);
             break;
           case 'ArrowDown':
+            console.log('🎯 ArrowDown - adding', radians, 'to x');
             targetRotation.current.x += radians;
+            console.log('🎯 ArrowDown - new x:', targetRotation.current.x);
             break;
           case 'ArrowLeft':
+            console.log('🎯 ArrowLeft - subtracting', radians, 'from y');
             targetRotation.current.y -= radians;
+            console.log('🎯 ArrowLeft - new y:', targetRotation.current.y);
             break;
           case 'ArrowRight':
+            console.log('🎯 ArrowRight - adding', radians, 'to y');
             targetRotation.current.y += radians;
+            console.log('🎯 ArrowRight - new y:', targetRotation.current.y);
             break;
         }
+        console.log('🎯 After assignment - targetRotation.current:', targetRotation.current);
         
-        api.start({
-          rotationX: targetRotation.current.x,
-          rotationY: targetRotation.current.y,
-          rotationZ: targetRotation.current.z,
-          config: { tension: 120, friction: 14 },
-        });
+        console.log('🎯 ARROW KEY - Setting spring rotation state to:', targetRotation.current);
+        
+        const newSpringRotation = {
+          x: targetRotation.current.x,
+          y: targetRotation.current.y,
+          z: targetRotation.current.z,
+        };
+        
+        console.log('🎯 ARROW KEY - Setting springRotation state to:', newSpringRotation);
+        setSpringRotation(newSpringRotation);
+        
         setIsRotating(true);
         
-        console.log('🎯 New rotation:', targetRotation.current);
+        console.log('🎯 Arrow key - New target rotation:', targetRotation.current);
+        console.log('🎯 Arrow key - Spring values before animation:', springs.rotationX.get(), springs.rotationY.get(), springs.rotationZ.get());
+        
+        // Check spring values after a short delay
+        setTimeout(() => {
+          console.log('🎯 Arrow key - Spring values after 100ms:', springs.rotationX.get(), springs.rotationY.get(), springs.rotationZ.get());
+          console.log('🎯 Arrow key - Target should be:', targetRotation.current);
+        }, 100);
+        
         setTimeout(() => setIsRotating(false), 1000);
         return true; // Event handled
       }
       
       if (rotationKey) {
-        console.log('🔄 Rotation key detected:', rotationKey);
-        
-        switch (rotationKey) {
-          case 'q':
-            targetRotation.current.z -= radians;
-            break;
-          case 'e':
-            targetRotation.current.z += radians;
-            break;
-        }
-        
-        api.start({
-          rotationX: targetRotation.current.x,
-          rotationY: targetRotation.current.y,
-          rotationZ: targetRotation.current.z,
-          config: { tension: 120, friction: 14 },
-        });
-        setIsRotating(true);
-        
-        console.log('🎯 New rotation:', targetRotation.current);
-        setTimeout(() => setIsRotating(false), 1000);
-        return true; // Event handled
+        console.log('🔄 Q/E ROTATION DISABLED FOR TESTING');
+        return true; // Event handled but do nothing
       }
       
       return false; // Event not handled by this component
@@ -223,6 +241,9 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   
   
   const rotateTo = (axis: 'x' | 'y' | 'z', degrees: number) => {
+    console.log('🔄 ROTATETO DISABLED FOR TESTING');
+    return;
+    
     const radians = (degrees * Math.PI) / 180;
     
     switch (axis) {
@@ -249,7 +270,11 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   };
   
   const reset = () => {
-    targetRotation.current = { x: 0, y: 0, z: 0 };
+    console.log('🔄 RESET DISABLED FOR TESTING');
+    return;
+    
+    console.log('🔄 RESET CALLED - resetting target rotation to 0,0,0');
+    setTargetRotation({ x: 0, y: 0, z: 0 });
     api.start({
       rotationX: 0,
       rotationY: 0,
