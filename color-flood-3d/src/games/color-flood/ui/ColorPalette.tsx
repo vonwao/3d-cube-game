@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import type { ColorIndex } from '../logic/types';
-import { useGameState, usePalette, useGameStore } from '../logic/gameStore';
+import { useIsWon, useIsGameOver, useSelectedColor, useCurrentPalette, useSimpleGameStore } from '../logic/simpleGameStore';
 
 interface ColorPaletteProps {
   className?: string;
 }
 
 export const ColorPalette: React.FC<ColorPaletteProps> = ({ className = '' }) => {
-  const { isWon, isGameOver, selectedColor } = useGameState();
-  const palette = usePalette();
+  const isWon = useIsWon();
+  const isGameOver = useIsGameOver();
+  const selectedColor = useSelectedColor();
+  const palette = useCurrentPalette();
   const [hoveredColor, setHoveredColor] = useState<ColorIndex | null>(null);
   
   const handleColorClick = (colorIndex: ColorIndex) => {
     if (isWon || isGameOver) return;
     
-    const state = useGameStore.getState();
+    const state = useSimpleGameStore.getState();
     state.applyColor(colorIndex);
   };
   

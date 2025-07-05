@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
-import { useGameState, usePalette, useAnimationState, useGameStore } from './logic/gameStore';
+import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore } from './logic/simpleGameStore';
 import { ColorPalette } from './ui/ColorPalette';
 import { GameHUD } from './ui/GameHUD';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
@@ -13,9 +13,9 @@ interface CubeSceneProps {
 }
 
 const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
-  const { cubeState } = useGameState();
-  const palette = usePalette();
-  const { animationProgress } = useAnimationState();
+  const cubeState = useCubeState();
+  const palette = useCurrentPalette();
+  const animationProgress = useAnimationProgress();
   const { rotation } = useCubeControls({
     rotationSpeed: 1.2,
     dampingFactor: 0.08,
@@ -29,7 +29,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
       if (key >= '1' && key <= '6') {
         const colorIndex = parseInt(key) - 1;
         if (colorIndex >= 0 && colorIndex < 6) {
-          const state = useGameStore.getState();
+          const state = useSimpleGameStore.getState();
           state.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
         }
       }
@@ -74,11 +74,11 @@ const LoadingSpinner: React.FC = () => (
 );
 
 export const ColorFloodGame: React.FC = () => {
-  const { currentLevel } = useGameState();
+  const currentLevel = useCurrentLevel();
   
   useEffect(() => {
     if (!currentLevel) {
-      const state = useGameStore.getState();
+      const state = useSimpleGameStore.getState();
       state.loadLevel(SAMPLE_LEVELS[0]);
     }
   }, [currentLevel]);

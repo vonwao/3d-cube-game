@@ -1,27 +1,54 @@
-import { useCallback } from 'react';
-import { useGameState, useGameStats, useGameStore } from '../logic/gameStore';
+import React, { useCallback, useMemo, useEffect } from 'react';
+import { useCubeState, useIsWon, useIsGameOver, useCanUndo, useSimpleGameStore } from '../logic/simpleGameStore';
 
 interface GameHUDProps {
   className?: string;
 }
 
 export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
-  const { canUndo, isWon, isGameOver } = useGameState();
-  const { moves, maxMoves, stars, movesRemaining } = useGameStats();
+  const cubeState = useCubeState();
+  const isWon = useIsWon();
+  const isGameOver = useIsGameOver();
+  const canUndo = useCanUndo();
   
   const handleUndo = useCallback(() => {
-    const state = useGameStore.getState();
-    if (state.undoStack.length > 0) {
-      state.undo();
-    }
+    useSimpleGameStore.getState().undo();
   }, []);
   
   const handleReset = useCallback(() => {
-    const state = useGameStore.getState();
-    state.reset();
+    useSimpleGameStore.getState().reset();
   }, []);
   
-  const renderStars = () => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'u' || event.key === 'U') {
+        if (canUndo) {
+          handleUndo();
+        }
+      }
+      if (event.key === 'r' || event.key === 'R') {
+        handleReset();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [canUndo, handleUndo, handleReset]);
+  
+  const stars = useMemo(() => {
+    if (!isWon) return 0;
+    const { moves, maxMoves } = cubeState;
+    if (moves <= Math.floor(maxMoves * 0.6)) return 3;
+    if (moves <= Math.floor(maxMoves * 0.8)) return 2;
+    if (moves <= maxMoves) return 1;
+    return 0;
+  }, [isWon, cubeState.moves, cubeState.maxMoves]);
+  
+  const movesRemaining = useMemo(() => {
+    return Math.max(0, cubeState.maxMoves - cubeState.moves);
+  }, [cubeState.maxMoves, cubeState.moves]);
+  
+  const renderStars = useMemo(() => {
     return Array.from({ length: 3 }, (_, i) => (
       <span
         key={i}
@@ -31,9 +58,9 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
         ★
       </span>
     ));
-  };
+  }, [stars]);
   
-  const getStatusMessage = () => {
+  const statusMessage = useMemo(() => {
     if (isWon) {
       return `Congratulations! ${stars} star${stars !== 1 ? 's' : ''}!`;
     }
@@ -41,23 +68,23 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
       return 'Game Over - Try Again!';
     }
     return `${movesRemaining} moves remaining`;
-  };
+  }, [isWon, isGameOver, stars, movesRemaining]);
   
   return (
     <div className={`game-hud ${className}`}>
       <div className="hud-top">
         <div className="moves-display">
           <div className="moves-counter">
-            <span className="moves-current">{moves}</span>
+            <span className="moves-current">{cubeState.moves}</span>
             <span className="moves-divider">/</span>
-            <span className="moves-max">{maxMoves}</span>
+            <span className="moves-max">{cubeState.maxMoves}</span>
           </div>
           <div className="moves-label">Moves</div>
         </div>
         
         <div className="stars-display">
           <div className="stars-container">
-            {renderStars()}
+            {renderStars}
           </div>
           <div className="stars-label">Stars</div>
         </div>
@@ -86,7 +113,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
       
       <div className="hud-status">
         <div className={`status-message ${isWon ? 'won' : isGameOver ? 'game-over' : ''}`}>
-          {getStatusMessage()}
+          {statusMessage}
         </div>
       </div>
     </div>

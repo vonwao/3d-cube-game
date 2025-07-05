@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+import { shallow } from 'zustand/shallow';
 import type { GameState, ColorIndex, Level, ColorPalette } from './types';
 import { DEFAULT_PALETTES } from './types';
 import { floodFill, isWin, createInitialState, getStarRating } from './flood';
@@ -146,12 +147,12 @@ export const useGameState = () => useGameStore(state => ({
   isGameOver: state.isGameOver,
   selectedColor: state.selectedColor,
   canUndo: state.undoStack.length > 0,
-}));
+}), shallow);
 
 export const useAnimationState = () => useGameStore(state => ({
   isAnimating: state.isAnimating,
   animationProgress: state.animationProgress,
-}));
+}), shallow);
 
 export const usePalette = () => useGameStore(state => state.currentPalette);
 
@@ -165,4 +166,4 @@ export const useGameStats = () => useGameStore(state => {
     stars,
     movesRemaining: Math.max(0, cubeState.maxMoves - cubeState.moves),
   };
-});
+}, shallow);
