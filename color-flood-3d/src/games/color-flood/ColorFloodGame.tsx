@@ -23,7 +23,8 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   const animationProgress = useAnimationProgress();
   const { rotation } = useCubeControls({
     rotationSpeed: 1.2,
-    dampingFactor: 0.08,
+    dampingFactor: 0.02,
+    keyboardSpeed: 45,
     enableKeyboard: true,
   });
   

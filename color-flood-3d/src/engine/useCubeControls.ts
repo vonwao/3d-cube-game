@@ -137,7 +137,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
         }
         
         console.log('🎯 New target rotation:', targetRotation.current);
-        setTimeout(() => setIsRotating(false), 300);
+        setTimeout(() => setIsRotating(false), 1000);
         return true; // Event handled
       }
       
@@ -155,7 +155,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
         }
         
         console.log('🎯 New target rotation:', targetRotation.current);
-        setTimeout(() => setIsRotating(false), 300);
+        setTimeout(() => setIsRotating(false), 1000);
         return true; // Event handled
       }
       
