@@ -79,9 +79,6 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   };
   
   const handlePointerMove = (event: PointerEvent) => {
-    console.log('🖱️ MOUSE MOVE - DISABLED FOR TESTING');
-    return; // Temporarily disable mouse drag
-    
     if (!isDragging) return;
     
     const deltaX = event.clientX - lastPointer.current.x;
@@ -100,10 +97,11 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     targetRotation.current.x += rotationX;
     targetRotation.current.y += rotationY;
     
-    api.start({
-      rotationX: targetRotation.current.x,
-      rotationY: targetRotation.current.y,
-      config: { tension: 200, friction: 20 }, // Immediate response for dragging
+    // Use state-driven approach like arrow keys
+    setSpringRotation({
+      x: targetRotation.current.x,
+      y: targetRotation.current.y,
+      z: targetRotation.current.z,
     });
     
     console.log('🎯 New rotation from mouse:', targetRotation.current.x, targetRotation.current.y);
@@ -118,9 +116,6 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   };
   
   const handlePointerUp = (event: PointerEvent) => {
-    console.log('🖱️ MOUSE UP - DISABLED FOR TESTING');
-    return; // Temporarily disable mouse up processing
-    
     if (!isDragging) return;
     
     setIsDragging(false);
@@ -132,10 +127,11 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     targetRotation.current.x += momentumY;
     targetRotation.current.y += momentumX;
     
-    api.start({
-      rotationX: targetRotation.current.x,
-      rotationY: targetRotation.current.y,
-      config: { tension: 120, friction: 14 }, // Smooth deceleration
+    // Use state-driven approach for momentum
+    setSpringRotation({
+      x: targetRotation.current.x,
+      y: targetRotation.current.y,
+      z: targetRotation.current.z,
     });
     
     gl.domElement.releasePointerCapture(event.pointerId);
@@ -211,8 +207,26 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
       }
       
       if (rotationKey) {
-        console.log('🔄 Q/E ROTATION DISABLED FOR TESTING');
-        return true; // Event handled but do nothing
+        console.log('🔄 Q/E rotation:', rotationKey);
+        
+        switch (rotationKey) {
+          case 'q':
+            targetRotation.current.z -= radians;
+            break;
+          case 'e':
+            targetRotation.current.z += radians;
+            break;
+        }
+        
+        setSpringRotation({
+          x: targetRotation.current.x,
+          y: targetRotation.current.y,
+          z: targetRotation.current.z,
+        });
+        
+        setIsRotating(true);
+        setTimeout(() => setIsRotating(false), 1000);
+        return true; // Event handled
       }
       
       return false; // Event not handled by this component
@@ -241,9 +255,6 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   
   
   const rotateTo = (axis: 'x' | 'y' | 'z', degrees: number) => {
-    console.log('🔄 ROTATETO DISABLED FOR TESTING');
-    return;
-    
     const radians = (degrees * Math.PI) / 180;
     
     switch (axis) {
@@ -258,11 +269,10 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
         break;
     }
     
-    api.start({
-      rotationX: targetRotation.current.x,
-      rotationY: targetRotation.current.y,
-      rotationZ: targetRotation.current.z,
-      config: { tension: 120, friction: 14 },
+    setSpringRotation({
+      x: targetRotation.current.x,
+      y: targetRotation.current.y,
+      z: targetRotation.current.z,
     });
     
     setIsRotating(true);
@@ -270,17 +280,9 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   };
   
   const reset = () => {
-    console.log('🔄 RESET DISABLED FOR TESTING');
-    return;
-    
     console.log('🔄 RESET CALLED - resetting target rotation to 0,0,0');
     setTargetRotation({ x: 0, y: 0, z: 0 });
-    api.start({
-      rotationX: 0,
-      rotationY: 0,
-      rotationZ: 0,
-      config: { tension: 120, friction: 14 },
-    });
+    setSpringRotation({ x: 0, y: 0, z: 0 });
     setIsRotating(false);
   };
   
