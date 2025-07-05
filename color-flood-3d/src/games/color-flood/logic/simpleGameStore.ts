@@ -2,16 +2,22 @@ import { create } from 'zustand';
 import type { GameState, ColorIndex, Level, ColorPalette } from './types';
 import { DEFAULT_PALETTES } from './types';
 import { floodFill, isWin, createInitialState } from './flood';
+import { DEFAULT_ANIMATION_CONFIG, type AnimationConfig, type AnimationPreset, ANIMATION_PRESETS } from '../config/animationConfig';
 
 interface SimpleGameStore extends GameState {
   currentPalette: ColorPalette;
   isAnimating: boolean;
   animationProgress: number;
+  animationConfig: AnimationConfig;
+  animationStartTime: number | null;
   
   loadLevel: (level: Level) => void;
   applyColor: (color: ColorIndex) => void;
   undo: () => void;
   reset: () => void;
+  setAnimationPreset: (preset: AnimationPreset) => void;
+  setAnimationConfig: (config: Partial<AnimationConfig>) => void;
+  updateAnimationProgress: (progress: number) => void;
 }
 
 export const useSimpleGameStore = create<SimpleGameStore>()((set, get) => ({
@@ -29,6 +35,8 @@ export const useSimpleGameStore = create<SimpleGameStore>()((set, get) => ({
   currentPalette: DEFAULT_PALETTES[0],
   isAnimating: false,
   animationProgress: 1,
+  animationConfig: DEFAULT_ANIMATION_CONFIG,
+  animationStartTime: null,
   
   loadLevel: (level: Level) => {
     const cubeState = createInitialState(level.cells, level.maxMoves);
@@ -41,12 +49,13 @@ export const useSimpleGameStore = create<SimpleGameStore>()((set, get) => ({
       selectedColor: null,
       isAnimating: false,
       animationProgress: 1,
+      animationStartTime: null,
     });
   },
   
   applyColor: (color: ColorIndex) => {
     const state = get();
-    if (state.isWon || state.isGameOver) return;
+    if (state.isWon || state.isGameOver || state.isAnimating) return;
     
     const newState = floodFill(state.cubeState, color);
     if (newState === state.cubeState) return;
@@ -61,17 +70,10 @@ export const useSimpleGameStore = create<SimpleGameStore>()((set, get) => ({
       isWon: won,
       isGameOver: gameOver,
       selectedColor: color,
-      isAnimating: true,
+      isAnimating: state.animationConfig.enabled,
       animationProgress: 0,
+      animationStartTime: state.animationConfig.enabled ? performance.now() : null,
     });
-    
-    // Simple animation without subscription
-    setTimeout(() => {
-      const currentState = get();
-      if (currentState.isAnimating) {
-        set({ isAnimating: false, animationProgress: 1 });
-      }
-    }, 200);
   },
   
   undo: () => {
@@ -105,7 +107,36 @@ export const useSimpleGameStore = create<SimpleGameStore>()((set, get) => ({
       selectedColor: null,
       isAnimating: false,
       animationProgress: 1,
+      animationStartTime: null,
     });
+  },
+  
+  setAnimationPreset: (preset: AnimationPreset) => {
+    set({
+      animationConfig: ANIMATION_PRESETS[preset]
+    });
+  },
+  
+  setAnimationConfig: (config: Partial<AnimationConfig>) => {
+    const state = get();
+    set({
+      animationConfig: { ...state.animationConfig, ...config }
+    });
+  },
+  
+  updateAnimationProgress: (progress: number) => {
+    const state = get();
+    if (!state.isAnimating) return;
+    
+    set({ animationProgress: progress });
+    
+    if (progress >= 1) {
+      set({ 
+        isAnimating: false, 
+        animationProgress: 1,
+        animationStartTime: null
+      });
+    }
   },
 }));
 
@@ -118,3 +149,6 @@ export const useCanUndo = () => useSimpleGameStore(state => state.undoStack.leng
 export const useSelectedColor = () => useSimpleGameStore(state => state.selectedColor);
 export const useCurrentPalette = () => useSimpleGameStore(state => state.currentPalette);
 export const useAnimationProgress = () => useSimpleGameStore(state => state.animationProgress);
+export const useIsAnimating = () => useSimpleGameStore(state => state.isAnimating);
+export const useAnimationConfig = () => useSimpleGameStore(state => state.animationConfig);
+export const useAnimationStartTime = () => useSimpleGameStore(state => state.animationStartTime);

@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 
-export const Instructions: React.FC = () => {
+interface InstructionsProps {
+  onClose?: () => void;
+}
+
+export const Instructions: React.FC<InstructionsProps> = ({ onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
+  
+  const handleClose = () => {
+    setIsVisible(false);
+    onClose?.();
+  };
   
   if (!isVisible) {
     return (
@@ -22,7 +31,7 @@ export const Instructions: React.FC = () => {
           <h2>🎲 Color Flood 3D</h2>
           <button 
             className="close-button"
-            onClick={() => setIsVisible(false)}
+            onClick={handleClose}
           >
             ×
           </button>
@@ -77,7 +86,7 @@ export const Instructions: React.FC = () => {
         <div className="instructions-footer">
           <button 
             className="start-playing-button"
-            onClick={() => setIsVisible(false)}
+            onClick={handleClose}
           >
             Start Playing! 🚀
           </button>

@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useKeyboardManager, isActionKey } from '../../../engine/useKeyboardManager';
 import { useCubeState, useIsWon, useIsGameOver, useCanUndo, useSimpleGameStore } from '../logic/simpleGameStore';
 
 interface GameHUDProps {
@@ -19,26 +20,28 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
     useSimpleGameStore.getState().reset();
   }, []);
   
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Only handle if not already handled by other components
-      if (event.defaultPrevented) return;
+  // Action keys (undo/reset) with medium priority
+  useKeyboardManager(
+    (event: KeyboardEvent) => {
+      const actionKey = isActionKey(event.key);
       
-      if (event.key === 'u' || event.key === 'U') {
-        if (canUndo) {
-          handleUndo();
-          event.preventDefault();
-        }
+      if (actionKey === 'u' && canUndo) {
+        handleUndo();
+        return true; // Event handled
       }
-      if (event.key === 'r' || event.key === 'R') {
+      
+      if (actionKey === 'r') {
         handleReset();
-        event.preventDefault();
+        return true; // Event handled
       }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canUndo, handleUndo, handleReset]);
+      
+      return false; // Event not handled
+    },
+    { 
+      enabled: true,
+      priority: 15 // Medium priority - between color selection and cube rotation
+    }
+  );
   
   const stars = useMemo(() => {
     if (!isWon) return 0;
@@ -112,6 +115,18 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
             title="Reset (R)"
           >
             ⟲
+          </button>
+          
+          <button
+            className="control-button select-level-button"
+            onClick={() => {
+              // This will be handled by the parent component
+              window.dispatchEvent(new CustomEvent('openLevelSelector'));
+            }}
+            aria-label="Select different level"
+            title="Select Level"
+          >
+            📋
           </button>
         </div>
       </div>

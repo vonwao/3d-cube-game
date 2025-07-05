@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Euler, Vector2 } from 'three';
+import { useKeyboardManager, isArrowKey, isRotationKey } from './useKeyboardManager';
 
 interface CubeControlsConfig {
   rotationSpeed?: number;
@@ -93,45 +94,62 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     event.preventDefault();
   };
   
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (!enableKeyboard) return;
-    
-    const radians = (keyboardSpeed * Math.PI) / 180;
-    
-    switch (event.key) {
-      case 'ArrowUp':
-        targetRotation.current.x -= radians;
-        setIsRotating(true);
-        break;
-      case 'ArrowDown':
-        targetRotation.current.x += radians;
-        setIsRotating(true);
-        break;
-      case 'ArrowLeft':
-        targetRotation.current.y -= radians;
-        setIsRotating(true);
-        break;
-      case 'ArrowRight':
-        targetRotation.current.y += radians;
-        setIsRotating(true);
-        break;
-      case 'q':
-      case 'Q':
-        targetRotation.current.z -= radians;
-        setIsRotating(true);
-        break;
-      case 'e':
-      case 'E':
-        targetRotation.current.z += radians;
-        setIsRotating(true);
-        break;
-      default:
-        return;
+  // Keyboard handler using the centralized keyboard manager
+  useKeyboardManager(
+    (event: KeyboardEvent) => {
+      if (!enableKeyboard) return false;
+      
+      const radians = (keyboardSpeed * Math.PI) / 180;
+      const arrowKey = isArrowKey(event.key);
+      const rotationKey = isRotationKey(event.key);
+      
+      if (arrowKey) {
+        switch (arrowKey) {
+          case 'ArrowUp':
+            targetRotation.current.x -= radians;
+            setIsRotating(true);
+            break;
+          case 'ArrowDown':
+            targetRotation.current.x += radians;
+            setIsRotating(true);
+            break;
+          case 'ArrowLeft':
+            targetRotation.current.y -= radians;
+            setIsRotating(true);
+            break;
+          case 'ArrowRight':
+            targetRotation.current.y += radians;
+            setIsRotating(true);
+            break;
+        }
+        
+        setTimeout(() => setIsRotating(false), 300);
+        return true; // Event handled
+      }
+      
+      if (rotationKey) {
+        switch (rotationKey) {
+          case 'q':
+            targetRotation.current.z -= radians;
+            setIsRotating(true);
+            break;
+          case 'e':
+            targetRotation.current.z += radians;
+            setIsRotating(true);
+            break;
+        }
+        
+        setTimeout(() => setIsRotating(false), 300);
+        return true; // Event handled
+      }
+      
+      return false; // Event not handled by this component
+    },
+    { 
+      enabled: enableKeyboard,
+      priority: 10 // Lower priority than color selection
     }
-    
-    setTimeout(() => setIsRotating(false), 300);
-    event.preventDefault();
-  };
+  );
   
   useEffect(() => {
     const canvas = gl.domElement;
@@ -141,21 +159,13 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     canvas.addEventListener('pointerup', handlePointerUp);
     canvas.addEventListener('pointercancel', handlePointerUp);
     
-    if (enableKeyboard) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    
     return () => {
       canvas.removeEventListener('pointerdown', handlePointerDown);
       canvas.removeEventListener('pointermove', handlePointerMove);
       canvas.removeEventListener('pointerup', handlePointerUp);
       canvas.removeEventListener('pointercancel', handlePointerUp);
-      
-      if (enableKeyboard) {
-        window.removeEventListener('keydown', handleKeyDown);
-      }
     };
-  }, [isDragging, enableKeyboard, enableMouse, enableTouch]);
+  }, [isDragging, enableMouse, enableTouch]);
   
   useFrame(() => {
     currentRotation.current.x = lerp(currentRotation.current.x, targetRotation.current.x, dampingFactor);

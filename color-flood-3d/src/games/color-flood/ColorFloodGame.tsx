@@ -1,13 +1,17 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
+import { useKeyboardManager, isColorKey } from '../../engine/useKeyboardManager';
+import { useGameAnimation } from './hooks/useGameAnimation';
 import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore } from './logic/simpleGameStore';
 import { ColorPalette } from './ui/ColorPalette';
 import { GameHUD } from './ui/GameHUD';
 import { Instructions } from './ui/Instructions';
+import { LevelSelector } from './ui/LevelSelector';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
+import type { Level } from './logic/types';
 
 interface CubeSceneProps {
   onCellClick?: (index: number) => void;
@@ -23,24 +27,27 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
     enableKeyboard: true,
   });
   
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const key = event.key;
+  // Initialize the game animation system
+  useGameAnimation();
+  
+  // Color selection keyboard handler with highest priority
+  useKeyboardManager(
+    (event: KeyboardEvent) => {
+      const colorIndex = isColorKey(event.key);
       
-      // Only handle color keys here, let cube controls handle arrow keys
-      if (key >= '1' && key <= '6') {
-        const colorIndex = parseInt(key) - 1;
-        if (colorIndex >= 0 && colorIndex < 6) {
-          const state = useSimpleGameStore.getState();
-          state.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
-          event.preventDefault(); // Prevent other handlers
-        }
+      if (colorIndex !== null) {
+        const state = useSimpleGameStore.getState();
+        state.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
+        return true; // Event handled
       }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+      
+      return false; // Event not handled
+    },
+    { 
+      enabled: true,
+      priority: 20 // Highest priority - color selection takes precedence
+    }
+  );
   
   return (
     <>
@@ -78,6 +85,8 @@ const LoadingSpinner: React.FC = () => (
 
 export const ColorFloodGame: React.FC = () => {
   const currentLevel = useCurrentLevel();
+  const [showLevelSelector, setShowLevelSelector] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
   
   useEffect(() => {
     if (!currentLevel) {
@@ -85,6 +94,28 @@ export const ColorFloodGame: React.FC = () => {
       state.loadLevel(SAMPLE_LEVELS[0]);
     }
   }, [currentLevel]);
+  
+  useEffect(() => {
+    const handleOpenLevelSelector = () => {
+      setShowLevelSelector(true);
+    };
+    
+    window.addEventListener('openLevelSelector', handleOpenLevelSelector);
+    
+    return () => {
+      window.removeEventListener('openLevelSelector', handleOpenLevelSelector);
+    };
+  }, []);
+  
+  const handleLevelSelect = (level: Level) => {
+    const state = useSimpleGameStore.getState();
+    state.loadLevel(level);
+    setShowLevelSelector(false);
+  };
+  
+  const handleCloseLevelSelector = () => {
+    setShowLevelSelector(false);
+  };
   
   const handleCellClick = (index: number) => {
     console.log(`Cell clicked: ${index}`);
@@ -116,7 +147,16 @@ export const ColorFloodGame: React.FC = () => {
         
         <ColorPalette className="color-palette" />
         
-        <Instructions />
+        {showInstructions && (
+          <Instructions onClose={() => setShowInstructions(false)} />
+        )}
+        
+        {showLevelSelector && (
+          <LevelSelector
+            onLevelSelect={handleLevelSelect}
+            onClose={handleCloseLevelSelector}
+          />
+        )}
       </div>
     </div>
   );

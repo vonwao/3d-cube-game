@@ -1,4 +1,276 @@
 /* Color Flood Game Styles */
+
+/* Level Selector Styles */
+.level-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.level-selector-modal {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 1000px;
+  max-height: 80vh;
+  width: 100%;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.level-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.level-selector-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.level-selector-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.difficulty-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.difficulty-filter {
+  padding: 0.5rem 1rem;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.difficulty-filter:hover {
+  border-color: #2196F3;
+  color: #2196F3;
+}
+
+.difficulty-filter.active {
+  background: #2196F3;
+  border-color: #2196F3;
+  color: white;
+}
+
+.random-level-button {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+}
+
+.random-level-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+}
+
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.level-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.level-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: #2196F3;
+}
+
+.level-card.selected {
+  border-color: #4CAF50;
+  background: #f8fff8;
+  transform: scale(1.02);
+}
+
+.level-card.hovered .level-preview {
+  transform: scale(1.1);
+}
+
+.level-preview {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.mini-cube-preview {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.level-info {
+  text-align: center;
+}
+
+.level-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.level-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.difficulty-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.level-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.level-progress {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.level-card:hover .level-progress {
+  opacity: 1;
+}
+
+.play-hint {
+  font-size: 0.875rem;
+  color: #2196F3;
+  font-weight: 500;
+}
+
+.no-levels-message {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.no-levels-message p {
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .level-selector-overlay {
+    padding: 1rem;
+  }
+  
+  .level-selector-modal {
+    padding: 1.5rem;
+    max-height: 90vh;
+  }
+  
+  .levels-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .level-selector-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .difficulty-filters {
+    justify-content: center;
+  }
+}
 .color-flood-game {
   width: 100vw;
   height: 100vh;
@@ -120,6 +392,14 @@
 .control-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.select-level-button {
+  background: rgba(33, 150, 243, 0.2);
+}
+
+.select-level-button:hover:not(:disabled) {
+  background: rgba(33, 150, 243, 0.4);
 }
 
 .hud-status {

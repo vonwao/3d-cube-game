@@ -102,8 +102,12 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
   
   useFrame(() => {
     if (meshRef.current && animationProgress < 1) {
-      const scale = 0.8 + 0.2 * animationProgress;
+      // Smooth scale animation that emphasizes the flood-fill process
+      const scale = 0.9 + 0.1 * animationProgress;
       meshRef.current.scale.setScalar(scale);
+    } else if (meshRef.current && animationProgress >= 1) {
+      // Ensure we end at normal scale
+      meshRef.current.scale.setScalar(1);
     }
   });
   
