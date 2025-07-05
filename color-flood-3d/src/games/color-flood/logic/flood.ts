@@ -24,39 +24,42 @@ export const getNeighbors = (index: number): number[] => {
   return neighbors;
 };
 
-export const floodFill = (state: CubeState, newColor: ColorIndex): CubeState => {
+export const floodFill = (state: CubeState, targetColor: ColorIndex): CubeState => {
   const newCells = [...state.cells];
   const newFloodRegion = [...state.floodRegion];
   
-  // Get the current color of the flood region (before changing it)
-  const currentColor = state.cells.find((_, i) => state.floodRegion[i]);
-  if (currentColor === newColor) {
-    return state; // No change if selecting the same color
+  // Get the color of our current territory
+  const ourColor = state.cells.find((_, i) => state.floodRegion[i]);
+  if (ourColor === undefined) return state;
+  
+  // Can't target our own color
+  if (ourColor === targetColor) {
+    return state;
   }
   
   const queue: number[] = [];
   const visited = new Set<number>();
   
-  // First, change all current flood region cells to the new color
+  // Start from all cells in our current flood region
   for (let i = 0; i < TOTAL_CELLS; i++) {
     if (state.floodRegion[i]) {
       queue.push(i);
       visited.add(i);
-      newCells[i] = newColor;
     }
   }
   
-  // Then expand into adjacent cells that have the new color
+  // Expand into adjacent cells that have the target color
   while (queue.length > 0) {
     const current = queue.shift()!;
     const neighbors = getNeighbors(current);
     
     for (const neighbor of neighbors) {
-      // Expand into neighbors that have the new color (but weren't part of our region yet)
-      if (!visited.has(neighbor) && state.cells[neighbor] === newColor) {
+      // If neighbor has the target color and we haven't captured it yet
+      if (!visited.has(neighbor) && state.cells[neighbor] === targetColor) {
         visited.add(neighbor);
         queue.push(neighbor);
         newFloodRegion[neighbor] = true;
+        newCells[neighbor] = ourColor; // Convert it to our color
       }
     }
   }
@@ -70,8 +73,8 @@ export const floodFill = (state: CubeState, newColor: ColorIndex): CubeState => 
 };
 
 export const isWin = (state: CubeState): boolean => {
-  const firstColor = state.cells[0];
-  return state.cells.every(color => color === firstColor);
+  // Win when all cells have been captured by our flood region
+  return state.floodRegion.every(cell => cell === true);
 };
 
 export const createInitialState = (cells: ColorIndex[], maxMoves: number): CubeState => {

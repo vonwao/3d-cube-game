@@ -40,28 +40,28 @@ export const Instructions: React.FC<InstructionsProps> = ({ onClose }) => {
         <div className="instructions-content">
           <div className="goal">
             <h3>🎯 Goal</h3>
-            <p>Make the entire 3x3x3 cube the same color by strategically expanding your flood region!</p>
+            <p>Capture the entire 3x3x3 cube by flooding into different colored regions!</p>
           </div>
           
           <div className="how-to-play">
             <h3>🎮 How Flood Fill Works</h3>
             <ol>
-              <li><strong>Your Territory:</strong> You start controlling one corner cell (shown with white wireframes)</li>
-              <li><strong>Choose a Color:</strong> Click any color from the palette below the cube</li>
-              <li><strong>Flood Expansion:</strong> Your region changes to that color AND expands to capture any adjacent cells that already have that color</li>
-              <li><strong>Adjacent Cells:</strong> Only cells touching face-to-face count (not diagonal or corner-touching)</li>
-              <li><strong>Strategy:</strong> Look for colors that will give you the biggest expansion - plan your path to victory!</li>
-              <li><strong>Win Condition:</strong> Flood the entire cube within the move limit for maximum stars!</li>
+              <li><strong>Your Territory:</strong> You start controlling one corner (shown with white wireframes)</li>
+              <li><strong>Choose a Target Color:</strong> Click any color from the palette to attack that color</li>
+              <li><strong>Flood & Capture:</strong> Your territory expands to capture all adjacent cells of that target color</li>
+              <li><strong>Convert to Your Color:</strong> Captured cells turn into your color and join your territory</li>
+              <li><strong>Adjacent Rule:</strong> Only cells touching face-to-face count (not diagonal)</li>
+              <li><strong>Win Condition:</strong> Capture the entire cube within the move limit!</li>
             </ol>
           </div>
           
           <div className="flood-strategy">
             <h3>🌊 Flood Fill Strategy</h3>
             <div className="strategy-tips">
-              <p><strong>Think like water:</strong> Your color "flows" through connected cells of the same color</p>
-              <p><strong>Look for clusters:</strong> Target colors that form large connected regions</p>
-              <p><strong>Plan your path:</strong> Consider which colors will give you the biggest expansion</p>
-              <p><strong>Use the 3D space:</strong> Remember cells connect through all 6 faces of the cube</p>
+              <p><strong>Think like conquest:</strong> You're capturing enemy territory by targeting their colors</p>
+              <p><strong>Look for big targets:</strong> Target colors that have large connected regions adjacent to you</p>
+              <p><strong>Plan your expansion:</strong> Consider which color will give you the most new territory</p>
+              <p><strong>Use 3D thinking:</strong> Remember cells connect through all 6 faces of the cube</p>
             </div>
           </div>
           
