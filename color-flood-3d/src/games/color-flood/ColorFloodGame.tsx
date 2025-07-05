@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
+import { animated } from '@react-spring/three';
 import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
 import { useKeyboardManager, isColorKey } from '../../engine/useKeyboardManager';
@@ -23,18 +24,12 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   const animationProgress = useAnimationProgress();
   const { rotation } = useCubeControls({
     rotationSpeed: 1.2,
-    dampingFactor: 0.02,
     keyboardSpeed: 45,
     enableKeyboard: true,
   });
   
   // Initialize the game animation system
   useGameAnimation();
-  
-  // Log rotation changes
-  useEffect(() => {
-    console.log('🔵 CubeScene rotation changed:', rotation);
-  }, [rotation]);
   
   return (
     <>
@@ -47,7 +42,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
         shadow-mapSize-height={2048}
       />
       
-      <group rotation={rotation}>
+      <animated.group rotation-x={rotation[0]} rotation-y={rotation[1]} rotation-z={rotation[2]}>
         <CubeMesh
           cells={cubeState.cells}
           colors={palette.colors}
@@ -56,7 +51,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
           animationProgress={animationProgress}
           onCellClick={onCellClick}
         />
-      </group>
+      </animated.group>
       
       <Environment preset="studio" />
     </>
