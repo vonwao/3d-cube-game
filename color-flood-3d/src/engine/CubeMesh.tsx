@@ -89,7 +89,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       const isHighlighted = floodRegion[i];
       
       tempObject.position.set(x, y, z);
-      tempObject.scale.setScalar(isHighlighted ? 1.05 : 0.001);
+      tempObject.scale.setScalar(isHighlighted ? 1.08 : 0.001);
       tempObject.updateMatrix();
       
       highlightMeshRef.current.setMatrixAt(i, tempObject.matrix);
@@ -118,11 +118,11 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       
       hoverMeshRef.current.setMatrixAt(i, tempObject.matrix);
       
-      // Use the cell's color but brighter for hover
+      // Use the cell's color but slightly brighter for hover
       if (isHovered) {
         const colorIndex = cells[i];
         const cellColor = colorArray[colorIndex];
-        tempColor.copy(cellColor).multiplyScalar(1.5); // Brighten the color
+        tempColor.copy(cellColor).multiplyScalar(1.2); // Subtle brightness increase
       } else {
         tempColor.setRGB(0, 0, 0);
       }
@@ -196,12 +196,13 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
         args={[undefined, undefined, TOTAL_CELLS]}
         renderOrder={1}
       >
-        <boxGeometry args={[1, 1, 1]} />
+        <boxGeometry args={[1.05, 1.05, 1.05]} />
         <meshBasicMaterial
           transparent
-          opacity={0.3}
+          opacity={0.6}
           color="white"
           wireframe={true}
+          wireframeLinewidth={2}
         />
       </instancedMesh>
       
@@ -214,7 +215,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
           <boxGeometry args={[1.02, 1.02, 1.02]} />
           <meshBasicMaterial
             transparent
-            opacity={0.4}
+            opacity={0.2}
             wireframe={false}
           />
         </instancedMesh>
