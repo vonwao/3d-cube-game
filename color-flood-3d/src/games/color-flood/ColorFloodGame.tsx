@@ -30,24 +30,10 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   // Initialize the game animation system
   useGameAnimation();
   
-  // Color selection keyboard handler with highest priority
-  useKeyboardManager(
-    (event: KeyboardEvent) => {
-      const colorIndex = isColorKey(event.key);
-      
-      if (colorIndex !== null) {
-        const state = useSimpleGameStore.getState();
-        state.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
-        return true; // Event handled
-      }
-      
-      return false; // Event not handled
-    },
-    { 
-      enabled: true,
-      priority: 20 // Highest priority - color selection takes precedence
-    }
-  );
+  // Log rotation changes
+  useEffect(() => {
+    console.log('🔵 CubeScene rotation changed:', rotation);
+  }, [rotation]);
   
   return (
     <>
@@ -87,6 +73,25 @@ export const ColorFloodGame: React.FC = () => {
   const currentLevel = useCurrentLevel();
   const [showLevelSelector, setShowLevelSelector] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
+  
+  // Color selection keyboard handler with highest priority (outside Canvas)
+  useKeyboardManager(
+    (event: KeyboardEvent) => {
+      const colorIndex = isColorKey(event.key);
+      
+      if (colorIndex !== null) {
+        const state = useSimpleGameStore.getState();
+        state.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
+        return true; // Event handled
+      }
+      
+      return false; // Event not handled
+    },
+    { 
+      enabled: true,
+      priority: 20 // Highest priority - color selection takes precedence
+    }
+  );
   
   useEffect(() => {
     if (!currentLevel) {

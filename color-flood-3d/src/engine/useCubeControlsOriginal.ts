@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Euler, Vector2 } from 'three';
-import { useKeyboardManager, isArrowKey, isRotationKey } from './useKeyboardManager';
 
 interface CubeControlsConfig {
   rotationSpeed?: number;
@@ -13,13 +12,13 @@ interface CubeControlsConfig {
 }
 
 interface CubeControlsReturn {
-  rotation: [number, number, number];
+  rotation: Euler;
   isRotating: boolean;
   rotateTo: (axis: 'x' | 'y' | 'z', degrees: number) => void;
   reset: () => void;
 }
 
-export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsReturn => {
+export const useCubeControlsOriginal = (config: CubeControlsConfig = {}): CubeControlsReturn => {
   const {
     rotationSpeed = 1,
     dampingFactor = 0.05,
@@ -42,7 +41,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   
   
   const handlePointerDown = (event: PointerEvent) => {
-    console.log('🖱️ Pointer down:', event.pointerType, 'enableMouse:', enableMouse, 'enableTouch:', enableTouch);
+    console.log('Original controls - Pointer down:', event.pointerType);
     
     if (!enableMouse && event.pointerType === 'mouse') return;
     if (!enableTouch && event.pointerType === 'touch') return;
@@ -54,7 +53,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     gl.domElement.setPointerCapture(event.pointerId);
     event.preventDefault();
     
-    console.log('🖱️ Drag started at:', event.clientX, event.clientY);
+    console.log('Original controls - Dragging started');
   };
   
   const handlePointerMove = (event: PointerEvent) => {
@@ -63,9 +62,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     const deltaX = event.clientX - lastPointer.current.x;
     const deltaY = event.clientY - lastPointer.current.y;
     
-    if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
-      console.log('🖱️ Mouse drag:', deltaX, deltaY);
-    }
+    console.log('Original controls - Pointer move:', deltaX, deltaY);
     
     velocity.current.set(deltaX, deltaY);
     
@@ -75,7 +72,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     targetRotation.current.y += rotationY;
     targetRotation.current.x += rotationX;
     
-    console.log('🎯 Target rotation from mouse:', targetRotation.current);
+    console.log('Original controls - Target rotation:', targetRotation.current);
     
     lastPointer.current.set(event.clientX, event.clientY);
     
@@ -104,68 +101,55 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     event.preventDefault();
   };
   
-  // Keyboard handler using the centralized keyboard manager
-  useKeyboardManager(
-    (event: KeyboardEvent) => {
-      console.log('⌨️ Cube controls received key:', event.key, 'enableKeyboard:', enableKeyboard);
-      
-      if (!enableKeyboard) return false;
-      
-      const radians = (keyboardSpeed * Math.PI) / 180;
-      const arrowKey = isArrowKey(event.key);
-      const rotationKey = isRotationKey(event.key);
-      
-      if (arrowKey) {
-        console.log('⬆️ Arrow key detected:', arrowKey, 'applying rotation:', radians);
-        switch (arrowKey) {
-          case 'ArrowUp':
-            targetRotation.current.x -= radians;
-            setIsRotating(true);
-            break;
-          case 'ArrowDown':
-            targetRotation.current.x += radians;
-            setIsRotating(true);
-            break;
-          case 'ArrowLeft':
-            targetRotation.current.y -= radians;
-            setIsRotating(true);
-            break;
-          case 'ArrowRight':
-            targetRotation.current.y += radians;
-            setIsRotating(true);
-            break;
-        }
-        
-        console.log('🎯 New target rotation:', targetRotation.current);
-        setTimeout(() => setIsRotating(false), 300);
-        return true; // Event handled
-      }
-      
-      if (rotationKey) {
-        console.log('🔄 Rotation key detected:', rotationKey);
-        switch (rotationKey) {
-          case 'q':
-            targetRotation.current.z -= radians;
-            setIsRotating(true);
-            break;
-          case 'e':
-            targetRotation.current.z += radians;
-            setIsRotating(true);
-            break;
-        }
-        
-        console.log('🎯 New target rotation:', targetRotation.current);
-        setTimeout(() => setIsRotating(false), 300);
-        return true; // Event handled
-      }
-      
-      return false; // Event not handled by this component
-    },
-    { 
-      enabled: enableKeyboard,
-      priority: 10 // Lower priority than color selection
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!enableKeyboard) return;
+    
+    console.log('Original controls - Key down:', event.key);
+    
+    const radians = (keyboardSpeed * Math.PI) / 180;
+    
+    switch (event.key) {
+      case 'ArrowUp':
+        targetRotation.current.x -= radians;
+        setIsRotating(true);
+        console.log('Original controls - Arrow Up');
+        break;
+      case 'ArrowDown':
+        targetRotation.current.x += radians;
+        setIsRotating(true);
+        console.log('Original controls - Arrow Down');
+        break;
+      case 'ArrowLeft':
+        targetRotation.current.y -= radians;
+        setIsRotating(true);
+        console.log('Original controls - Arrow Left');
+        break;
+      case 'ArrowRight':
+        targetRotation.current.y += radians;
+        setIsRotating(true);
+        console.log('Original controls - Arrow Right');
+        break;
+      case 'q':
+      case 'Q':
+        targetRotation.current.z -= radians;
+        setIsRotating(true);
+        console.log('Original controls - Q');
+        break;
+      case 'e':
+      case 'E':
+        targetRotation.current.z += radians;
+        setIsRotating(true);
+        console.log('Original controls - E');
+        break;
+      default:
+        return;
     }
-  );
+    
+    console.log('Original controls - Target rotation from keyboard:', targetRotation.current);
+    
+    setTimeout(() => setIsRotating(false), 300);
+    event.preventDefault();
+  };
   
   useEffect(() => {
     const canvas = gl.domElement;
@@ -175,32 +159,26 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     canvas.addEventListener('pointerup', handlePointerUp);
     canvas.addEventListener('pointercancel', handlePointerUp);
     
+    if (enableKeyboard) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    
     return () => {
       canvas.removeEventListener('pointerdown', handlePointerDown);
       canvas.removeEventListener('pointermove', handlePointerMove);
       canvas.removeEventListener('pointerup', handlePointerUp);
       canvas.removeEventListener('pointercancel', handlePointerUp);
+      
+      if (enableKeyboard) {
+        window.removeEventListener('keydown', handleKeyDown);
+      }
     };
-  }, [isDragging, enableMouse, enableTouch]);
+  }, [isDragging, enableKeyboard, enableMouse, enableTouch]);
   
   useFrame(() => {
-    const oldX = currentRotation.current.x;
-    const oldY = currentRotation.current.y;
-    const oldZ = currentRotation.current.z;
-    
     currentRotation.current.x = lerp(currentRotation.current.x, targetRotation.current.x, dampingFactor);
     currentRotation.current.y = lerp(currentRotation.current.y, targetRotation.current.y, dampingFactor);
     currentRotation.current.z = lerp(currentRotation.current.z, targetRotation.current.z, dampingFactor);
-    
-    // Log if rotation changed
-    if (Math.abs(oldX - currentRotation.current.x) > 0.001 || 
-        Math.abs(oldY - currentRotation.current.y) > 0.001 || 
-        Math.abs(oldZ - currentRotation.current.z) > 0.001) {
-      console.log('🔄 Rotation updating:', {
-        current: [currentRotation.current.x.toFixed(3), currentRotation.current.y.toFixed(3), currentRotation.current.z.toFixed(3)],
-        target: [targetRotation.current.x.toFixed(3), targetRotation.current.y.toFixed(3), targetRotation.current.z.toFixed(3)]
-      });
-    }
     
     const deltaX = Math.abs(currentRotation.current.x - targetRotation.current.x);
     const deltaY = Math.abs(currentRotation.current.y - targetRotation.current.y);
@@ -226,7 +204,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   };
   
   return {
-    rotation: [currentRotation.current.x, currentRotation.current.y, currentRotation.current.z] as [number, number, number],
+    rotation: currentRotation.current,
     isRotating,
     rotateTo,
     reset,

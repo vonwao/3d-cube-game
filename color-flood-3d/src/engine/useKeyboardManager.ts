@@ -27,21 +27,28 @@ class KeyboardManager {
   }
 
   private handleKeyDown = (event: KeyboardEvent) => {
+    console.log('🔥 KeyboardManager received:', event.key, 'handlers:', this.handlers.length);
+    
     // Sort handlers by priority (higher priority first)
     const sortedHandlers = [...this.handlers].sort((a, b) => b.priority - a.priority);
     
-    for (const { handler } of sortedHandlers) {
+    for (const { handler, priority } of sortedHandlers) {
       try {
+        console.log(`🔥 Trying handler with priority ${priority}`);
         const handled = handler(event);
+        console.log(`🔥 Handler returned:`, handled);
         if (handled) {
           event.preventDefault();
           event.stopPropagation();
+          console.log('🔥 Event handled and prevented');
           return;
         }
       } catch (error) {
         console.error('Keyboard handler error:', error);
       }
     }
+    
+    console.log('🔥 No handler claimed the event');
   };
 
   addHandler(handler: KeyboardHandler, priority: number, id: string) {
