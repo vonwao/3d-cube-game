@@ -8,8 +8,7 @@ import { useCubeControls } from '../../engine/useCubeControls';
 import { useKeyboardManager, isColorKey } from '../../engine/useKeyboardManager';
 import { useGameAnimation } from './hooks/useGameAnimation';
 import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore } from './logic/simpleGameStore';
-import { ColorPalette } from './ui/ColorPalette';
-import { GameHUD } from './ui/GameHUD';
+import { UnifiedControlPanel } from './ui/UnifiedControlPanel';
 import { Instructions } from './ui/Instructions';
 import { LevelSelector } from './ui/LevelSelector';
 import { MoveToast } from './ui/MoveToast';
@@ -167,8 +166,6 @@ export const ColorFloodGame: React.FC = () => {
   return (
     <div className="color-flood-game">
       <div className="game-container">
-        <GameHUD className="game-hud" />
-        
         <div className="game-scene">
           <Canvas
             camera={{
@@ -188,7 +185,8 @@ export const ColorFloodGame: React.FC = () => {
           <ComboTracker />
         </div>
         
-        <ColorPalette className="color-palette" />
+        {/* Unified Control Panel */}
+        <UnifiedControlPanel className="unified-control-panel" />
         
         {/* Toast notifications */}
         <MoveToast />

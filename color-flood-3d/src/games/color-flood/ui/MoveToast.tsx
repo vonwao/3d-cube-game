@@ -3,9 +3,10 @@ import { useCubeState, useIsWon } from '../logic/simpleGameStore';
 
 interface ToastMessage {
   id: string;
-  type: 'success' | 'win' | 'efficient';
+  type: 'success' | 'win' | 'efficient' | 'stars';
   message: string;
   duration: number;
+  stars?: number;
 }
 
 export const MoveToast: React.FC = () => {
@@ -45,26 +46,35 @@ export const MoveToast: React.FC = () => {
   }, [cubeState.moves, cubeState.floodRegion.length, lastMoveCount, lastFloodSize]);
 
   useEffect(() => {
-    // Show win toast
+    // Show win toast with star rating
     if (isWon) {
       const efficiency = cubeState.moves / cubeState.maxMoves;
-      let message = 'Victory!';
-      let type: 'win' | 'efficient' = 'win';
+      let stars = 0;
+      if (efficiency <= 0.6) stars = 3;
+      else if (efficiency <= 0.8) stars = 2;
+      else if (efficiency <= 1.0) stars = 1;
       
-      if (efficiency <= 0.6) {
-        message = '🌟 Perfect! Amazing efficiency!';
+      let message = 'Victory!';
+      let type: 'win' | 'efficient' | 'stars' = 'stars';
+      
+      if (stars === 3) {
+        message = '🌟 Perfect! 3 Stars!';
         type = 'efficient';
-      } else if (efficiency <= 0.8) {
-        message = '⭐ Great job! Very efficient!';
+      } else if (stars === 2) {
+        message = '⭐ Great! 2 Stars!';
+      } else if (stars === 1) {
+        message = '🎉 Victory! 1 Star!';
       } else {
-        message = '🎉 Victory! Well done!';
+        message = '💪 Try again for stars!';
+        type = 'win';
       }
       
       const winToast: ToastMessage = {
         id: `win-${Date.now()}`,
         type,
         message,
-        duration: 3000,
+        duration: 4000,
+        stars: stars,
       };
       
       setToasts(prev => [...prev, winToast]);
@@ -91,6 +101,15 @@ export const MoveToast: React.FC = () => {
         >
           <div className="toast-content">
             {toast.message}
+            {toast.stars !== undefined && toast.stars > 0 && (
+              <div className="toast-stars">
+                {Array.from({ length: 3 }, (_, i) => (
+                  <span key={i} className={`star ${i < (toast.stars || 0) ? 'filled' : 'empty'}`}>
+                    ★
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
           <div 
             className="toast-progress"
