@@ -56,8 +56,39 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
   
   return (
     <div className={`unified-control-panel ${className}`}>
-      {/* Row 1: Game Controls */}
+      {/* Row 1: Color Palette */}
       <div className="control-row row-1">
+        <div className="control-section color-section">
+          <div className="color-grid">
+            {palette.colors.map((color, index) => {
+              const colorIndex = index as ColorIndex;
+              const isHovered = hoveredColor === colorIndex;
+
+              return (
+                <button
+                  key={colorIndex}
+                  className={`color-button ${isHovered ? 'hovered' : ''} ${isDisabled ? 'disabled' : ''}`}
+                  style={{
+                    backgroundColor: color,
+                    borderColor: color,
+                    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                    boxShadow: isHovered
+                      ? `0 0 0 2px ${color}60, 0 4px 8px ${color}40`
+                      : '0 2px 4px rgba(0,0,0,0.15)',
+                  }}
+                  onClick={() => handleColorClick(colorIndex)}
+                  onMouseEnter={() => setHoveredColor(colorIndex)}
+                  onMouseLeave={() => setHoveredColor(null)}
+                  disabled={isDisabled}
+                  title={`Select color ${colorIndex + 1} (Press ${colorIndex + 1})`}
+                >
+                  <span className="color-number">{colorIndex + 1}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="control-section game-controls">
           <div className="control-buttons">
             <button
@@ -94,38 +125,6 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
             >
               💡
             </button>
-          </div>
-        </div>
-        
-        {/* Color Palette */}
-        <div className="control-section color-section">
-          <div className="color-grid">
-            {palette.colors.map((color, index) => {
-              const colorIndex = index as ColorIndex;
-              const isHovered = hoveredColor === colorIndex;
-              
-              return (
-                <button
-                  key={colorIndex}
-                  className={`color-button ${isHovered ? 'hovered' : ''} ${isDisabled ? 'disabled' : ''}`}
-                  style={{
-                    backgroundColor: color,
-                    borderColor: color,
-                    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                    boxShadow: isHovered
-                      ? `0 0 0 2px ${color}60, 0 4px 8px ${color}40`
-                      : '0 2px 4px rgba(0,0,0,0.15)',
-                  }}
-                  onClick={() => handleColorClick(colorIndex)}
-                  onMouseEnter={() => setHoveredColor(colorIndex)}
-                  onMouseLeave={() => setHoveredColor(null)}
-                  disabled={isDisabled}
-                  title={`Select color ${colorIndex + 1} (Press ${colorIndex + 1})`}
-                >
-                  <span className="color-number">{colorIndex + 1}</span>
-                </button>
-              );
-            })}
           </div>
         </div>
       </div>
