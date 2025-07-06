@@ -50,7 +50,7 @@ const AnimatedGroup: React.FC<AnimatedGroupProps> = ({ rotation, children }) => 
     }
   });
   
-  return <group ref={groupRef} scale={[1.2, 1.2, 1.2]}>{children}</group>;
+  return <group ref={groupRef} scale={[1.5, 1.5, 1.5]}>{children}</group>;
 };
 
 const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
