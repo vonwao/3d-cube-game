@@ -879,7 +879,7 @@
   color: white;
   font-family: inherit;
   
-  /* Desktop: Right side panel */
+  /* Desktop: Right side panel with column layout */
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
@@ -887,9 +887,10 @@
   max-height: 80vh;
   overflow-y: auto;
   
+  /* Flexbox layout: two sections vertically stacked */
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1rem;
 }
 
 .control-section {
@@ -909,15 +910,10 @@
   padding-bottom: 0.5rem;
 }
 
-/* Desktop Layout: Two columns side-by-side */
-.unified-control-panel {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-}
-
+/* Layout structure for new simplified design */
 .controls-section {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 1rem;
   flex: 1;
@@ -928,7 +924,6 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  min-width: 200px;
 }
 
 /* Game Controls */
@@ -1161,10 +1156,7 @@
   padding: 0.25rem 0;
 }
 
-/* Control Rows - Desktop: Use flex layout for both main and info rows */
-.control-row {
-  /* No special styling needed - handled by main-row and info-row */
-}
+/* Legacy class - no longer used in new simplified layout */
 
 /* Mobile Layout: Bottom Panel */
 @media (max-width: 768px) {
@@ -1472,13 +1464,8 @@
   display: none;
 }
 
-/* Mobile responsive adjustments - Override desktop columns to use rows */
+/* Mobile responsive adjustments for our new layout */
 @media (max-width: 768px) {
-  .unified-control-panel {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
   .controls-section {
     gap: 0.75rem;
     justify-content: space-between;
@@ -1488,7 +1475,6 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    min-width: unset;
     flex-wrap: wrap;
   }
   
