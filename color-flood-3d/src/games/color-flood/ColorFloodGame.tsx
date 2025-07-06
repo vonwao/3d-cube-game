@@ -2,6 +2,7 @@ import { Suspense, useEffect, useState, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { Group } from 'three';
+import * as THREE from 'three';
 import type { SpringValue } from '@react-spring/three';
 import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
@@ -69,10 +70,10 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   
   return (
     <>
-      <ambientLight intensity={0.4} />
+      <ambientLight intensity={0.25} />
       <directionalLight
-        position={[5, 5, 5]}
-        intensity={1}
+        position={[5, 10, 5]}
+        intensity={3}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
@@ -174,6 +175,11 @@ export const ColorFloodGame: React.FC = () => {
             }}
             shadows
             className="game-canvas"
+            gl={{
+              outputColorSpace: THREE.SRGBColorSpace,
+              toneMapping: THREE.LinearToneMapping,
+              toneMappingExposure: 1
+            }}
           >
             <Suspense fallback={null}>
               <CubeScene onCellClick={handleCellClick} />
