@@ -1,6 +1,6 @@
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
 import { renderHook } from '@testing-library/react';
-import { useKeyboardManager, isColorKey, isArrowKey, isRotationKey, isActionKey } from '../useKeyboardManager';
+import { useKeyboardManager, isColorKey, isArrowKey, isRotationKey, isActionKey, type KeyboardHandler } from '../useKeyboardManager';
 
 describe('useKeyboardManager', () => {
   let mockAddEventListener: jest.MockedFunction<typeof window.addEventListener>;
@@ -26,7 +26,7 @@ describe('useKeyboardManager', () => {
   });
 
   test('should add and remove event listeners correctly', () => {
-    const handler = jest.fn(() => false);
+    const handler = jest.fn().mockReturnValue(false) as KeyboardHandler;
     
     const { unmount } = renderHook(() => 
       useKeyboardManager(handler, { enabled: true, priority: 10 })
@@ -40,7 +40,7 @@ describe('useKeyboardManager', () => {
   });
 
   test('should not add listeners when disabled', () => {
-    const handler = jest.fn(() => false);
+    const handler = jest.fn().mockReturnValue(false) as KeyboardHandler;
     
     renderHook(() => 
       useKeyboardManager(handler, { enabled: false, priority: 10 })
@@ -50,8 +50,8 @@ describe('useKeyboardManager', () => {
   });
 
   test('should handle priority correctly', () => {
-    const highPriorityHandler = jest.fn(() => true);
-    const lowPriorityHandler = jest.fn(() => true);
+    const highPriorityHandler = jest.fn().mockReturnValue(true) as KeyboardHandler;
+    const lowPriorityHandler = jest.fn().mockReturnValue(true) as KeyboardHandler;
     
     const { unmount: unmount1 } = renderHook(() => 
       useKeyboardManager(highPriorityHandler, { priority: 20 })
@@ -68,8 +68,8 @@ describe('useKeyboardManager', () => {
     
     keydownHandler(event);
     
-    expect(highPriorityHandler).toHaveBeenCalledWith(event);
-    expect(lowPriorityHandler).not.toHaveBeenCalled(); // Should not be called because high priority handled it
+    expect(highPriorityHandler as any).toHaveBeenCalledWith(event);
+    expect(lowPriorityHandler as any).not.toHaveBeenCalled(); // Should not be called because high priority handled it
     
     unmount1();
     unmount2();
