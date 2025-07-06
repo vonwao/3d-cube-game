@@ -883,14 +883,13 @@
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  width: auto;
-  max-width: 500px;
+  width: 240px;
   max-height: 80vh;
   overflow-y: auto;
   
-  /* Desktop: Two sections as columns (side by side) */
+  /* Desktop: Two sections stacked vertically */
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 1rem;
 }
 
@@ -925,9 +924,8 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  flex: 0 0 auto;
-  padding-left: 1rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Game Controls */
