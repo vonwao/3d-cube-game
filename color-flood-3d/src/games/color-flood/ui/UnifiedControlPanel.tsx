@@ -7,10 +7,9 @@ import { getHint } from '../logic/solver';
 interface UnifiedControlPanelProps {
   className?: string;
   onShowInstructions?: () => void;
-  rotateTo?: (axis: 'x' | 'y' | 'z', degrees: number) => void;
 }
 
-export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ className = '', onShowInstructions, rotateTo }) => {
+export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ className = '', onShowInstructions }) => {
   const cubeState = useCubeState();
   const isWon: boolean = useIsWon();
   const isGameOver: boolean = useIsGameOver();
@@ -44,6 +43,23 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
     // Clear hint after 3 seconds
     setTimeout(() => setHintColor(null), 3000);
   }, [cubeState, isWon, isGameOver]);
+
+  // Rotation handlers that dispatch keyboard events (same as keyboard shortcuts)
+  const handleRotateUp = useCallback(() => {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
+  }, []);
+
+  const handleRotateDown = useCallback(() => {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+  }, []);
+
+  const handleRotateLeft = useCallback(() => {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+  }, []);
+
+  const handleRotateRight = useCallback(() => {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+  }, []);
   
   // Action keys (undo/reset) with medium priority
   useKeyboardManager(
@@ -161,39 +177,39 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
               💡
             </button>
             
-            {/* Directional rotation buttons for mobile */}
-            <button
-              className="control-button rotation-button"
-              onClick={() => rotateTo?.('x', -45)}
-              disabled={!rotateTo}
-              title="Rotate up (↑)"
-            >
-              ↑
-            </button>
-            <button
-              className="control-button rotation-button"
-              onClick={() => rotateTo?.('x', 45)}
-              disabled={!rotateTo}
-              title="Rotate down (↓)"
-            >
-              ↓
-            </button>
-            <button
-              className="control-button rotation-button"
-              onClick={() => rotateTo?.('y', -45)}
-              disabled={!rotateTo}
-              title="Rotate left (←)"
-            >
-              ←
-            </button>
-            <button
-              className="control-button rotation-button"
-              onClick={() => rotateTo?.('y', 45)}
-              disabled={!rotateTo}
-              title="Rotate right (→)"
-            >
-              →
-            </button>
+            {/* Directional rotation buttons for mobile - arranged like a D-pad */}
+            <div className="rotation-dpad">
+              <button
+                className="control-button rotation-button dpad-up"
+                onClick={handleRotateUp}
+                title="Rotate up (↑)"
+              >
+                ↑
+              </button>
+              <div className="dpad-middle">
+                <button
+                  className="control-button rotation-button dpad-left"
+                  onClick={handleRotateLeft}
+                  title="Rotate left (←)"
+                >
+                  ←
+                </button>
+                <button
+                  className="control-button rotation-button dpad-right"
+                  onClick={handleRotateRight}
+                  title="Rotate right (→)"
+                >
+                  →
+                </button>
+              </div>
+              <button
+                className="control-button rotation-button dpad-down"
+                onClick={handleRotateDown}
+                title="Rotate down (↓)"
+              >
+                ↓
+              </button>
+            </div>
           </div>
         </div>
       </div>

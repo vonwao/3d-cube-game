@@ -20,7 +20,6 @@ import type { Level } from './logic/types';
 
 interface CubeSceneProps {
   onCellClick?: (index: number) => void;
-  onRotateToReady?: (rotateTo: (axis: 'x' | 'y' | 'z', degrees: number) => void) => void;
 }
 
 interface AnimatedGroupProps {
@@ -55,22 +54,15 @@ const AnimatedGroup: React.FC<AnimatedGroupProps> = ({ rotation, children }) => 
   return <group ref={groupRef} scale={[1.5, 1.5, 1.5]}>{children}</group>;
 };
 
-const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick, onRotateToReady }) => {
+const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   const cubeState = useCubeState();
   const palette = useCurrentPalette();
   const animationProgress = useAnimationProgress();
-  const { rotation, rotateTo } = useCubeControls({
+  const { rotation } = useCubeControls({
     rotationSpeed: 1.2,
     keyboardSpeed: 45,
     enableKeyboard: true,
   });
-  
-  // Pass rotateTo function to parent component
-  useEffect(() => {
-    if (onRotateToReady) {
-      onRotateToReady(rotateTo);
-    }
-  }, [rotateTo, onRotateToReady]);
   
   // Initialize the game animation system
   useGameAnimation();
@@ -115,7 +107,6 @@ export const ColorFloodGame: React.FC = () => {
   const currentLevel = useCurrentLevel();
   const [showLevelSelector, setShowLevelSelector] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
-  const [rotateTo, setRotateTo] = useState<((axis: 'x' | 'y' | 'z', degrees: number) => void) | null>(null);
   
   // Color selection keyboard handler with highest priority (outside Canvas)
   useKeyboardManager(
@@ -191,7 +182,7 @@ export const ColorFloodGame: React.FC = () => {
             }}
           >
             <Suspense fallback={null}>
-              <CubeScene onCellClick={handleCellClick} onRotateToReady={setRotateTo} />
+              <CubeScene onCellClick={handleCellClick} />
             </Suspense>
           </Canvas>
           
@@ -204,7 +195,6 @@ export const ColorFloodGame: React.FC = () => {
         <UnifiedControlPanel 
           className="unified-control-panel" 
           onShowInstructions={() => setShowInstructions(true)}
-          rotateTo={rotateTo || undefined}
         />
         
         {/* Toast notifications */}

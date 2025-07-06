@@ -1390,3 +1390,43 @@
     border: 2px solid black;
   }
 }
+
+/* D-pad Rotation Controls */
+.rotation-dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.dpad-middle {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.rotation-button {
+  min-width: 2rem !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  padding: 0 !important;
+  font-size: 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .rotation-dpad {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+  
+  .rotation-button {
+    min-width: 2.5rem !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    font-size: 1.2rem !important;
+  }
+}
