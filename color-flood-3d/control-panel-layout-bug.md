@@ -11,8 +11,8 @@ The user requested a specific layout change for the UnifiedControlPanel componen
    - **Section 2**: Move counter, shortcut help text, info button
 
 2. **Desktop vs Mobile behavior**:
-   - **Desktop**: Two sections should be arranged as **columns** (side-by-side)
-   - **Mobile**: Two sections should be arranged as **rows** (stacked vertically)
+   - **Desktop**: Two sections should be arranged as **columns** (and inside of that stacked vertically)
+   - **Mobile**: Two sections should be arranged as **rows** (and and inside stacked horizontally)
 
 3. **D-pad layout**: Change from cross layout to Mac keyboard layout:
    - **Before**: `↑` / `←` `→` / `↓` (cross)
