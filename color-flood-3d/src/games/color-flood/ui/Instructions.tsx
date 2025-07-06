@@ -12,6 +12,18 @@ export const Instructions: React.FC<InstructionsProps> = ({ onClose }) => {
     onClose?.();
   };
   
+  // ESC key handler
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isVisible) {
+        handleClose();
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isVisible, handleClose]);
+  
   if (!isVisible) {
     return (
       <button 

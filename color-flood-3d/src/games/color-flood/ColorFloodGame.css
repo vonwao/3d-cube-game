@@ -79,25 +79,29 @@
 }
 
 .difficulty-filter {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border: 2px solid #ddd;
   background: white;
-  border-radius: 20px;
+  border-radius: 25px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: #666;
+  font-weight: 500;
 }
 
 .difficulty-filter:hover {
   border-color: #2196F3;
   color: #2196F3;
+  transform: translateY(-1px);
 }
 
 .difficulty-filter.active {
   background: #2196F3;
   border-color: #2196F3;
   color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
 }
 
 .random-level-button {
@@ -115,6 +119,28 @@
 .random-level-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+}
+
+.primary-random-button {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+  margin-top: 1rem;
+  width: 100%;
+  text-align: center;
+}
+
+.primary-random-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
+  background: linear-gradient(135deg, #FF5252, #FF7043);
 }
 
 .levels-grid {
@@ -1120,7 +1146,7 @@
   
   .game-scene {
     margin-right: 0;
-    margin-bottom: 160px; /* Account for compact bottom panel */
+    margin-bottom: 180px; /* Account for 2-row bottom panel */
   }
   
   .unified-control-panel {
@@ -1131,16 +1157,27 @@
     right: 0;
     top: auto;
     width: 100%;
-    max-height: 40vh;
+    max-height: 50vh;
     transform: none;
     border-radius: 12px 12px 0 0;
     padding: 0.8rem;
     
-    /* Single row compact layout for mobile */
-    flex-direction: row;
+    /* 2-row layout for mobile */
+    flex-direction: column;
+    gap: 0.8rem;
+    overflow-y: auto;
+  }
+  
+  .control-row {
+    display: flex;
     gap: 0.8rem;
     overflow-x: auto;
-    align-items: center;
+    padding-bottom: 0.3rem;
+  }
+  
+  .row-1 {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 0.8rem;
   }
   
   .control-section {
@@ -1153,13 +1190,17 @@
   }
   
   .color-grid {
-    grid-template-columns: repeat(6, 1fr);
-    gap: 0.3rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+  
+  .info-section {
+    min-width: 200px;
+    text-align: left;
   }
   
   .control-hints {
     font-size: 0.9rem;
-    text-align: left;
   }
   
   .hint-line {
@@ -1170,7 +1211,7 @@
 /* Small mobile adjustments */
 @media (max-width: 480px) {
   .game-scene {
-    margin-bottom: 140px; /* Account for compact layout */
+    margin-bottom: 160px; /* Account for compact 2-row layout */
   }
   
   .unified-control-panel {
@@ -1201,6 +1242,10 @@
   
   .control-hints {
     font-size: 0.8rem;
+  }
+  
+  .info-section {
+    min-width: 180px;
   }
 }
 

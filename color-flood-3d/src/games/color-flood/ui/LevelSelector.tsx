@@ -133,13 +133,27 @@ interface LevelSelectorProps {
 
 export const LevelSelector: React.FC<LevelSelectorProps> = ({ onLevelSelect, onClose }) => {
   const [selectedLevelId, setSelectedLevelId] = useState<string | null>(null);
-  const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
+  const [filterDifficulty, setFilterDifficulty] = useState<string>('any');
   const totalStars = useTotalStars();
+  
+  // ESC key handler
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
 
   const filteredLevels = useMemo(() => {
-    const levels = filterDifficulty === 'all' ? SAMPLE_LEVELS : SAMPLE_LEVELS.filter(level => level.tier === filterDifficulty);
-    return levels;
+    if (filterDifficulty === 'any' || filterDifficulty === 'all') {
+      return SAMPLE_LEVELS;
+    }
+    return SAMPLE_LEVELS.filter(level => level.tier === filterDifficulty);
   }, [filterDifficulty]);
 
   const handleLevelClick = (level: ExtendedLevel) => {
@@ -150,12 +164,12 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ onLevelSelect, onC
     }, 150);
   };
 
-  const handleRandomLevel = (difficulty?: string) => {
+  const handleRandomLevel = () => {
     let availableLevels = SAMPLE_LEVELS;
     
-    // Filter by difficulty if specified
-    if (difficulty && difficulty !== 'all') {
-      availableLevels = SAMPLE_LEVELS.filter(level => level.tier === difficulty);
+    // Filter by difficulty if not "any"
+    if (filterDifficulty !== 'any' && filterDifficulty !== 'all') {
+      availableLevels = SAMPLE_LEVELS.filter(level => level.tier === filterDifficulty);
     }
     
     const randomLevel = availableLevels[Math.floor(Math.random() * availableLevels.length)];
@@ -166,25 +180,31 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ onLevelSelect, onC
     const filters: Array<{
       key: string;
       name: string;
-      count: number;
       color?: string;
     }> = [
-      { key: 'all', name: 'All Levels', count: SAMPLE_LEVELS.length }
+      { key: 'any', name: 'Any Level' }
     ];
     
     LEVEL_TIERS.forEach(tier => {
-      const tierLevels = SAMPLE_LEVELS.filter(l => l.tier === tier.id);
-      
-      filters.push({
-        key: tier.id,
-        name: tier.name,
-        count: tierLevels.length,
-        color: tier.color,
-      });
+      if (tier.id !== 'tutorial') {
+        filters.push({
+          key: tier.id,
+          name: tier.name,
+          color: tier.color,
+        });
+      }
     });
     
     return filters;
   }, []);
+  
+  const getButtonLabel = () => {
+    if (filterDifficulty === 'any') {
+      return '🎲 Random Any Level';
+    }
+    const selectedTier = tierFilters.find(f => f.key === filterDifficulty);
+    return `🎲 Random ${selectedTier?.name || 'Easy'} Game`;
+  };
 
   return (
     <div className="level-selector-overlay">
@@ -214,30 +234,18 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ onLevelSelect, onC
                 onClick={() => setFilterDifficulty(filter.key)}
                 style={{ borderColor: filter.color }}
               >
-                <div className="filter-content">
-                  <span className="filter-name">{filter.name}</span>
-                  <span className="filter-count">({filter.count})</span>
-                </div>
+                <span className="filter-name">{filter.name}</span>
               </button>
             ))}
           </div>
           
-          <div className="random-controls">
-            <button 
-              className="random-level-button"
-              onClick={() => handleRandomLevel()}
-              title="Random level from any difficulty"
-            >
-              🎲 Random Any
-            </button>
-            <button 
-              className="random-level-button"
-              onClick={() => handleRandomLevel(filterDifficulty)}
-              title={`Random ${filterDifficulty === 'all' ? 'any' : filterDifficulty} level`}
-            >
-              🎯 Random {filterDifficulty === 'all' ? 'Any' : tierFilters.find(f => f.key === filterDifficulty)?.name || 'Current'}
-            </button>
-          </div>
+          <button 
+            className="primary-random-button"
+            onClick={handleRandomLevel}
+            title={`Start a ${filterDifficulty === 'any' ? 'random level from any difficulty' : `random ${filterDifficulty} level`}`}
+          >
+            {getButtonLabel()}
+          </button>
         </div>
 
         <div className="levels-grid">

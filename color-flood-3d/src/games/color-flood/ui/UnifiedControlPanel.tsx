@@ -10,8 +10,8 @@ interface UnifiedControlPanelProps {
 
 export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ className = '', onShowInstructions }) => {
   const cubeState = useCubeState();
-  const isWon = useIsWon();
-  const isGameOver = useIsGameOver();
+  const isWon: boolean = useIsWon();
+  const isGameOver: boolean = useIsGameOver();
   const canUndo = useCanUndo();
   const palette = useCurrentPalette();
   const [hoveredColor, setHoveredColor] = useState<ColorIndex | null>(null);
@@ -56,88 +56,92 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
   
   return (
     <div className={`unified-control-panel ${className}`}>
-      {/* Game Controls */}
-      <div className="control-section game-controls">
-        <div className="control-buttons">
-          <button
-            className="control-button undo-button"
-            onClick={handleUndo}
-            disabled={!canUndo}
-            title="Undo last move (U)"
-          >
-            ↶
-          </button>
-          
-          <button
-            className="control-button reset-button"
-            onClick={handleReset}
-            title="Reset level (R)"
-          >
-            🔄
-          </button>
-          
-          <button
-            className="control-button new-game-button"
-            onClick={() => {
-              window.dispatchEvent(new CustomEvent('openLevelSelector'));
-            }}
-            title="New Game"
-          >
-            🎮
-          </button>
-          
-          <button
-            className="control-button help-button"
-            onClick={onShowInstructions}
-            title="Show help and instructions (H)"
-          >
-            💡
-          </button>
-        </div>
-      </div>
-      
-      {/* Color Palette */}
-      <div className="control-section color-section">
-        <div className="color-grid">
-          {palette.colors.map((color, index) => {
-            const colorIndex = index as ColorIndex;
-            const isHovered = hoveredColor === colorIndex;
+      {/* Row 1: Game Controls */}
+      <div className="control-row row-1">
+        <div className="control-section game-controls">
+          <div className="control-buttons">
+            <button
+              className="control-button undo-button"
+              onClick={handleUndo}
+              disabled={!canUndo}
+              title="Undo last move (U)"
+            >
+              ↶
+            </button>
             
-            return (
-              <button
-                key={colorIndex}
-                className={`color-button ${isHovered ? 'hovered' : ''} ${isDisabled ? 'disabled' : ''}`}
-                style={{
-                  backgroundColor: color,
-                  borderColor: color,
-                  transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                  boxShadow: isHovered
-                    ? `0 0 0 2px ${color}60, 0 4px 8px ${color}40`
-                    : '0 2px 4px rgba(0,0,0,0.15)',
-                }}
-                onClick={() => handleColorClick(colorIndex)}
-                onMouseEnter={() => setHoveredColor(colorIndex)}
-                onMouseLeave={() => setHoveredColor(null)}
-                disabled={isDisabled}
-                title={`Select color ${colorIndex + 1} (Press ${colorIndex + 1})`}
-              >
-                <span className="color-number">{colorIndex + 1}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      
-      {/* Game Info */}
-      <div className="control-section info-section">
-        <div className="current-moves">
-          <span className="moves-label">Move</span>
-          <span className="moves-value">{cubeState.moves}/{cubeState.maxMoves}</span>
+            <button
+              className="control-button reset-button"
+              onClick={handleReset}
+              title="Reset level (R)"
+            >
+              🔄
+            </button>
+            
+            <button
+              className="control-button new-game-button"
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('openLevelSelector'));
+              }}
+              title="New Game"
+            >
+              🎮
+            </button>
+            
+            <button
+              className="control-button help-button"
+              onClick={onShowInstructions}
+              title="Show help and instructions"
+            >
+              💡
+            </button>
+          </div>
         </div>
         
-        <div className="control-hints">
-          <div className="hint-line">1-6: Colors • U: Undo • R: Reset</div>
-          <div className="hint-line">Drag or ↑↓←→ to rotate</div>
+        {/* Color Palette */}
+        <div className="control-section color-section">
+          <div className="color-grid">
+            {palette.colors.map((color, index) => {
+              const colorIndex = index as ColorIndex;
+              const isHovered = hoveredColor === colorIndex;
+              
+              return (
+                <button
+                  key={colorIndex}
+                  className={`color-button ${isHovered ? 'hovered' : ''} ${isDisabled ? 'disabled' : ''}`}
+                  style={{
+                    backgroundColor: color,
+                    borderColor: color,
+                    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                    boxShadow: isHovered
+                      ? `0 0 0 2px ${color}60, 0 4px 8px ${color}40`
+                      : '0 2px 4px rgba(0,0,0,0.15)',
+                  }}
+                  onClick={() => handleColorClick(colorIndex)}
+                  onMouseEnter={() => setHoveredColor(colorIndex)}
+                  onMouseLeave={() => setHoveredColor(null)}
+                  disabled={isDisabled}
+                  title={`Select color ${colorIndex + 1} (Press ${colorIndex + 1})`}
+                >
+                  <span className="color-number">{colorIndex + 1}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      
+      {/* Row 2: Game Info */}
+      <div className="control-row row-2">
+        <div className="control-section info-section">
+          <div className="current-moves">
+            <span className="moves-label">Move</span>
+            <span className="moves-value">{cubeState.moves}/{cubeState.maxMoves}</span>
+          </div>
+          
+          <div className="control-hints">
+            <div className="hint-line">1-6: Colors • U: Undo • R: Reset</div>
+            <div className="hint-line">Drag or ↑↓←→ to rotate</div>
+          </div>
         </div>
       </div>
       
