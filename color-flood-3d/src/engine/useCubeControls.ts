@@ -200,16 +200,35 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   useEffect(() => {
     const canvas = gl.domElement;
     
+    // Add touch event listeners to prevent page scrolling during rotation
+    const handleTouchStart = (e: TouchEvent) => {
+      if (enableTouch) {
+        e.preventDefault();
+      }
+    };
+    
+    const handleTouchMove = (e: TouchEvent) => {
+      if (enableTouch && isDragging) {
+        e.preventDefault();
+      }
+    };
+    
     canvas.addEventListener('pointerdown', handlePointerDown);
     canvas.addEventListener('pointermove', handlePointerMove);
     canvas.addEventListener('pointerup', handlePointerUp);
     canvas.addEventListener('pointercancel', handlePointerUp);
+    
+    // Add touch-specific event listeners to prevent scrolling
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     
     return () => {
       canvas.removeEventListener('pointerdown', handlePointerDown);
       canvas.removeEventListener('pointermove', handlePointerMove);
       canvas.removeEventListener('pointerup', handlePointerUp);
       canvas.removeEventListener('pointercancel', handlePointerUp);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchmove', handleTouchMove);
     };
   }, [isDragging, enableMouse, enableTouch]);
   

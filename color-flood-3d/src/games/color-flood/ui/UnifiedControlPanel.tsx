@@ -7,9 +7,10 @@ import { getHint } from '../logic/solver';
 interface UnifiedControlPanelProps {
   className?: string;
   onShowInstructions?: () => void;
+  rotateTo?: (axis: 'x' | 'y' | 'z', degrees: number) => void;
 }
 
-export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ className = '', onShowInstructions }) => {
+export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ className = '', onShowInstructions, rotateTo }) => {
   const cubeState = useCubeState();
   const isWon: boolean = useIsWon();
   const isGameOver: boolean = useIsGameOver();
@@ -158,6 +159,40 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
               title="Show help and instructions"
             >
               💡
+            </button>
+            
+            {/* Directional rotation buttons for mobile */}
+            <button
+              className="control-button rotation-button"
+              onClick={() => rotateTo?.('x', -45)}
+              disabled={!rotateTo}
+              title="Rotate up (↑)"
+            >
+              ↑
+            </button>
+            <button
+              className="control-button rotation-button"
+              onClick={() => rotateTo?.('x', 45)}
+              disabled={!rotateTo}
+              title="Rotate down (↓)"
+            >
+              ↓
+            </button>
+            <button
+              className="control-button rotation-button"
+              onClick={() => rotateTo?.('y', -45)}
+              disabled={!rotateTo}
+              title="Rotate left (←)"
+            >
+              ←
+            </button>
+            <button
+              className="control-button rotation-button"
+              onClick={() => rotateTo?.('y', 45)}
+              disabled={!rotateTo}
+              title="Rotate right (→)"
+            >
+              →
             </button>
           </div>
         </div>
