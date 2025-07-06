@@ -37,7 +37,6 @@ export default tseslint.config([
     },
   },
 ])
-```
 
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
@@ -66,4 +65,12 @@ export default tseslint.config([
     },
   },
 ])
+```
+
+## Deployment
+
+The game lives in the `color-flood-3d` directory. Netlify builds and deploys from this folder automatically. Run the following from the subdirectory to trigger a manual deploy:
+
+```bash
+pnpm deploy
 ```
