@@ -99,7 +99,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
         
         <div className="controls">
           <button
-            className="control-button undo-button"
+            className="control-button"
             onClick={handleUndo}
             disabled={!canUndo}
             aria-label="Undo last move"
@@ -109,7 +109,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
           </button>
           
           <button
-            className="control-button reset-button"
+            className="control-button"
             onClick={handleReset}
             aria-label="Reset level"
             title="Reset (R)"
@@ -118,7 +118,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({ className = '' }) => {
           </button>
           
           <button
-            className="control-button select-level-button"
+            className="control-button"
             onClick={() => {
               // This will be handled by the parent component
               window.dispatchEvent(new CustomEvent('openLevelSelector'));

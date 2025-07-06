@@ -422,13 +422,6 @@
   cursor: not-allowed;
 }
 
-.select-level-button {
-  background: rgba(33, 150, 243, 0.2);
-}
-
-.select-level-button:hover:not(:disabled) {
-  background: rgba(33, 150, 243, 0.4);
-}
 
 .hud-status {
   text-align: center;
@@ -950,21 +943,6 @@
   cursor: not-allowed;
 }
 
-.new-game-button {
-  background: rgba(33, 150, 243, 0.3);
-}
-
-.new-game-button:hover:not(:disabled) {
-  background: rgba(33, 150, 243, 0.5);
-}
-
-.help-button {
-  background: rgba(156, 39, 176, 0.3);
-}
-
-.help-button:hover:not(:disabled) {
-  background: rgba(156, 39, 176, 0.5);
-}
 
 /* Difficulty Selection */
 .difficulty-flow-group {

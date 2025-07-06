@@ -92,7 +92,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
         <div className="control-section game-controls">
           <div className="control-buttons">
             <button
-              className="control-button undo-button"
+              className="control-button"
               onClick={handleUndo}
               disabled={!canUndo}
               title="Undo last move (U)"
@@ -101,7 +101,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
             </button>
             
             <button
-              className="control-button reset-button"
+              className="control-button"
               onClick={handleReset}
               title="Reset level (R)"
             >
@@ -109,7 +109,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
             </button>
             
             <button
-              className="control-button new-game-button"
+              className="control-button"
               onClick={() => {
                 window.dispatchEvent(new CustomEvent('openLevelSelector'));
               }}
@@ -119,7 +119,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
             </button>
             
             <button
-              className="control-button help-button"
+              className="control-button"
               onClick={onShowInstructions}
               title="Show help and instructions"
             >
