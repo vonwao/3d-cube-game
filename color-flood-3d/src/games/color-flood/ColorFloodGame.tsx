@@ -186,7 +186,10 @@ export const ColorFloodGame: React.FC = () => {
         </div>
         
         {/* Unified Control Panel */}
-        <UnifiedControlPanel className="unified-control-panel" />
+        <UnifiedControlPanel 
+          className="unified-control-panel" 
+          onShowInstructions={() => setShowInstructions(true)}
+        />
         
         {/* Toast notifications */}
         <MoveToast />
