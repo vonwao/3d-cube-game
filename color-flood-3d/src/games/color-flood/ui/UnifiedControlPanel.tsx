@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useKeyboardManager, isActionKey } from '../../../engine/useKeyboardManager';
 import { useCubeState, useIsWon, useIsGameOver, useCanUndo, useCurrentPalette, useSimpleGameStore } from '../logic/simpleGameStore';
 import type { ColorIndex } from '../logic/types';
+import { getHint } from '../logic/solver';
 
 interface UnifiedControlPanelProps {
   className?: string;
@@ -15,6 +16,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
   const canUndo = useCanUndo();
   const palette = useCurrentPalette();
   const [hoveredColor, setHoveredColor] = useState<ColorIndex | null>(null);
+  const [hintColor, setHintColor] = useState<ColorIndex | null>(null);
   
   const handleUndo = useCallback(() => {
     useSimpleGameStore.getState().undo();
@@ -27,7 +29,20 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
   const handleColorClick = useCallback((colorIndex: ColorIndex) => {
     if (isWon || isGameOver) return;
     useSimpleGameStore.getState().applyColor(colorIndex);
+    setHintColor(null); // Clear hint when player makes a move
   }, [isWon, isGameOver]);
+
+  const handleHint = useCallback(() => {
+    if (isWon || isGameOver) return;
+    const currentLevel = useSimpleGameStore.getState().currentLevel;
+    if (!currentLevel) return;
+    
+    const hint = getHint(currentLevel, cubeState);
+    setHintColor(hint);
+    
+    // Clear hint after 3 seconds
+    setTimeout(() => setHintColor(null), 3000);
+  }, [cubeState, isWon, isGameOver]);
   
   // Action keys (undo/reset) with medium priority
   useKeyboardManager(
@@ -41,6 +56,11 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
       
       if (actionKey === 'r') {
         handleReset();
+        return true;
+      }
+      
+      if (actionKey === 'h' && !isDisabled) {
+        handleHint();
         return true;
       }
       
@@ -63,26 +83,31 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
             {palette.colors.map((color, index) => {
               const colorIndex = index as ColorIndex;
               const isHovered = hoveredColor === colorIndex;
+              const isHinted = hintColor === colorIndex;
 
               return (
                 <button
                   key={colorIndex}
-                  className={`color-button ${isHovered ? 'hovered' : ''} ${isDisabled ? 'disabled' : ''}`}
+                  className={`color-button ${isHovered ? 'hovered' : ''} ${isHinted ? 'hinted' : ''} ${isDisabled ? 'disabled' : ''}`}
                   style={{
                     backgroundColor: color,
                     borderColor: color,
                     transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                    boxShadow: isHovered
+                    boxShadow: isHinted
+                      ? `0 0 0 3px #FFD700, 0 0 10px #FFD700, 0 4px 8px ${color}40`
+                      : isHovered
                       ? `0 0 0 2px ${color}60, 0 4px 8px ${color}40`
                       : '0 2px 4px rgba(0,0,0,0.15)',
+                    animation: isHinted ? 'pulse 1s ease-in-out infinite' : 'none',
                   }}
                   onClick={() => handleColorClick(colorIndex)}
                   onMouseEnter={() => setHoveredColor(colorIndex)}
                   onMouseLeave={() => setHoveredColor(null)}
                   disabled={isDisabled}
-                  title={`Select color ${colorIndex + 1} (Press ${colorIndex + 1})`}
+                  title={`Select color ${colorIndex + 1} (Press ${colorIndex + 1})${isHinted ? ' - Hint!' : ''}`}
                 >
                   <span className="color-number">{colorIndex + 1}</span>
+                  {isHinted && <span className="hint-indicator">★</span>}
                 </button>
               );
             })}
@@ -120,6 +145,15 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
             
             <button
               className="control-button"
+              onClick={handleHint}
+              disabled={isDisabled}
+              title="Get hint for next move (H)"
+            >
+              🔍
+            </button>
+            
+            <button
+              className="control-button"
               onClick={onShowInstructions}
               title="Show help and instructions"
             >
@@ -138,7 +172,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
           </div>
           
           <div className="control-hints">
-            <div className="hint-line">1-6: Colors • U: Undo • R: Reset</div>
+            <div className="hint-line">1-6: Colors • U: Undo • R: Reset • H: Hint</div>
             <div className="hint-line">Drag or ↑↓←→ to rotate</div>
           </div>
         </div>

@@ -177,7 +177,7 @@ export const SAMPLE_LEVELS: ExtendedLevel[] = [
       1, 2, 1,
       0, 1, 0,
     ] as ColorIndex[],
-    maxMoves: 4,
+    maxMoves: 6,
   },
   {
     id: 'hard-01',
