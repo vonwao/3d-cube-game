@@ -1,0 +1,4 @@
+[build]
+  base = "color-flood-3d"
+  command = "pnpm build"
+  publish = "dist"
