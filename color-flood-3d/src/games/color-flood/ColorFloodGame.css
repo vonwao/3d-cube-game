@@ -813,32 +813,7 @@
   box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
 }
 
-.help-button {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(52, 152, 219, 0.8);
-  color: #3498db;
-  font-size: 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
 
-.help-button:hover {
-  background: #3498db;
-  color: white;
-  transform: scale(1.1);
-}
 
 /* Mobile adjustments for instructions */
 @media (max-width: 768px) {
@@ -864,13 +839,6 @@
     padding: 0.8rem 1.5rem 1rem;
   }
   
-  .help-button {
-    top: 0.5rem;
-    right: 0.5rem;
-    width: 35px;
-    height: 35px;
-    font-size: 1rem;
-  }
 }
 
 /* Unified Control Panel */
@@ -1017,23 +985,6 @@
   transition: all 0.2s ease;
 }
 
-.new-game-button {
-  padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
-}
-
-.new-game-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
-}
 
 /* Color Grid */
 .color-grid {

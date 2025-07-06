@@ -1,40 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface InstructionsProps {
   onClose?: () => void;
 }
 
 export const Instructions: React.FC<InstructionsProps> = ({ onClose }) => {
-  const [isVisible, setIsVisible] = useState(true);
   
   const handleClose = () => {
-    setIsVisible(false);
     onClose?.();
   };
   
   // ESC key handler
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isVisible) {
+      if (event.key === 'Escape') {
         handleClose();
       }
     };
-    
+
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isVisible, handleClose]);
-  
-  if (!isVisible) {
-    return (
-      <button 
-        className="help-button"
-        onClick={() => setIsVisible(true)}
-        title="Show Instructions"
-      >
-        ?
-      </button>
-    );
-  }
+  }, [handleClose]);
   
   return (
     <div className="instructions-overlay">
