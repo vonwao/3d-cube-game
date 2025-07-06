@@ -191,7 +191,7 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ onLevelSelect, onC
       <div className="level-selector-modal">
         <div className="level-selector-header">
           <div className="header-content">
-            <h2>🎲 Select a Level</h2>
+            <h2>🎮 New Game</h2>
             <div className="progress-display">
               <span className="star-count">⭐ {totalStars} stars earned</span>
             </div>
