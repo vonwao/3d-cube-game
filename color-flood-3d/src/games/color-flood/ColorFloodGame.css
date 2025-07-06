@@ -910,6 +910,20 @@
 }
 
 /* Game Controls */
+.controls-layout {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.main-control-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+/* Legacy support for old class name */
 .control-buttons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1164,7 +1178,8 @@
     gap: 0.6rem;
   }
   
-  .game-controls .control-buttons {
+  .game-controls .control-buttons,
+  .game-controls .main-control-buttons {
     gap: 0.4rem;
   }
   
@@ -1397,7 +1412,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
-  margin-left: 0.5rem;
+  flex-shrink: 0;
 }
 
 .dpad-middle {
@@ -1418,15 +1433,23 @@
 
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
+  .controls-layout {
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  
+  .main-control-buttons {
+    gap: 0.4rem;
+  }
+  
   .rotation-dpad {
-    margin-left: 0;
-    margin-top: 0.5rem;
+    margin: 0;
   }
   
   .rotation-button {
-    min-width: 2.5rem !important;
-    width: 2.5rem !important;
-    height: 2.5rem !important;
-    font-size: 1.2rem !important;
+    min-width: 2.2rem !important;
+    width: 2.2rem !important;
+    height: 2.2rem !important;
+    font-size: 1.1rem !important;
   }
 }

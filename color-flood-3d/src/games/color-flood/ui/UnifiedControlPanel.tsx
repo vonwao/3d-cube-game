@@ -132,52 +132,54 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
         </div>
 
         <div className="control-section game-controls">
-          <div className="control-buttons">
-            <button
-              className="control-button"
-              onClick={handleUndo}
-              disabled={!canUndo}
-              title="Undo last move (U)"
-            >
-              ↶
-            </button>
+          <div className="controls-layout">
+            <div className="main-control-buttons">
+              <button
+                className="control-button"
+                onClick={handleUndo}
+                disabled={!canUndo}
+                title="Undo last move (U)"
+              >
+                ↶
+              </button>
+              
+              <button
+                className="control-button"
+                onClick={handleReset}
+                title="Reset level (R)"
+              >
+                🔄
+              </button>
+              
+              <button
+                className="control-button"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('openLevelSelector'));
+                }}
+                title="New Game"
+              >
+                🎮
+              </button>
+              
+              <button
+                className="control-button"
+                onClick={handleHint}
+                disabled={isDisabled}
+                title="Get hint for next move (H)"
+              >
+                🔍
+              </button>
+              
+              <button
+                className="control-button"
+                onClick={onShowInstructions}
+                title="Show help and instructions"
+              >
+                💡
+              </button>
+            </div>
             
-            <button
-              className="control-button"
-              onClick={handleReset}
-              title="Reset level (R)"
-            >
-              🔄
-            </button>
-            
-            <button
-              className="control-button"
-              onClick={() => {
-                window.dispatchEvent(new CustomEvent('openLevelSelector'));
-              }}
-              title="New Game"
-            >
-              🎮
-            </button>
-            
-            <button
-              className="control-button"
-              onClick={handleHint}
-              disabled={isDisabled}
-              title="Get hint for next move (H)"
-            >
-              🔍
-            </button>
-            
-            <button
-              className="control-button"
-              onClick={onShowInstructions}
-              title="Show help and instructions"
-            >
-              💡
-            </button>
-            
-            {/* Directional rotation buttons for mobile - arranged like a D-pad */}
+            {/* D-pad positioned to the right on mobile */}
             <div className="rotation-dpad">
               <button
                 className="control-button rotation-button dpad-up"
