@@ -59,9 +59,9 @@ export const Instructions: React.FC<InstructionsProps> = ({ onClose }) => {
             <h3>🎮 How Flood Fill Works</h3>
             <ol>
               <li><strong>Your Territory:</strong> You start controlling one corner (shown with white wireframes)</li>
-              <li><strong>Choose a Target Color:</strong> Click any color from the palette to attack that color</li>
-              <li><strong>Flood & Capture:</strong> Your territory expands to capture all adjacent cells of that target color</li>
-              <li><strong>Convert to Your Color:</strong> Captured cells turn into your color and join your territory</li>
+              <li><strong>Choose a Target Color:</strong> Click any color from the palette to flood that color into your corner</li>
+              <li><strong>Flood & Capture:</strong> Your territory expands to capture all adjacent cells</li>
+              <li><strong>Convert to Your Color:</strong> Captured cells turn into the new color and join your territory</li>
               <li><strong>Adjacent Rule:</strong> Only cells touching face-to-face count (not diagonal)</li>
               <li><strong>Win Condition:</strong> Capture the entire cube within the move limit!</li>
             </ol>

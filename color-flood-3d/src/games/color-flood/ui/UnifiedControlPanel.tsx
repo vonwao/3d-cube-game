@@ -93,142 +93,138 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
   
   return (
     <div className={`unified-control-panel ${className}`}>
-      {/* Row 1: Color Palette */}
-      <div className="control-row row-1">
-        <div className="control-section color-section">
-          <div className="color-grid">
-            {palette.colors.map((color, index) => {
-              const colorIndex = index as ColorIndex;
-              const isHovered = hoveredColor === colorIndex;
-              const isHinted = hintColor === colorIndex;
+      {/* Section 1: Colors, Buttons, D-pad */}
+      <div className="controls-section">
+        <div className="color-grid">
+          {palette.colors.map((color, index) => {
+            const colorIndex = index as ColorIndex;
+            const isHovered = hoveredColor === colorIndex;
+            const isHinted = hintColor === colorIndex;
 
-              return (
-                <button
-                  key={colorIndex}
-                  className={`color-button ${isHovered ? 'hovered' : ''} ${isHinted ? 'hinted' : ''} ${isDisabled ? 'disabled' : ''}`}
-                  style={{
-                    backgroundColor: color,
-                    borderColor: color,
-                    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                    boxShadow: isHinted
-                      ? `0 0 0 3px #FFD700, 0 0 10px #FFD700, 0 4px 8px ${color}40`
-                      : isHovered
-                      ? `0 0 0 2px ${color}60, 0 4px 8px ${color}40`
-                      : '0 2px 4px rgba(0,0,0,0.15)',
-                    animation: isHinted ? 'pulse 1s ease-in-out infinite' : 'none',
-                  }}
-                  onClick={() => handleColorClick(colorIndex)}
-                  onMouseEnter={() => setHoveredColor(colorIndex)}
-                  onMouseLeave={() => setHoveredColor(null)}
-                  disabled={isDisabled}
-                  title={`Select color ${colorIndex + 1} (Press ${colorIndex + 1})${isHinted ? ' - Hint!' : ''}`}
-                >
-                  <span className="color-number">{colorIndex + 1}</span>
-                  {isHinted && <span className="hint-indicator">★</span>}
-                </button>
-              );
-            })}
-          </div>
+            return (
+              <button
+                key={colorIndex}
+                className={`color-button ${isHovered ? 'hovered' : ''} ${isHinted ? 'hinted' : ''} ${isDisabled ? 'disabled' : ''}`}
+                style={{
+                  backgroundColor: color,
+                  borderColor: color,
+                  transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                  boxShadow: isHinted
+                    ? `0 0 0 3px #FFD700, 0 0 10px #FFD700, 0 4px 8px ${color}40`
+                    : isHovered
+                    ? `0 0 0 2px ${color}60, 0 4px 8px ${color}40`
+                    : '0 2px 4px rgba(0,0,0,0.15)',
+                  animation: isHinted ? 'pulse 1s ease-in-out infinite' : 'none',
+                }}
+                onClick={() => handleColorClick(colorIndex)}
+                onMouseEnter={() => setHoveredColor(colorIndex)}
+                onMouseLeave={() => setHoveredColor(null)}
+                disabled={isDisabled}
+                title={`Select color ${colorIndex + 1} (Press ${colorIndex + 1})${isHinted ? ' - Hint!' : ''}`}
+              >
+                <span className="color-number">{colorIndex + 1}</span>
+                {isHinted && <span className="hint-indicator">★</span>}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="control-section game-controls">
-          <div className="controls-layout">
-            <div className="main-control-buttons">
-              <button
-                className="control-button"
-                onClick={handleUndo}
-                disabled={!canUndo}
-                title="Undo last move (U)"
-              >
-                ↶
-              </button>
-              
-              <button
-                className="control-button"
-                onClick={handleReset}
-                title="Reset level (R)"
-              >
-                🔄
-              </button>
-              
-              <button
-                className="control-button"
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('openLevelSelector'));
-                }}
-                title="New Game"
-              >
-                🎮
-              </button>
-              
-              <button
-                className="control-button"
-                onClick={handleHint}
-                disabled={isDisabled}
-                title="Get hint for next move (H)"
-              >
-                🔍
-              </button>
-              
-              <button
-                className="control-button"
-                onClick={onShowInstructions}
-                title="Show help and instructions"
-              >
-                💡
-              </button>
-            </div>
-            
-            {/* D-pad positioned to the right on mobile */}
-            <div className="rotation-dpad">
-              <button
-                className="control-button rotation-button dpad-up"
-                onClick={handleRotateUp}
-                title="Rotate up (↑)"
-              >
-                ↑
-              </button>
-              <div className="dpad-middle">
-                <button
-                  className="control-button rotation-button dpad-left"
-                  onClick={handleRotateLeft}
-                  title="Rotate left (←)"
-                >
-                  ←
-                </button>
-                <button
-                  className="control-button rotation-button dpad-right"
-                  onClick={handleRotateRight}
-                  title="Rotate right (→)"
-                >
-                  →
-                </button>
-              </div>
-              <button
-                className="control-button rotation-button dpad-down"
-                onClick={handleRotateDown}
-                title="Rotate down (↓)"
-              >
-                ↓
-              </button>
-            </div>
+        <div className="main-control-buttons">
+          <button
+            className="control-button"
+            onClick={handleUndo}
+            disabled={!canUndo}
+            title="Undo last move (U)"
+          >
+            <span className="button-icon">↶</span>
+            <span className="button-label">Undo</span>
+          </button>
+          
+          <button
+            className="control-button"
+            onClick={handleReset}
+            title="Reset level (R)"
+          >
+            <span className="button-icon">🔄</span>
+            <span className="button-label">Reset</span>
+          </button>
+          
+          <button
+            className="control-button"
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('openLevelSelector'));
+            }}
+            title="New Game"
+          >
+            <span className="button-icon">🎮</span>
+            <span className="button-label">Game</span>
+          </button>
+          
+          <button
+            className="control-button"
+            onClick={handleHint}
+            disabled={isDisabled}
+            title="Get hint for next move (H)"
+          >
+            <span className="button-icon">🔍</span>
+            <span className="button-label">Hint</span>
+          </button>
+        </div>
+
+        <div className="rotation-dpad">
+          <button
+            className="control-button rotation-button dpad-up"
+            onClick={handleRotateUp}
+            title="Rotate up (↑)"
+          >
+            <span className="button-icon">↑</span>
+          </button>
+          <div className="dpad-bottom-row">
+            <button
+              className="control-button rotation-button dpad-left"
+              onClick={handleRotateLeft}
+              title="Rotate left (←)"
+            >
+              <span className="button-icon">←</span>
+            </button>
+            <button
+              className="control-button rotation-button dpad-down"
+              onClick={handleRotateDown}
+              title="Rotate down (↓)"
+            >
+              <span className="button-icon">↓</span>
+            </button>
+            <button
+              className="control-button rotation-button dpad-right"
+              onClick={handleRotateRight}
+              title="Rotate right (→)"
+            >
+              <span className="button-icon">→</span>
+            </button>
           </div>
         </div>
       </div>
       
-      {/* Row 2: Game Info */}
-      <div className="control-row row-2">
-        <div className="control-section info-section">
-          <div className="current-moves">
-            <span className="moves-label">Move</span>
-            <span className="moves-value">{cubeState.moves}/{cubeState.maxMoves}</span>
-          </div>
-          
-          <div className="control-hints">
-            <div className="hint-line">1-6: Colors • U: Undo • R: Reset • H: Hint</div>
-            <div className="hint-line">Drag or ↑↓←→ to rotate</div>
-          </div>
+      {/* Section 2: Move counter, shortcuts, info button */}
+      <div className="info-section">
+        <div className="current-moves">
+          <span className="moves-label">Move</span>
+          <span className="moves-value">{cubeState.moves}/{cubeState.maxMoves}</span>
         </div>
+        
+        <div className="control-hints">
+          <div className="hint-line">1-6: Colors • U: Undo • R: Reset • H: Hint</div>
+          <div className="hint-line">Drag or ↑↓←→ to rotate</div>
+        </div>
+
+        <button
+          className="control-button info-button"
+          onClick={onShowInstructions}
+          title="Show help and instructions"
+        >
+          <span className="button-icon">💡</span>
+          <span className="button-label">Help</span>
+        </button>
       </div>
       
       {/* Commented out difficulty section for potential future use

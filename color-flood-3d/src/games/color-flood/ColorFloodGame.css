@@ -909,18 +909,38 @@
   padding-bottom: 0.5rem;
 }
 
-/* Game Controls */
-.controls-layout {
+/* Desktop Layout: Two columns side-by-side */
+.unified-control-panel {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.controls-section {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex: 1;
 }
 
+.info-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 200px;
+}
+
+/* Game Controls */
 .main-control-buttons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
   justify-items: center;
+}
+
+.dpad-section {
+  flex-shrink: 0;
 }
 
 /* Legacy support for old class name */
@@ -942,9 +962,24 @@
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(5px);
+  gap: 0.1rem;
+}
+
+.button-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.button-label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: 0.9;
 }
 
 .control-button:hover:not(:disabled) {
@@ -1126,9 +1161,9 @@
   padding: 0.25rem 0;
 }
 
-/* Control Rows - Desktop: Column layout */
+/* Control Rows - Desktop: Use flex layout for both main and info rows */
 .control-row {
-  display: contents; /* Make rows invisible on desktop */
+  /* No special styling needed - handled by main-row and info-row */
 }
 
 /* Mobile Layout: Bottom Panel */
@@ -1161,16 +1196,16 @@
     overflow-y: auto;
   }
   
-  .control-row {
-    display: flex;
-    gap: 0.8rem;
+  .main-row {
+    gap: 0.75rem;
     overflow-x: auto;
-    padding-bottom: 0.3rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   }
   
-  .row-1 {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    padding-bottom: 0.8rem;
+  .info-row {
+    padding-top: 0.5rem;
+    gap: 0.5rem;
   }
   
   .control-section {
@@ -1406,7 +1441,7 @@
   }
 }
 
-/* D-pad Rotation Controls */
+/* D-pad Rotation Controls - Mac keyboard layout */
 .rotation-dpad {
   display: flex;
   flex-direction: column;
@@ -1415,7 +1450,7 @@
   flex-shrink: 0;
 }
 
-.dpad-middle {
+.dpad-bottom-row {
   display: flex;
   gap: 0.25rem;
 }
@@ -1429,21 +1464,41 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  flex-direction: row !important;
+  gap: 0 !important;
 }
 
-/* Mobile responsive adjustments */
+.rotation-button .button-label {
+  display: none;
+}
+
+/* Mobile responsive adjustments - Override desktop columns to use rows */
 @media (max-width: 768px) {
-  .controls-layout {
-    justify-content: space-between;
+  .unified-control-panel {
+    flex-direction: column;
     gap: 0.75rem;
+  }
+  
+  .controls-section {
+    gap: 0.75rem;
+    justify-content: space-between;
+  }
+  
+  .info-section {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    min-width: unset;
+    flex-wrap: wrap;
   }
   
   .main-control-buttons {
     gap: 0.4rem;
   }
   
-  .rotation-dpad {
-    margin: 0;
+  .control-hints {
+    flex-grow: 1;
+    text-align: center;
   }
   
   .rotation-button {
@@ -1451,5 +1506,10 @@
     width: 2.2rem !important;
     height: 2.2rem !important;
     font-size: 1.1rem !important;
+  }
+  
+  .info-button {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
   }
 }
