@@ -185,8 +185,8 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       >
         <boxGeometry args={[0.9, 0.9, 0.9]} />
         <meshStandardMaterial
-          roughness={0.3}
-          metalness={0.1}
+          roughness={0.8}
+          metalness={0}
           transparent={false}
         />
       </instancedMesh>

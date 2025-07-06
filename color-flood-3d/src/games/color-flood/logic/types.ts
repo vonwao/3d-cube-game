@@ -38,7 +38,7 @@ export const DEFAULT_PALETTES: ColorPalette[] = [
       '#2ECC71', // Bright Green
       '#F39C12', // Bright Orange
       '#9B59B6', // Bright Purple
-      '#F1C40F', // Bright Yellow
+      '#FFFFFF', // White for better contrast
     ],
   },
   {
@@ -49,7 +49,7 @@ export const DEFAULT_PALETTES: ColorPalette[] = [
       '#45B7D1', // Sky Blue
       '#96CEB4', // Mint Green
       '#FFEAA7', // Peach
-      '#DDA0DD', // Plum
+      '#FFFFFF', // White for better contrast
     ],
   },
   {
@@ -60,7 +60,7 @@ export const DEFAULT_PALETTES: ColorPalette[] = [
       '#FFC107', // Amber
       '#8BC34A', // Light Green
       '#00BCD4', // Cyan
-      '#673AB7', // Deep Purple
+      '#FFFFFF', // White for better contrast
     ],
   },
 ];
