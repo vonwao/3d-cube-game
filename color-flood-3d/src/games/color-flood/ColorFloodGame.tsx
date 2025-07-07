@@ -67,6 +67,8 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
     rotationSpeed: 1.2,
     keyboardSpeed: 45,
     enableKeyboard: true,
+    enableMouse: true,
+    enableTouch: true
   });
   
   // Initialize the game animation system
@@ -108,6 +110,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
           />
         </AnimatedGroup>
       </group>
+      
       
       <Environment preset="studio" />
     </>

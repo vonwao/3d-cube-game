@@ -96,6 +96,9 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     if (meshRef.current.instanceColor) {
       meshRef.current.instanceColor.needsUpdate = true;
     }
+    
+    // Force update geometry bounds for proper raycasting
+    meshRef.current.geometry.computeBoundingSphere();
   }, [cells, colorArray, positions, totalCells]);
   
   useEffect(() => {
@@ -212,6 +215,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
         ref={highlightMeshRef}
         args={[undefined, undefined, totalCells]}
         renderOrder={1}
+        raycast={() => null} // Disable raycasting for highlight mesh
       >
         <boxGeometry args={[1.05, 1.05, 1.05]} />
         <meshBasicMaterial
@@ -228,6 +232,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
           ref={hoverMeshRef}
           args={[undefined, undefined, totalCells]}
           renderOrder={2}
+          raycast={() => null} // Disable raycasting for hover mesh
         >
           <boxGeometry args={[1.02, 1.02, 1.02]} />
           <meshBasicMaterial

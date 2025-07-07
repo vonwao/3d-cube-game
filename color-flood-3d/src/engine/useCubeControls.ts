@@ -33,6 +33,9 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   
   const [isRotating, setIsRotating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [hasMoved, setHasMoved] = useState(false);
+  const [pointerDown, setPointerDown] = useState(false);
+  const [startPointer, setStartPointer] = useState(new Vector2());
   
   // State-driven approach - spring automatically follows these values
   const [springRotation, setSpringRotation] = useState({ x: 0, y: 0, z: 0 });
@@ -64,71 +67,88 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     if (!enableMouse && event.pointerType === 'mouse') return;
     if (!enableTouch && event.pointerType === 'touch') return;
     
-    setIsDragging(true);
+    // Store initial position but don't start dragging yet
     lastPointer.current.set(event.clientX, event.clientY);
+    startPointer.set(event.clientX, event.clientY);
     velocity.current.set(0, 0);
     
-    gl.domElement.setPointerCapture(event.pointerId);
-    event.preventDefault();
+    // Set a flag that we're ready to start dragging (but not dragging yet)
+    setPointerDown(true);
   };
   
   const handlePointerMove = (event: PointerEvent) => {
-    if (!isDragging) return;
+    // Only process if pointer is down
+    if (!pointerDown) return;
     
     const deltaX = event.clientX - lastPointer.current.x;
     const deltaY = event.clientY - lastPointer.current.y;
     
+    // Check if user has moved enough to consider it a drag (not a click)
+    const totalDelta = Math.abs(event.clientX - startPointer.x) + Math.abs(event.clientY - startPointer.y);
     
-    velocity.current.set(deltaX, deltaY);
-    
-    const rotationX = (deltaY * rotationSpeed) / 200;
-    const rotationY = (deltaX * rotationSpeed) / 200;
-    
-    // Update target rotation values
-    targetRotation.current.x += rotationX;
-    targetRotation.current.y += rotationY;
-    
-    // Use state-driven approach like arrow keys
-    setSpringRotation({
-      x: targetRotation.current.x,
-      y: targetRotation.current.y,
-      z: targetRotation.current.z,
-    });
-    
-    
-    lastPointer.current.set(event.clientX, event.clientY);
-    
-    if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
-      setIsRotating(true);
+    // Start dragging only after significant movement AND pointer is down
+    if (!isDragging && totalDelta > 5) {
+      setIsDragging(true);
+      setHasMoved(true);
+      // Now capture the pointer for smooth dragging
+      gl.domElement.setPointerCapture(event.pointerId);
     }
     
-    event.preventDefault();
+    // Only rotate if actually dragging
+    if (isDragging) {
+      velocity.current.set(deltaX, deltaY);
+      
+      const rotationX = (deltaY * rotationSpeed) / 200;
+      const rotationY = (deltaX * rotationSpeed) / 200;
+      
+      // Update target rotation values
+      targetRotation.current.x += rotationX;
+      targetRotation.current.y += rotationY;
+      
+      // Use state-driven approach like arrow keys
+      setSpringRotation({
+        x: targetRotation.current.x,
+        y: targetRotation.current.y,
+        z: targetRotation.current.z,
+      });
+      
+      if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
+        setIsRotating(true);
+      }
+      
+      event.preventDefault();
+    }
+    
+    lastPointer.current.set(event.clientX, event.clientY);
   };
   
   const handlePointerUp = (event: PointerEvent) => {
-    if (!isDragging) return;
-    
+    // Reset all states
+    setPointerDown(false);
     setIsDragging(false);
+    setHasMoved(false);
     
-    const momentumX = velocity.current.x * 0.02;
-    const momentumY = velocity.current.y * 0.02;
-    
-    // Apply momentum with smooth deceleration
-    targetRotation.current.x += momentumY;
-    targetRotation.current.y += momentumX;
-    
-    // Use state-driven approach for momentum
-    setSpringRotation({
-      x: targetRotation.current.x,
-      y: targetRotation.current.y,
-      z: targetRotation.current.z,
-    });
-    
-    gl.domElement.releasePointerCapture(event.pointerId);
-    
-    setTimeout(() => setIsRotating(false), 800);
-    
-    event.preventDefault();
+    // Only release capture if we had it
+    if (isDragging && hasMoved) {
+      gl.domElement.releasePointerCapture(event.pointerId);
+      
+      const momentumX = velocity.current.x * 0.02;
+      const momentumY = velocity.current.y * 0.02;
+      
+      // Apply momentum with smooth deceleration
+      targetRotation.current.x += momentumY;
+      targetRotation.current.y += momentumX;
+      
+      // Use state-driven approach for momentum
+      setSpringRotation({
+        x: targetRotation.current.x,
+        y: targetRotation.current.y,
+        z: targetRotation.current.z,
+      });
+      
+      setTimeout(() => setIsRotating(false), 800);
+      event.preventDefault();
+    }
   };
   
   // Keyboard handler using the centralized keyboard manager
@@ -230,7 +250,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
       canvas.removeEventListener('touchstart', handleTouchStart);
       canvas.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [isDragging, enableMouse, enableTouch]);
+  }, [isDragging, enableMouse, enableTouch, hasMoved, pointerDown]);
   
   
   const rotateTo = (axis: 'x' | 'y' | 'z', degrees: number) => {

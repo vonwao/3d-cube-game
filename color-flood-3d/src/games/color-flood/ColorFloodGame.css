@@ -580,11 +580,8 @@
 .game-canvas {
   width: 100% !important;
   height: 100% !important;
-  cursor: grab;
-}
-
-.game-canvas:active {
-  cursor: grabbing;
+  /* Default cursor, will be overridden by three.js on hover */
+  cursor: default;
 }
 
 /* Color Palette Styles */
@@ -1941,6 +1938,79 @@
   .toast {
     max-width: none;
     width: 100%;
+  }
+}
+
+/* Visual effects overlays - ensure they don't block pointer events */
+.move-effects,
+.combo-tracker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.floating-number,
+.pulse-effect,
+.combo-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.floating-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.pulse-effect {
+  width: 100px;
+  height: 100px;
+  border: 3px solid;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.combo-display {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  animation: comboAppear 0.3s ease;
+}
+
+.combo-message {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.best-combo {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.combo-nice { background: rgba(33, 150, 243, 0.9); }
+.combo-amazing { background: rgba(76, 175, 80, 0.9); }
+.combo-incredible { background: rgba(255, 152, 0, 0.9); }
+.combo-fire { background: rgba(244, 67, 54, 0.9); }
+
+@keyframes comboAppear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
