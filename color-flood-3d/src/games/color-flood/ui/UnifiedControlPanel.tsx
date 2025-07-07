@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useKeyboardManager, isActionKey } from '../../../engine/useKeyboardManager';
-import { useCubeState, useIsWon, useCanUndo, useCurrentPalette, useSimpleGameStore, useCubeSize } from '../logic/simpleGameStore';
+import { useCubeState, useIsWon, useCanUndo, useCurrentPalette, useSimpleGameStore, useCubeSize, useIsExploded } from '../logic/simpleGameStore';
 import type { ColorIndex } from '../logic/types';
 import { getHint } from '../logic/solver';
 import { CubeSizeSelector } from './CubeSizeSelector';
@@ -16,6 +16,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
   const canUndo = useCanUndo();
   const palette = useCurrentPalette();
   const cubeSize = useCubeSize();
+  const isExploded = useIsExploded();
   const [hoveredColor, setHoveredColor] = useState<ColorIndex | null>(null);
   const [hintColor, setHintColor] = useState<ColorIndex | null>(null);
   
@@ -170,6 +171,15 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
             <span className="button-icon">🔍</span>
             <span className="button-label">Hint</span>
           </button>
+          
+          <button
+            className={`control-button ${isExploded ? 'active' : ''}`}
+            onClick={() => useSimpleGameStore.getState().toggleExplodedView()}
+            title="Toggle exploded view (E)"
+          >
+            <span className="button-icon">{isExploded ? '🎯' : '💥'}</span>
+            <span className="button-label">Explode</span>
+          </button>
         </div>
 
         <div className="rotation-dpad">
@@ -218,7 +228,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
         </div>
         
         <div className="control-hints">
-          <div className="hint-line">1-6: Colors • U: Undo • R: Reset • H: Hint</div>
+          <div className="hint-line">1-6: Colors • U: Undo • R: Reset • H: Hint • E: Explode</div>
           <div className="hint-line">Drag or ↑↓←→ to rotate</div>
         </div>
 

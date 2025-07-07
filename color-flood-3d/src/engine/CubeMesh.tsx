@@ -14,6 +14,7 @@ interface CubeMeshProps {
   onCellClick?: (index: number) => void;
   enableHover?: boolean;
   cubeSize: CubeSize;
+  explosionProgress?: number;
 }
 
 const tempObject = new Object3D();
@@ -28,6 +29,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
   onCellClick,
   enableHover = true,
   cubeSize,
+  explosionProgress = 0,
 }) => {
   const totalCells = cubeSize ** 3;
   const defaultFloodRegion = useMemo(() => new Array(totalCells).fill(false), [totalCells]);
@@ -47,18 +49,27 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
   const positions = useMemo(() => {
     const positions: [number, number, number][] = [];
     const offset = (cubeSize - 1) / 2;
-    const adjustedSpacing = cubeSize > 4 ? spacing * 0.9 : spacing; // Tighter spacing for larger cubes
+    const adjustedSpacing = cubeSize > 4 ? spacing * 0.9 : spacing;
+    
+    // Calculate explosion offset based on layer and cube size
+    // Larger cubes need more separation to see inner layers
+    const explosionMultiplier = cubeSize <= 3 ? 2 : cubeSize <= 4 ? 2.5 : 3;
+    const explosionOffset = explosionProgress * adjustedSpacing * explosionMultiplier;
     
     for (let i = 0; i < totalCells; i++) {
       const [x, y, z] = indexToVec3(i);
+      
+      // Apply explosion offset to each Z layer
+      const zOffset = (z - offset) * explosionOffset;
+      
       positions.push([
         (x - offset) * adjustedSpacing,
         (y - offset) * adjustedSpacing,
-        (z - offset) * adjustedSpacing,
+        (z - offset) * adjustedSpacing + zOffset,
       ]);
     }
     return positions;
-  }, [spacing, cubeSize, totalCells, indexToVec3]);
+  }, [spacing, cubeSize, totalCells, indexToVec3, explosionProgress]);
   
   const colorArray = useMemo(() => {
     return colors.map(color => new Color(color));

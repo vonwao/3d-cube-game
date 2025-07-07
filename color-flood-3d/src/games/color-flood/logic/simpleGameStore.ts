@@ -17,6 +17,10 @@ interface SimpleGameStore extends GameState {
   animationConfig: AnimationConfig;
   animationStartTime: number | null;
   
+  // View state
+  isExploded: boolean;
+  explosionProgress: number;
+  
   // Progress tracking
   levelProgress: Record<string, number>; // level id -> stars earned
   totalStars: number;
@@ -26,6 +30,8 @@ interface SimpleGameStore extends GameState {
   undo: () => void;
   reset: () => void;
   changeCubeSize: (size: CubeSize) => void;
+  toggleExplodedView: () => void;
+  setExplosionProgress: (progress: number) => void;
   setAnimationPreset: (preset: AnimationPreset) => void;
   setAnimationConfig: (config: Partial<AnimationConfig>) => void;
   updateAnimationProgress: (progress: number) => void;
@@ -52,6 +58,10 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
       animationProgress: 1,
       animationConfig: DEFAULT_ANIMATION_CONFIG,
       animationStartTime: null,
+      
+      // View state
+      isExploded: false,
+      explosionProgress: 0,
       
       // Progress tracking
       levelProgress: {},
@@ -167,6 +177,18 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
         });
       },
       
+      toggleExplodedView: () => {
+        const state = get();
+        set({ 
+          isExploded: !state.isExploded,
+          explosionProgress: !state.isExploded ? 0 : 1 // Start animation
+        });
+      },
+      
+      setExplosionProgress: (progress: number) => {
+        set({ explosionProgress: progress });
+      },
+      
       updateAnimationProgress: (progress: number) => {
         const state = get();
         if (!state.isAnimating) return;
@@ -232,3 +254,7 @@ export const useLevelStars = (levelId: string) => useSimpleGameStore(state => st
 
 // Cube size selector
 export const useCubeSize = () => useSimpleGameStore(state => state.cubeSize);
+
+// Exploded view selectors
+export const useIsExploded = () => useSimpleGameStore(state => state.isExploded);
+export const useExplosionProgress = () => useSimpleGameStore(state => state.explosionProgress);

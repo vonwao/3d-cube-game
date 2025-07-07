@@ -1544,6 +1544,17 @@
   }
 }
 
+/* Exploded view button active state */
+.control-button.active {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: #3B82F6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.control-button.active:hover {
+  background: rgba(59, 130, 246, 0.4);
+}
+
 /* Mobile toast adjustments */
 @media (max-width: 768px) {
   .toast-container {

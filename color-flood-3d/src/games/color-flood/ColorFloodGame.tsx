@@ -8,7 +8,8 @@ import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
 import { useKeyboardManager, isColorKey } from '../../engine/useKeyboardManager';
 import { useGameAnimation } from './hooks/useGameAnimation';
-import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore, useCubeSize } from './logic/simpleGameStore';
+import { useExplosionAnimation } from './hooks/useExplosionAnimation';
+import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore, useCubeSize, useExplosionProgress } from './logic/simpleGameStore';
 import { UnifiedControlPanel } from './ui/UnifiedControlPanel';
 import { Instructions } from './ui/Instructions';
 import { LevelSelector } from './ui/LevelSelector';
@@ -61,6 +62,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   const palette = useCurrentPalette();
   const animationProgress = useAnimationProgress();
   const cubeSize = useCubeSize();
+  const explosionProgress = useExplosionProgress();
   const { rotation } = useCubeControls({
     rotationSpeed: 1.2,
     keyboardSpeed: 45,
@@ -69,6 +71,9 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   
   // Initialize the game animation system
   useGameAnimation();
+  
+  // Initialize explosion animation
+  useExplosionAnimation();
   
   // Dynamic scale based on cube size
   const groupScale = useMemo(() => {
@@ -99,6 +104,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
             onCellClick={onCellClick}
             enableHover={true}
             cubeSize={cubeSize}
+            explosionProgress={explosionProgress}
           />
         </AnimatedGroup>
       </group>
@@ -136,6 +142,13 @@ export const ColorFloodGame: React.FC = () => {
         const state = useSimpleGameStore.getState();
         state.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
         return true; // Event handled
+      }
+      
+      // Handle explode toggle with 'E' key
+      if (event.key === 'e' || event.key === 'E') {
+        const state = useSimpleGameStore.getState();
+        state.toggleExplodedView();
+        return true;
       }
       
       return false; // Event not handled
@@ -211,7 +224,7 @@ export const ColorFloodGame: React.FC = () => {
           {/* Visual feedback overlays */}
           <MoveEffects />
           <ComboTracker />
-          <CubeAnalyzer />
+          {/* <CubeAnalyzer /> */}
         </div>
         
         {/* Unified Control Panel */}
