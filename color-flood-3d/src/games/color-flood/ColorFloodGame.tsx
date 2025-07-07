@@ -13,6 +13,7 @@ import { UnifiedControlPanel } from './ui/UnifiedControlPanel';
 import { Instructions } from './ui/Instructions';
 import { LevelSelector } from './ui/LevelSelector';
 import { MoveToast } from './ui/MoveToast';
+import { WinDialog } from './ui/WinDialog';
 import { MoveEffects } from './ui/MoveEffects';
 import { ComboTracker } from './ui/ComboTracker';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
@@ -202,6 +203,9 @@ export const ColorFloodGame: React.FC = () => {
         
         {/* Toast notifications */}
         <MoveToast />
+        
+        {/* Win Dialog */}
+        <WinDialog />
         
         {showInstructions && (
           <Instructions onClose={() => setShowInstructions(false)} />

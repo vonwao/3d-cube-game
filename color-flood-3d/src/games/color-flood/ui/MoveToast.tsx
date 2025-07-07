@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useCubeState, useIsWon } from '../logic/simpleGameStore';
+import { useCubeState } from '../logic/simpleGameStore';
 
 interface ToastMessage {
   id: string;
@@ -14,7 +14,7 @@ export const MoveToast: React.FC = () => {
   const [lastMoveCount, setLastMoveCount] = useState(0);
   const [lastFloodSize, setLastFloodSize] = useState(0);
   const cubeState = useCubeState();
-  const isWon = useIsWon();
+  // const isWon = useIsWon(); // Handled by WinDialog now
 
   useEffect(() => {
     // Check for successful moves (excluding the initial state)
@@ -45,45 +45,8 @@ export const MoveToast: React.FC = () => {
     setLastFloodSize(cubeState.floodRegion.length);
   }, [cubeState.moves, cubeState.floodRegion.length, lastMoveCount, lastFloodSize]);
 
-  useEffect(() => {
-    // Show win toast with star rating
-    if (isWon) {
-      const efficiency = cubeState.moves / cubeState.maxMoves;
-      let stars = 0;
-      if (efficiency <= 0.6) stars = 3;
-      else if (efficiency <= 0.8) stars = 2;
-      else if (efficiency <= 1.0) stars = 1;
-      
-      let message = 'Victory!';
-      let type: 'win' | 'efficient' | 'stars' = 'stars';
-      
-      if (stars === 3) {
-        message = '🌟 Perfect! 3 Stars!';
-        type = 'efficient';
-      } else if (stars === 2) {
-        message = '⭐ Great! 2 Stars!';
-      } else if (stars === 1) {
-        message = '🎉 Victory! 1 Star!';
-      } else {
-        message = '💪 Try again for stars!';
-        type = 'win';
-      }
-      
-      const winToast: ToastMessage = {
-        id: `win-${Date.now()}`,
-        type,
-        message,
-        duration: 4000,
-        stars: stars,
-      };
-      
-      setToasts(prev => [...prev, winToast]);
-      
-      setTimeout(() => {
-        setToasts(prev => prev.filter(toast => toast.id !== winToast.id));
-      }, winToast.duration);
-    }
-  }, [isWon, cubeState.moves, cubeState.maxMoves]);
+  // Win handling is now done by WinDialog component
+  // useEffect removed to prevent duplicate win notifications
 
   const removeToast = (id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
