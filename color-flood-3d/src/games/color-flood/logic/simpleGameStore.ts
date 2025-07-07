@@ -68,14 +68,14 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
   
       applyColor: (color: ColorIndex) => {
         const state = get();
-        if (state.isWon || state.isGameOver || state.isAnimating) return;
+        if (state.isWon || state.isAnimating) return;
         
         const newState = floodFill(state.cubeState, color);
         if (newState === state.cubeState) return;
         
         const newUndoStack = [...state.undoStack, state.cubeState];
         const won = isWin(newState);
-        const gameOver = newState.moves >= newState.maxMoves && !won;
+        const gameOver = false; // Never end the game, allow playing beyond max moves
         
         set({
           cubeState: newState,

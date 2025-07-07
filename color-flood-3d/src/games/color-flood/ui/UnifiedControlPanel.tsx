@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useKeyboardManager, isActionKey } from '../../../engine/useKeyboardManager';
-import { useCubeState, useIsWon, useIsGameOver, useCanUndo, useCurrentPalette, useSimpleGameStore } from '../logic/simpleGameStore';
+import { useCubeState, useIsWon, useCanUndo, useCurrentPalette, useSimpleGameStore } from '../logic/simpleGameStore';
 import type { ColorIndex } from '../logic/types';
 import { getHint } from '../logic/solver';
 
@@ -12,7 +12,6 @@ interface UnifiedControlPanelProps {
 export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ className = '', onShowInstructions }) => {
   const cubeState = useCubeState();
   const isWon: boolean = useIsWon();
-  const isGameOver: boolean = useIsGameOver();
   const canUndo = useCanUndo();
   const palette = useCurrentPalette();
   const [hoveredColor, setHoveredColor] = useState<ColorIndex | null>(null);
@@ -27,13 +26,13 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
   }, []);
   
   const handleColorClick = useCallback((colorIndex: ColorIndex) => {
-    if (isWon || isGameOver) return;
+    if (isWon) return;
     useSimpleGameStore.getState().applyColor(colorIndex);
     setHintColor(null); // Clear hint when player makes a move
-  }, [isWon, isGameOver]);
+  }, [isWon]);
 
   const handleHint = useCallback(() => {
-    if (isWon || isGameOver) return;
+    if (isWon) return;
     const currentLevel = useSimpleGameStore.getState().currentLevel;
     if (!currentLevel) return;
     
@@ -42,7 +41,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
     
     // Clear hint after 3 seconds
     setTimeout(() => setHintColor(null), 3000);
-  }, [cubeState, isWon, isGameOver]);
+  }, [cubeState, isWon]);
 
   // Rotation handlers that dispatch keyboard events (same as keyboard shortcuts)
   const handleRotateUp = useCallback(() => {
@@ -89,7 +88,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
     }
   );
   
-  const isDisabled = isWon || isGameOver;
+  const isDisabled = isWon;
   
   return (
     <div className={`unified-control-panel ${className}`}>
@@ -209,7 +208,11 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
       <div className="info-section">
         <div className="current-moves">
           <span className="moves-label">Move</span>
-          <span className="moves-value">{cubeState.moves}/{cubeState.maxMoves}</span>
+          <span className={`moves-value ${
+            cubeState.moves / cubeState.maxMoves < 0.8 ? 'moves-good' :
+            cubeState.moves / cubeState.maxMoves <= 1.0 ? 'moves-warning' :
+            'moves-over'
+          }`}>{cubeState.moves}/{cubeState.maxMoves}</span>
         </div>
         
         <div className="control-hints">
