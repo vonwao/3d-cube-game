@@ -52,7 +52,7 @@ export const MinimalControls: React.FC<MinimalControlsProps> = () => {
         </button>
       </div>
 
-      <div className="controls-center">
+      <div className="controls-center game-hud">
         <span className="move-counter">
           <span className={`moves-value ${
             cubeState.moves / cubeState.maxMoves < 0.8 ? 'good' :

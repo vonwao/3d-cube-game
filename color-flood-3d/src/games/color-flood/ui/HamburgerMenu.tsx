@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSimpleGameStore, useCubeSize, useShowDpad, useAnimationConfig } from '../logic/simpleGameStore';
 import { generateLevelForSize } from '../logic/levelGenerator';
+import { useTutorialStore } from '../logic/tutorialStore';
 import type { CubeSize } from '../../../engine/types';
 import type { AnimationPreset } from '../config/animationConfig';
 
@@ -13,6 +14,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ onShowInstructions
   const cubeSize = useCubeSize();
   const showDpad = useShowDpad();
   const animationConfig = useAnimationConfig();
+  const { startTutorial } = useTutorialStore();
   
   // Local storage for UI preferences
   const [showColorPalette, setShowColorPalette] = useState(() => {
@@ -216,6 +218,15 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ onShowInstructions
                   }}
                 >
                   💡 How to Play
+                </button>
+                <button 
+                  className="menu-button"
+                  onClick={() => {
+                    startTutorial();
+                    setIsOpen(false);
+                  }}
+                >
+                  🎓 Interactive Tutorial
                 </button>
               </div>
             )}

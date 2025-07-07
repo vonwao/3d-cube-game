@@ -19,7 +19,9 @@ import { MoveToast } from './ui/MoveToast';
 import { WinDialog } from './ui/WinDialog';
 import { MoveEffects } from './ui/MoveEffects';
 import { ComboTracker } from './ui/ComboTracker';
+import { TutorialOverlay } from './ui/TutorialOverlay';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
+import { useTutorialStore, useHasSeenTutorial } from './logic/tutorialStore';
 
 interface CubeSceneProps {
   onCellClick?: (index: number) => void;
@@ -63,13 +65,21 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   const animationProgress = useAnimationProgress();
   const cubeSize = useCubeSize();
   const explosionProgress = useExplosionProgress();
-  const { rotation } = useCubeControls({
+  const { registerAction } = useTutorialStore();
+  const { rotation, isRotating } = useCubeControls({
     rotationSpeed: 1.2,
     keyboardSpeed: 45,
     enableKeyboard: true,
     enableMouse: true,
     enableTouch: true
   });
+  
+  // Track rotation for tutorial
+  useEffect(() => {
+    if (isRotating) {
+      registerAction('rotate-cube');
+    }
+  }, [isRotating, registerAction]);
   
   // Initialize the game animation system
   useGameAnimation();
@@ -127,6 +137,8 @@ const LoadingSpinner: React.FC = () => (
 export const ColorFloodGame: React.FC = () => {
   const currentLevel = useCurrentLevel();
   const cubeSize = useCubeSize();
+  const hasSeenTutorial = useHasSeenTutorial();
+  const { startTutorial, registerAction } = useTutorialStore();
   const [showInstructions, setShowInstructions] = useState(() => {
     return localStorage.getItem('showInstructionsOnStart') === 'true';
   });
@@ -148,6 +160,7 @@ export const ColorFloodGame: React.FC = () => {
       if (colorIndex !== null) {
         const state = useSimpleGameStore.getState();
         state.applyColor(colorIndex as 0 | 1 | 2 | 3 | 4 | 5);
+        registerAction('make-move');
         return true; // Event handled
       }
       
@@ -173,6 +186,16 @@ export const ColorFloodGame: React.FC = () => {
     }
   }, [currentLevel]);
   
+  // Start tutorial for new users
+  useEffect(() => {
+    if (!hasSeenTutorial && currentLevel) {
+      // Slight delay to ensure everything is loaded
+      setTimeout(() => {
+        startTutorial();
+      }, 500);
+    }
+  }, [hasSeenTutorial, currentLevel, startTutorial]);
+  
   // Listen for color palette toggle from hamburger menu
   useEffect(() => {
     const handleToggle = (event: Event) => {
@@ -189,6 +212,7 @@ export const ColorFloodGame: React.FC = () => {
     const cubeState = state.cubeState;
     const clickedCellColor = cubeState.cells[index];
     state.applyColor(clickedCellColor as 0 | 1 | 2 | 3 | 4 | 5);
+    registerAction('make-move');
   };
   
   if (!currentLevel) {
@@ -246,6 +270,9 @@ export const ColorFloodGame: React.FC = () => {
       
       {/* Hamburger Menu - rendered outside of game-container */}
       <HamburgerMenu onShowInstructions={() => setShowInstructions(true)} />
+      
+      {/* Tutorial Overlay */}
+      <TutorialOverlay />
     </div>
   );
 };
