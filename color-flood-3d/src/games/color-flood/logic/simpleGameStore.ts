@@ -21,6 +21,7 @@ interface SimpleGameStore extends GameState {
   isExploded: boolean;
   explosionProgress: number;
   showDpad: boolean;
+  cameraFov: number;
   
   // Progress tracking
   levelProgress: Record<string, number>; // level id -> stars earned
@@ -34,6 +35,9 @@ interface SimpleGameStore extends GameState {
   toggleExplodedView: () => void;
   setExplosionProgress: (progress: number) => void;
   toggleShowDpad: () => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  setCameraFov: (fov: number) => void;
   setAnimationPreset: (preset: AnimationPreset) => void;
   setAnimationConfig: (config: Partial<AnimationConfig>) => void;
   updateAnimationProgress: (progress: number) => void;
@@ -65,6 +69,7 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
       isExploded: false,
       explosionProgress: 0,
       showDpad: true,
+      cameraFov: 50,
       
       // Progress tracking
       levelProgress: {},
@@ -197,6 +202,23 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
         set({ showDpad: !state.showDpad });
       },
       
+      zoomIn: () => {
+        const state = get();
+        const newFov = Math.max(20, state.cameraFov - 5);
+        set({ cameraFov: newFov });
+      },
+      
+      zoomOut: () => {
+        const state = get();
+        const newFov = Math.min(80, state.cameraFov + 5);
+        set({ cameraFov: newFov });
+      },
+      
+      setCameraFov: (fov: number) => {
+        const clampedFov = Math.max(20, Math.min(80, fov));
+        set({ cameraFov: clampedFov });
+      },
+      
       updateAnimationProgress: (progress: number) => {
         const state = get();
         if (!state.isAnimating) return;
@@ -238,6 +260,7 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
         levelProgress: state.levelProgress,
         totalStars: state.totalStars,
         showDpad: state.showDpad,
+        cameraFov: state.cameraFov,
       }),
     }
   )
@@ -270,3 +293,6 @@ export const useExplosionProgress = () => useSimpleGameStore(state => state.expl
 
 // UI preference selectors
 export const useShowDpad = () => useSimpleGameStore(state => state.showDpad);
+
+// Camera controls
+export const useCameraFov = () => useSimpleGameStore(state => state.cameraFov);

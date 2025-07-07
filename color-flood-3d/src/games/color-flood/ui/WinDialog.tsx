@@ -3,10 +3,10 @@ import { useCubeState, useIsWon, useSimpleGameStore } from '../logic/simpleGameS
 import { SAMPLE_LEVELS, type ExtendedLevel } from '../levels/sampleLevels';
 
 interface WinDialogProps {
-  // No props needed currently
+  onClose?: () => void;
 }
 
-export const WinDialog: React.FC<WinDialogProps> = () => {
+export const WinDialog: React.FC<WinDialogProps> = ({ onClose }) => {
   const isWon = useIsWon();
   const cubeState = useCubeState();
   const gameState = useSimpleGameStore();
@@ -21,19 +21,13 @@ export const WinDialog: React.FC<WinDialogProps> = () => {
   else if (efficiency <= 0.8) stars = 2;
   else if (efficiency <= 1.0) stars = 1;
 
-  // Get current level tier and find next unplayed level in same tier
-  const sameTierLevels = SAMPLE_LEVELS.filter(level => level.tier === currentLevel.tier);
-  const unplayedSameTier = sameTierLevels.filter(level => !levelProgress[level.id] || level.id === currentLevel.id);
-  const hasMoreInTier = unplayedSameTier.length > 1; // More than just current level
+  // Find next unplayed level
 
-  // Find next unplayed level overall (prioritize same tier, then next tier)
   const currentIndex = SAMPLE_LEVELS.findIndex(level => level.id === currentLevel.id);
+  let nextLevel = null;
   
-  // First try to find next unplayed level in same tier
-  let nextLevel = unplayedSameTier.find(level => level.id !== currentLevel.id);
-  
-  // If no more in same tier, find next level in progression
-  if (!nextLevel && currentIndex >= 0) {
+  // Find next unplayed level
+  if (currentIndex >= 0) {
     for (let i = currentIndex + 1; i < SAMPLE_LEVELS.length; i++) {
       if (!levelProgress[SAMPLE_LEVELS[i].id]) {
         nextLevel = SAMPLE_LEVELS[i];
@@ -42,37 +36,36 @@ export const WinDialog: React.FC<WinDialogProps> = () => {
     }
   }
 
-  const handlePlayNextLevel = () => {
+  const handleNextLevel = () => {
     if (nextLevel) {
       gameState.loadLevel(nextLevel);
+    } else {
+      // If no next level, reload current level
+      gameState.loadLevel(currentLevel);
     }
   };
 
-  const handlePlaySameLevel = () => {
-    if (hasMoreInTier) {
-      // Play next unplayed level in same tier
-      gameState.loadLevel(unplayedSameTier[0]);
-    }
-  };
-
-  const handleReplayLevel = () => {
-    gameState.loadLevel(currentLevel);
+  const handleClose = () => {
+    onClose?.();
   };
 
   let message = 'Victory!';
   if (stars === 3) {
-    message = '🌟 Perfect! 3 Stars!';
+    message = 'Perfect! 3 Stars!';
   } else if (stars === 2) {
-    message = '⭐ Great! 2 Stars!';
+    message = 'Great! 2 Stars!';
   } else if (stars === 1) {
-    message = '🎉 Victory! 1 Star!';
+    message = 'Victory! 1 Star!';
   } else {
-    message = '💪 Completed!';
+    message = 'Completed!';
   }
 
   return (
     <div className="win-dialog-overlay">
       <div className="win-dialog">
+        <button className="win-dialog-close" onClick={handleClose} title="Close">
+          ×
+        </button>
         <div className="win-dialog-content">
           <h2 className="win-title">{message}</h2>
           
@@ -98,36 +91,17 @@ export const WinDialog: React.FC<WinDialogProps> = () => {
           )}
 
           <div className="win-buttons">
-            {nextLevel && (
-              <button 
-                className="win-button primary"
-                onClick={handlePlayNextLevel}
-              >
-                {nextLevel.tier === currentLevel.tier 
-                  ? `Next: ${nextLevel.name}`
-                  : `${nextLevel.tier}: ${nextLevel.name}`
-                }
-              </button>
-            )}
-            
             <button 
-              className="win-button secondary"
-              onClick={hasMoreInTier ? handlePlaySameLevel : handleReplayLevel}
+              className="win-button primary"
+              onClick={handleNextLevel}
             >
-              {hasMoreInTier ? `More ${currentLevel.tier} Levels` : 'Replay Level'}
+              {nextLevel 
+                ? (nextLevel.tier === currentLevel.tier 
+                    ? `Next Level: ${nextLevel.name}`
+                    : `${nextLevel.tier}: ${nextLevel.name}`)
+                : 'Play Again'
+              }
             </button>
-            
-            {!hasMoreInTier && !nextLevel && (
-              <div className="tier-complete-notice">
-                🎉 All levels completed! You're amazing!
-              </div>
-            )}
-            
-            {!hasMoreInTier && nextLevel && nextLevel.tier !== currentLevel.tier && (
-              <div className="tier-complete-notice">
-                🏆 {currentLevel.tier} tier complete!
-              </div>
-            )}
           </div>
         </div>
       </div>

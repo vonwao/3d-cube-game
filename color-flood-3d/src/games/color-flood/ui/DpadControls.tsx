@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useShowDpad } from '../logic/simpleGameStore';
+import { useShowDpad, useSimpleGameStore } from '../logic/simpleGameStore';
 
 export const DpadControls: React.FC = () => {
   const showDpad = useShowDpad();
@@ -19,6 +19,14 @@ export const DpadControls: React.FC = () => {
 
   const handleRotateRight = useCallback(() => {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+  }, []);
+
+  const handleZoomIn = useCallback(() => {
+    useSimpleGameStore.getState().zoomIn();
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    useSimpleGameStore.getState().zoomOut();
   }, []);
 
   if (!showDpad) return null;
@@ -54,13 +62,29 @@ export const DpadControls: React.FC = () => {
           →
         </button>
       </div>
-      <button
-        className="dpad-button dpad-down"
-        onClick={handleRotateDown}
-        title="Rotate down (↓)"
-      >
-        ↓
-      </button>
+      <div className="dpad-zoom-row">
+        <button
+          className="dpad-button dpad-zoom"
+          onClick={handleZoomOut}
+          title="Zoom out (-)"
+        >
+          −
+        </button>
+        <button
+          className="dpad-button dpad-down"
+          onClick={handleRotateDown}
+          title="Rotate down (↓)"
+        >
+          ↓
+        </button>
+        <button
+          className="dpad-button dpad-zoom"
+          onClick={handleZoomIn}
+          title="Zoom in (+)"
+        >
+          +
+        </button>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState, useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { Group } from 'three';
 import * as THREE from 'three';
@@ -9,7 +9,7 @@ import { useCubeControls } from '../../engine/useCubeControls';
 import { useKeyboardManager, isColorKey } from '../../engine/useKeyboardManager';
 import { useGameAnimation } from './hooks/useGameAnimation';
 import { useExplosionAnimation } from './hooks/useExplosionAnimation';
-import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore, useCubeSize, useExplosionProgress } from './logic/simpleGameStore';
+import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore, useCubeSize, useExplosionProgress, useCameraFov } from './logic/simpleGameStore';
 import { MinimalControls } from './ui/MinimalControls';
 import { DpadControls } from './ui/DpadControls';
 import { ColorPalette } from './ui/ColorPalette';
@@ -26,6 +26,32 @@ import { useTutorialStore } from './logic/tutorialStore';
 interface CubeSceneProps {
   onCellClick?: (index: number) => void;
 }
+
+interface CameraControllerProps {
+  fov: number;
+  position: [number, number, number];
+}
+
+const CameraController: React.FC<CameraControllerProps> = ({ fov, position }) => {
+  const { camera } = useThree();
+  
+  useEffect(() => {
+    if (camera && camera.type === 'PerspectiveCamera') {
+      const perspectiveCamera = camera as THREE.PerspectiveCamera;
+      perspectiveCamera.fov = fov;
+      perspectiveCamera.updateProjectionMatrix();
+    }
+  }, [camera, fov]);
+  
+  useEffect(() => {
+    if (camera) {
+      camera.position.set(...position);
+      camera.lookAt(0, 0, 0);
+    }
+  }, [camera, position]);
+  
+  return null;
+};
 
 interface AnimatedGroupProps {
   rotation: [SpringValue<number>, SpringValue<number>, SpringValue<number>];
@@ -65,7 +91,14 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   const animationProgress = useAnimationProgress();
   const cubeSize = useCubeSize();
   const explosionProgress = useExplosionProgress();
+  const cameraFov = useCameraFov();
   const { registerAction } = useTutorialStore();
+  
+  // Dynamic camera position based on cube size
+  const cameraPosition = useMemo(() => {
+    const distance = cubeSize * 2.7;
+    return [distance, distance, distance] as [number, number, number];
+  }, [cubeSize]);
   const { rotation, isRotating } = useCubeControls({
     rotationSpeed: 1.2,
     keyboardSpeed: 45,
@@ -96,6 +129,7 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   
   return (
     <>
+      <CameraController fov={cameraFov} position={cameraPosition} />
       <ambientLight intensity={0.25} />
       <directionalLight
         position={[5, 10, 5]}
@@ -145,6 +179,15 @@ export const ColorFloodGame: React.FC = () => {
   const [showColorPalette, setShowColorPalette] = useState(() => {
     return localStorage.getItem('showColorPalette') === 'true';
   });
+  const [dismissedWinDialog, setDismissedWinDialog] = useState(false);
+  const isWon = useSimpleGameStore(state => state.isWon);
+  
+  // Reset dismissed state when starting a new level
+  useEffect(() => {
+    if (!isWon) {
+      setDismissedWinDialog(false);
+    }
+  }, [isWon]);
   
   // Dynamic camera position based on cube size
   const cameraPosition = useMemo(() => {
@@ -271,7 +314,9 @@ export const ColorFloodGame: React.FC = () => {
         <MoveToast />
         
         {/* Win Dialog */}
-        <WinDialog />
+        {isWon && !dismissedWinDialog && (
+          <WinDialog onClose={() => setDismissedWinDialog(true)} />
+        )}
         
         {showInstructions && (
           <Instructions onClose={() => setShowInstructions(false)} />
