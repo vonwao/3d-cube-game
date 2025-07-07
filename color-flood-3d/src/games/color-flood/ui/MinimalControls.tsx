@@ -52,7 +52,7 @@ export const MinimalControls: React.FC<MinimalControlsProps> = () => {
         </button>
       </div>
 
-      <div className="controls-center game-hud">
+      <div className="controls-center">
         <span className="move-counter">
           <span className={`moves-value ${
             cubeState.moves / cubeState.maxMoves < 0.8 ? 'good' :
@@ -72,7 +72,7 @@ export const MinimalControls: React.FC<MinimalControlsProps> = () => {
         <button
           className="hamburger-button"
           onClick={() => window.dispatchEvent(new CustomEvent('openHamburgerMenu'))}
-          title="Menu"
+          title="Menu (M or Esc)"
         >
           ☰
         </button>

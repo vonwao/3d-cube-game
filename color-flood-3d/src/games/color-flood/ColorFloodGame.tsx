@@ -171,6 +171,12 @@ export const ColorFloodGame: React.FC = () => {
         return true;
       }
       
+      // Handle menu toggle with 'M' or 'Escape' key
+      if (event.key === 'm' || event.key === 'M' || event.key === 'Escape') {
+        window.dispatchEvent(new CustomEvent('openHamburgerMenu'));
+        return true;
+      }
+      
       return false; // Event not handled
     },
     { 

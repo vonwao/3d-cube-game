@@ -205,6 +205,10 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ onShowInstructions
                   <span className="key">Q/E</span>
                   <span className="action">Roll left/right</span>
                 </div>
+                <div className="shortcut">
+                  <span className="key">M/Esc</span>
+                  <span className="action">Open menu</span>
+                </div>
               </div>
             </div>
 
