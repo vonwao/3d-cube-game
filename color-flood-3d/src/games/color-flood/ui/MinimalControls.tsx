@@ -64,20 +64,20 @@ export const MinimalControls: React.FC<MinimalControlsProps> = ({
     <div className="minimal-controls">
       <div className="controls-left">
         <button
-          className="minimal-button"
+          className="minimal-button icon-button"
           onClick={handleUndo}
           disabled={!canUndo}
           title="Undo (U)"
         >
-          Undo
+          ↩️
         </button>
         
         <button
-          className="minimal-button"
+          className="minimal-button icon-button"
           onClick={handleReset}
           title="Reset (R)"
         >
-          Reset
+          🔄
         </button>
         
         <button
@@ -85,7 +85,10 @@ export const MinimalControls: React.FC<MinimalControlsProps> = ({
           onClick={handleToggleExplode}
           title="Explode (E)"
         >
-          Explode
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span>⤴️</span>
+            <span>Explode</span>
+          </span>
         </button>
       </div>
 
@@ -107,19 +110,19 @@ export const MinimalControls: React.FC<MinimalControlsProps> = ({
 
       <div className="controls-right">
         <button
-          className={`minimal-button icon-button ${showDpad ? 'active' : ''}`}
-          onClick={handleToggleDpad}
-          title="Toggle D-pad Controls"
-        >
-          🎮
-        </button>
-        
-        <button
           className={`minimal-button icon-button ${showColorPalette ? 'active' : ''}`}
           onClick={handleToggleColorPalette}
           title="Toggle Color Palette"
         >
           🎨
+        </button>
+        
+        <button
+          className={`minimal-button icon-button ${showDpad ? 'active' : ''}`}
+          onClick={handleToggleDpad}
+          title="Toggle D-pad Controls"
+        >
+          🎮
         </button>
         
         <div className="new-game-container" ref={newGameMenuRef}>

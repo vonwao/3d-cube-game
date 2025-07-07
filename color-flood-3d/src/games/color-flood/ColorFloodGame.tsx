@@ -173,9 +173,7 @@ export const ColorFloodGame: React.FC = () => {
   const cubeSize = useCubeSize();
   const { startTutorial, registerAction } = useTutorialStore();
   const hasCompletedTutorial = useTutorialStore(state => state.hasCompletedTutorial);
-  const [showInstructions, setShowInstructions] = useState(() => {
-    return localStorage.getItem('showInstructionsOnStart') === 'true';
-  });
+  const [showInstructions, setShowInstructions] = useState(false);
   const [showColorPalette, setShowColorPalette] = useState(() => {
     return localStorage.getItem('showColorPalette') === 'true';
   });
