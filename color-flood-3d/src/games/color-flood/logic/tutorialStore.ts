@@ -29,6 +29,7 @@ interface TutorialStore {
   resetTutorial: () => void;
   setStep: (index: number) => void;
   completeTutorial: () => void;
+  dismissTutorialPermanently: () => void;
   
   // Action tracking
   registerAction: (action: string) => void;
@@ -154,6 +155,14 @@ export const useTutorialStore = create<TutorialStore>()(
       },
       
       completeTutorial: () => {
+        set({
+          isActive: false,
+          hasCompletedTutorial: true,
+          hasSeenTutorial: true,
+        });
+      },
+      
+      dismissTutorialPermanently: () => {
         set({
           isActive: false,
           hasCompletedTutorial: true,

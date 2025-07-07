@@ -21,7 +21,7 @@ import { MoveEffects } from './ui/MoveEffects';
 import { ComboTracker } from './ui/ComboTracker';
 import { TutorialOverlay } from './ui/TutorialOverlay';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
-import { useTutorialStore, useHasSeenTutorial } from './logic/tutorialStore';
+import { useTutorialStore } from './logic/tutorialStore';
 
 interface CubeSceneProps {
   onCellClick?: (index: number) => void;
@@ -137,8 +137,8 @@ const LoadingSpinner: React.FC = () => (
 export const ColorFloodGame: React.FC = () => {
   const currentLevel = useCurrentLevel();
   const cubeSize = useCubeSize();
-  const hasSeenTutorial = useHasSeenTutorial();
   const { startTutorial, registerAction } = useTutorialStore();
+  const hasCompletedTutorial = useTutorialStore(state => state.hasCompletedTutorial);
   const [showInstructions, setShowInstructions] = useState(() => {
     return localStorage.getItem('showInstructionsOnStart') === 'true';
   });
@@ -194,13 +194,13 @@ export const ColorFloodGame: React.FC = () => {
   
   // Start tutorial for new users
   useEffect(() => {
-    if (!hasSeenTutorial && currentLevel) {
+    if (!hasCompletedTutorial && currentLevel) {
       // Slight delay to ensure everything is loaded
       setTimeout(() => {
         startTutorial();
       }, 500);
     }
-  }, [hasSeenTutorial, currentLevel, startTutorial]);
+  }, [hasCompletedTutorial, currentLevel, startTutorial]);
   
   // Listen for color palette toggle from hamburger menu
   useEffect(() => {

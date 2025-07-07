@@ -13,7 +13,7 @@ export const TutorialOverlay: React.FC = () => {
   const currentStep = useCurrentTutorialStep();
   const stepIndex = useTutorialStepIndex();
   const steps = useTutorialSteps();
-  const { nextStep, previousStep, skipTutorial } = useTutorialStore();
+  const { nextStep, previousStep, skipTutorial, dismissTutorialPermanently } = useTutorialStore();
   
   useEffect(() => {
     if (!isActive || !currentStep?.highlightElements) return;
@@ -38,8 +38,8 @@ export const TutorialOverlay: React.FC = () => {
   
   return (
     <>
-      {/* Dark overlay for the rest of the screen */}
-      <div className="tutorial-backdrop" onClick={skipTutorial} />
+      {/* Dark overlay for the rest of the screen - no click to dismiss */}
+      <div className="tutorial-backdrop" />
       
       {/* Tutorial bar at the top */}
       <div className="tutorial-overlay">
@@ -57,12 +57,20 @@ export const TutorialOverlay: React.FC = () => {
         </div>
         
         <div className="tutorial-controls">
-          <button 
-            className="tutorial-btn tutorial-btn-skip"
-            onClick={skipTutorial}
-          >
-            Skip Tutorial
-          </button>
+          <div className="tutorial-dismiss-buttons">
+            <button 
+              className="tutorial-btn tutorial-btn-skip"
+              onClick={skipTutorial}
+            >
+              Skip for Now
+            </button>
+            <button 
+              className="tutorial-btn tutorial-btn-dismiss"
+              onClick={dismissTutorialPermanently}
+            >
+              Don't Show Again
+            </button>
+          </div>
           
           <div className="tutorial-nav">
             <button 
