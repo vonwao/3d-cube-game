@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reset Tutorial</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
+        .status { margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Tutorial & Settings Reset Utility</h1>
+    
+    <button onclick="resetTutorial()">Reset Tutorial State</button>
+    <button onclick="disableOldInstructions()">Disable Old Instructions</button>
+    <button onclick="clearAll()">Clear All Settings</button>
+    <button onclick="showCurrentState()">Show Current State</button>
+    
+    <div class="status" id="status"></div>
+    
+    <script>
+        function resetTutorial() {
+            localStorage.removeItem('color-flood-tutorial');
+            document.getElementById('status').textContent = 'Tutorial state reset! Reload the game to see the tutorial.';
+        }
+        
+        function disableOldInstructions() {
+            localStorage.setItem('showInstructionsOnStart', 'false');
+            document.getElementById('status').textContent = 'Old instructions disabled on startup.';
+        }
+        
+        function clearAll() {
+            const keysToRemove = [
+                'color-flood-tutorial',
+                'showInstructionsOnStart',
+                'showColorPalette',
+                'color-flood-progress'
+            ];
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+            document.getElementById('status').textContent = 'All settings cleared!';
+        }
+        
+        function showCurrentState() {
+            const state = {
+                tutorial: localStorage.getItem('color-flood-tutorial'),
+                showInstructionsOnStart: localStorage.getItem('showInstructionsOnStart'),
+                showColorPalette: localStorage.getItem('showColorPalette'),
+                progress: localStorage.getItem('color-flood-progress')
+            };
+            document.getElementById('status').innerHTML = '<pre>' + JSON.stringify(state, null, 2) + '</pre>';
+        }
+        
+        // Show state on load
+        showCurrentState();
+    </script>
+</body>
+</html>
