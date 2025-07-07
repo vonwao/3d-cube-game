@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `pnpm dev` - Start development server with hot reload
 - `pnpm build` - Build for production (runs TypeScript check then Vite build)
+- `pnpm build:check` - Comprehensive build command that runs TypeScript check, ESLint, tests, and Vite build
 - `pnpm lint` - Run ESLint on all files
 - `pnpm test` - Run Jest tests once
 - `pnpm test:watch` - Run Jest tests in watch mode

@@ -35,7 +35,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   const [isDragging, setIsDragging] = useState(false);
   const [hasMoved, setHasMoved] = useState(false);
   const [pointerDown, setPointerDown] = useState(false);
-  const [startPointer, setStartPointer] = useState(new Vector2());
+  const [startPointer] = useState(new Vector2());
   
   // State-driven approach - spring automatically follows these values
   const [springRotation, setSpringRotation] = useState({ x: 0, y: 0, z: 0 });

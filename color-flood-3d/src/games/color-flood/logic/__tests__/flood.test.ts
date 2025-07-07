@@ -5,25 +5,25 @@ import type { CubeState, ColorIndex } from '../types';
 describe('Flood Fill Logic', () => {
   describe('getNeighbors', () => {
     test('should return correct neighbors for center cell (13)', () => {
-      const neighbors = getNeighbors(13);
+      const neighbors = getNeighbors(13, 3);
       expect(neighbors).toHaveLength(6);
       expect(neighbors.sort()).toEqual([10, 12, 14, 16, 4, 22].sort());
     });
 
     test('should return correct neighbors for corner cell (0)', () => {
-      const neighbors = getNeighbors(0);
+      const neighbors = getNeighbors(0, 3);
       expect(neighbors).toHaveLength(3);
       expect(neighbors.sort()).toEqual([1, 3, 9].sort());
     });
 
     test('should return correct neighbors for edge cell (1)', () => {
-      const neighbors = getNeighbors(1);
+      const neighbors = getNeighbors(1, 3);
       expect(neighbors).toHaveLength(4);
       expect(neighbors.sort()).toEqual([0, 2, 4, 10].sort());
     });
 
     test('should return correct neighbors for face center (4)', () => {
-      const neighbors = getNeighbors(4);
+      const neighbors = getNeighbors(4, 3);
       expect(neighbors).toHaveLength(5);
       expect(neighbors.sort()).toEqual([1, 3, 5, 7, 13].sort());
     });
@@ -36,10 +36,10 @@ describe('Flood Fill Logic', () => {
       initialCells[1] = 1;
       initialCells[3] = 1;
       
-      const state = createInitialState(initialCells, 10);
+      const state = createInitialState(initialCells, 10, 3);
       
-      const result1 = floodFill(state, 1);
-      const result2 = floodFill(result1, 1);
+      const result1 = floodFill(state, 1, 3);
+      const result2 = floodFill(result1, 1, 3);
       
       expect(result1).toEqual(result2);
     });
@@ -49,8 +49,8 @@ describe('Flood Fill Logic', () => {
       initialCells[1] = 1;
       initialCells[2] = 1;
       
-      const state = createInitialState(initialCells, 10);
-      const result = floodFill(state, 1);
+      const state = createInitialState(initialCells, 10, 3);
+      const result = floodFill(state, 1, 3);
       
       expect(result.floodRegion[0]).toBe(true);
       expect(result.floodRegion[1]).toBe(true);
@@ -60,9 +60,9 @@ describe('Flood Fill Logic', () => {
 
     test('should not change state when applying current color', () => {
       const initialCells: ColorIndex[] = new Array(27).fill(0) as ColorIndex[];
-      const state = createInitialState(initialCells, 10);
+      const state = createInitialState(initialCells, 10, 3);
       
-      const result = floodFill(state, 0);
+      const result = floodFill(state, 0, 3);
       
       expect(result).toBe(state);
     });
@@ -71,8 +71,8 @@ describe('Flood Fill Logic', () => {
       const initialCells: ColorIndex[] = new Array(27).fill(0) as ColorIndex[];
       initialCells[1] = 1;
       
-      const state = createInitialState(initialCells, 10);
-      const result = floodFill(state, 1);
+      const state = createInitialState(initialCells, 10, 3);
+      const result = floodFill(state, 1, 3);
       
       expect(result.moves).toBe(state.moves + 1);
     });
@@ -115,7 +115,7 @@ describe('Flood Fill Logic', () => {
         ...new Array(18).fill(0)
       ] as ColorIndex[];
       
-      const state = createInitialState(cells, 5);
+      const state = createInitialState(cells, 5, 3);
       
       expect(state.cells).toEqual(cells);
       expect(state.moves).toBe(0);
@@ -136,7 +136,7 @@ describe('Flood Fill Logic', () => {
         ...new Array(18).fill(2)
       ] as ColorIndex[];
       
-      const state = createInitialState(cells, 8);
+      const state = createInitialState(cells, 8, 3);
       
       expect(state.floodRegion[0]).toBe(true);
       expect(state.floodRegion[1]).toBe(true);
@@ -148,15 +148,15 @@ describe('Flood Fill Logic', () => {
   describe('Edge Cases', () => {
     test('should handle single-cell game', () => {
       const cells: ColorIndex[] = [0, ...new Array(26).fill(1)] as ColorIndex[];
-      const state = createInitialState(cells, 1);
-      const result = floodFill(state, 1);
+      const state = createInitialState(cells, 1, 3);
+      const result = floodFill(state, 1, 3);
       
       expect(isWin(result)).toBe(true);
     });
 
     test('should handle already won game', () => {
       const cells: ColorIndex[] = new Array(27).fill(3) as ColorIndex[];
-      const state = createInitialState(cells, 1);
+      const state = createInitialState(cells, 1, 3);
       
       expect(isWin(state)).toBe(true);
     });

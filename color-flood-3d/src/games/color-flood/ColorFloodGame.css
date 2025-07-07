@@ -584,31 +584,34 @@
   cursor: default;
 }
 
-/* Color Palette Styles */
+/* Color Palette Styles - Compact Corner Design */
 .color-palette {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  position: fixed;
+  bottom: 6rem;
+  left: 1rem;
   z-index: 10;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 280px;
+  width: auto;
 }
 
 .color-palette-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 0.75rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 .color-button {
-  width: 100%;
-  height: 3rem;
+  width: 3.5rem;
+  height: 3.5rem;
   border: 2px solid transparent;
-  border-radius: 0;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -617,9 +620,9 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .color-button::before {
@@ -632,6 +635,11 @@
   background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
   transform: translateX(-100%);
   transition: transform 0.6s ease;
+}
+
+.color-button:hover {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .color-button:hover::before {
@@ -653,16 +661,15 @@
 
 .color-hotkey {
   position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: 0.7rem;
-  font-weight: bold;
-  background: rgba(0, 0, 0, 0.7);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  font-weight: 900;
   color: white;
-  padding: 2px 4px;
-  border-radius: 3px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
   z-index: 2;
-  opacity: 0.8;
+  pointer-events: none;
 }
 
 .color-palette-hint {
@@ -674,13 +681,15 @@
 
 .keyboard-hints {
   display: flex;
-  gap: 1rem;
-  font-size: 0.8rem;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.7);
+  text-align: center;
 }
 
 .keyboard-hints span {
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 0.25rem;
   font-family: monospace;
@@ -733,21 +742,29 @@
   }
   
   .color-palette {
-    padding: 0.75rem;
+    padding: 0.6rem;
+    max-width: 240px;
+    bottom: 5.5rem;
+    left: 0.5rem;
   }
   
   .color-palette-grid {
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
   
   .color-button {
-    height: 2.5rem;
-    font-size: 0.9rem;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1rem;
+  }
+  
+  .color-hotkey {
+    font-size: 1rem;
   }
   
   .keyboard-hints {
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.2rem;
     align-items: center;
   }
 }
@@ -765,9 +782,21 @@
     font-size: 1rem;
   }
   
+  .color-palette {
+    padding: 0.5rem;
+    max-width: 200px;
+    bottom: 5.25rem;
+    left: 0.25rem;
+  }
+  
   .color-button {
-    height: 2rem;
-    font-size: 0.8rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .color-hotkey {
+    font-size: 0.9rem;
   }
   
   .keyboard-hints {
@@ -1843,21 +1872,24 @@
   opacity: 0.8;
 }
 
-/* Floating Color Palette */
+/* Floating Color Palette - inherits from main color-palette styles */
 .floating-palette {
+  /* Override position to be bottom-left corner above bottom bar */
   position: fixed;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 6rem;
+  left: 1rem;
   z-index: 150;
   background: rgba(0, 0, 0, 0.85);
-  padding: 1rem;
-  border-radius: 1rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 280px;
+  width: auto;
 }
 
 .floating-palette .color-palette-grid {
-  margin-bottom: 0;
+  margin-bottom: 0.5rem;
 }
 
 /* D-pad Controls */

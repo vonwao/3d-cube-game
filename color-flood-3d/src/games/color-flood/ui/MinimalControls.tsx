@@ -5,7 +5,7 @@ interface MinimalControlsProps {
   onShowInstructions?: () => void;
 }
 
-export const MinimalControls: React.FC<MinimalControlsProps> = ({ onShowInstructions }) => {
+export const MinimalControls: React.FC<MinimalControlsProps> = () => {
   const cubeState = useCubeState();
   const canUndo = useCanUndo();
   const cubeSize = useCubeSize();
