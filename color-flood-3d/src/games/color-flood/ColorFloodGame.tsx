@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState, useRef } from 'react';
+import { Suspense, useEffect, useState, useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import { Group } from 'three';
@@ -8,7 +8,7 @@ import { CubeMesh } from '../../engine/CubeMesh';
 import { useCubeControls } from '../../engine/useCubeControls';
 import { useKeyboardManager, isColorKey } from '../../engine/useKeyboardManager';
 import { useGameAnimation } from './hooks/useGameAnimation';
-import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore } from './logic/simpleGameStore';
+import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore, useCubeSize } from './logic/simpleGameStore';
 import { UnifiedControlPanel } from './ui/UnifiedControlPanel';
 import { Instructions } from './ui/Instructions';
 import { LevelSelector } from './ui/LevelSelector';
@@ -18,6 +18,7 @@ import { MoveEffects } from './ui/MoveEffects';
 import { ComboTracker } from './ui/ComboTracker';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
 import type { Level } from './logic/types';
+import { CubeAnalyzer } from './ui/CubeAnalyzer';
 
 interface CubeSceneProps {
   onCellClick?: (index: number) => void;
@@ -52,13 +53,14 @@ const AnimatedGroup: React.FC<AnimatedGroupProps> = ({ rotation, children }) => 
     }
   });
   
-  return <group ref={groupRef} scale={[1.5, 1.5, 1.5]}>{children}</group>;
+  return <group ref={groupRef}>{children}</group>;
 };
 
 const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   const cubeState = useCubeState();
   const palette = useCurrentPalette();
   const animationProgress = useAnimationProgress();
+  const cubeSize = useCubeSize();
   const { rotation } = useCubeControls({
     rotationSpeed: 1.2,
     keyboardSpeed: 45,
@@ -67,6 +69,12 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
   
   // Initialize the game animation system
   useGameAnimation();
+  
+  // Dynamic scale based on cube size
+  const groupScale = useMemo(() => {
+    const scale = cubeSize <= 4 ? 1.5 : 1.5 * (4 / cubeSize);
+    return [scale, scale, scale] as [number, number, number];
+  }, [cubeSize]);
   
   
   return (
@@ -80,17 +88,20 @@ const CubeScene: React.FC<CubeSceneProps> = ({ onCellClick }) => {
         shadow-mapSize-height={2048}
       />
       
-      <AnimatedGroup rotation={rotation}>
-        <CubeMesh
-          cells={cubeState.cells}
-          colors={palette.colors}
-          floodRegion={cubeState.floodRegion}
-          spacing={1.1}
-          animationProgress={animationProgress}
-          onCellClick={onCellClick}
-          enableHover={true}
-        />
-      </AnimatedGroup>
+      <group scale={groupScale}>
+        <AnimatedGroup rotation={rotation}>
+          <CubeMesh
+            cells={cubeState.cells}
+            colors={palette.colors}
+            floodRegion={cubeState.floodRegion}
+            spacing={1.1}
+            animationProgress={animationProgress}
+            onCellClick={onCellClick}
+            enableHover={true}
+            cubeSize={cubeSize}
+          />
+        </AnimatedGroup>
+      </group>
       
       <Environment preset="studio" />
     </>
@@ -106,8 +117,15 @@ const LoadingSpinner: React.FC = () => (
 
 export const ColorFloodGame: React.FC = () => {
   const currentLevel = useCurrentLevel();
+  const cubeSize = useCubeSize();
   const [showLevelSelector, setShowLevelSelector] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
+  
+  // Dynamic camera position based on cube size
+  const cameraPosition = useMemo(() => {
+    const distance = cubeSize * 2.7;
+    return [distance, distance, distance] as [number, number, number];
+  }, [cubeSize]);
   
   // Color selection keyboard handler with highest priority (outside Canvas)
   useKeyboardManager(
@@ -174,7 +192,7 @@ export const ColorFloodGame: React.FC = () => {
         <div className="game-scene">
           <Canvas
             camera={{
-              position: [8, 8, 8],
+              position: cameraPosition,
               fov: 50,
             }}
             shadows
@@ -193,6 +211,7 @@ export const ColorFloodGame: React.FC = () => {
           {/* Visual feedback overlays */}
           <MoveEffects />
           <ComboTracker />
+          <CubeAnalyzer />
         </div>
         
         {/* Unified Control Panel */}

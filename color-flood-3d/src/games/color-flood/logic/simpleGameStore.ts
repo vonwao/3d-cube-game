@@ -5,8 +5,12 @@ import { DEFAULT_PALETTES } from './types';
 import { floodFill, isWin, createInitialState } from './flood';
 import { DEFAULT_ANIMATION_CONFIG, type AnimationConfig, type AnimationPreset, ANIMATION_PRESETS } from '../config/animationConfig';
 import { getStarsForLevel, calculateTotalStars, type ExtendedLevel } from '../levels/sampleLevels';
+import type { CubeSize } from '../../../engine/types';
+import { DEFAULT_CUBE_SIZE } from './config';
+import { generateLevelForSize } from './levelGenerator';
 
 interface SimpleGameStore extends GameState {
+  cubeSize: CubeSize;
   currentPalette: ColorPalette;
   isAnimating: boolean;
   animationProgress: number;
@@ -21,6 +25,7 @@ interface SimpleGameStore extends GameState {
   applyColor: (color: ColorIndex) => void;
   undo: () => void;
   reset: () => void;
+  changeCubeSize: (size: CubeSize) => void;
   setAnimationPreset: (preset: AnimationPreset) => void;
   setAnimationConfig: (config: Partial<AnimationConfig>) => void;
   updateAnimationProgress: (progress: number) => void;
@@ -30,6 +35,7 @@ interface SimpleGameStore extends GameState {
 export const useSimpleGameStore = create<SimpleGameStore>()(
   persist(
     (set, get) => ({
+      cubeSize: DEFAULT_CUBE_SIZE,
       currentLevel: null,
       cubeState: {
         cells: [],
@@ -52,7 +58,8 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
       totalStars: 0,
       
       loadLevel: (level: Level) => {
-        const cubeState = createInitialState(level.cells, level.maxMoves);
+        const state = get();
+        const cubeState = createInitialState(level.cells, level.maxMoves, state.cubeSize);
         set({
           currentLevel: level,
           cubeState,
@@ -70,7 +77,7 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
         const state = get();
         if (state.isWon || state.isAnimating) return;
         
-        const newState = floodFill(state.cubeState, color);
+        const newState = floodFill(state.cubeState, color, state.cubeSize);
         if (newState === state.cubeState) return;
         
         const newUndoStack = [...state.undoStack, state.cubeState];
@@ -116,7 +123,7 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
         const state = get();
         if (!state.currentLevel) return;
         
-        const cubeState = createInitialState(state.currentLevel.cells, state.currentLevel.maxMoves);
+        const cubeState = createInitialState(state.currentLevel.cells, state.currentLevel.maxMoves, state.cubeSize);
         set({
           cubeState,
           undoStack: [],
@@ -139,6 +146,24 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
         const state = get();
         set({
           animationConfig: { ...state.animationConfig, ...config }
+        });
+      },
+      
+      changeCubeSize: (size: CubeSize) => {
+        const level = generateLevelForSize(size, 5); // Medium difficulty
+        
+        const cubeState = createInitialState(level.cells, level.maxMoves, size);
+        set({
+          cubeSize: size,
+          currentLevel: level,
+          cubeState,
+          undoStack: [],
+          isWon: false,
+          isGameOver: false,
+          selectedColor: null,
+          isAnimating: false,
+          animationProgress: 1,
+          animationStartTime: null,
         });
       },
       
@@ -204,3 +229,6 @@ export const useAnimationStartTime = () => useSimpleGameStore(state => state.ani
 export const useLevelProgress = () => useSimpleGameStore(state => state.levelProgress);
 export const useTotalStars = () => useSimpleGameStore(state => state.totalStars);
 export const useLevelStars = (levelId: string) => useSimpleGameStore(state => state.levelProgress[levelId] || 0);
+
+// Cube size selector
+export const useCubeSize = () => useSimpleGameStore(state => state.cubeSize);

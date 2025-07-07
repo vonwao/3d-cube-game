@@ -1,5 +1,7 @@
 import type { CubeState, ColorIndex, Level } from './types';
+import type { CubeSize } from '../../../engine/types';
 import { createInitialState, floodFill, isWin } from './flood';
+import { DEFAULT_CUBE_SIZE } from './config';
 
 export interface SolutionStep {
   color: ColorIndex;
@@ -39,8 +41,8 @@ const getPossibleMoves = (state: CubeState): ColorIndex[] => {
 /**
  * Solves a level using BFS to find the optimal solution
  */
-export const solveLevel = (level: Level): Solution => {
-  const initialState = createInitialState(level.cells, level.maxMoves);
+export const solveLevel = (level: Level, cubeSize: CubeSize = DEFAULT_CUBE_SIZE): Solution => {
+  const initialState = createInitialState(level.cells, level.maxMoves, cubeSize);
   
   // If already won, return empty solution
   if (isWin(initialState)) {
@@ -69,7 +71,7 @@ export const solveLevel = (level: Level): Solution => {
     const possibleMoves = getPossibleMoves(currentState);
     
     for (const color of possibleMoves) {
-      const newState = floodFill(currentState, color);
+      const newState = floodFill(currentState, color, cubeSize);
       const newPath = [...path, { color, moveNumber: path.length + 1 }];
       
       // Check if we've won
@@ -101,12 +103,12 @@ export const solveLevel = (level: Level): Solution => {
 /**
  * Analyzes all levels to find their optimal solutions
  */
-export const analyzeLevels = (levels: Level[]): Record<string, Solution> => {
+export const analyzeLevels = (levels: Level[], cubeSize: CubeSize = DEFAULT_CUBE_SIZE): Record<string, Solution> => {
   const results: Record<string, Solution> = {};
   
   for (const level of levels) {
     console.log(`Analyzing level ${level.id}...`);
-    const solution = solveLevel(level);
+    const solution = solveLevel(level, cubeSize);
     results[level.id] = solution;
     
     if (solution.solvable) {
@@ -122,9 +124,9 @@ export const analyzeLevels = (levels: Level[]): Record<string, Solution> => {
 /**
  * Validates that all levels are solvable within their declared maxMoves
  */
-export const validateLevels = (levels: Level[]): { valid: boolean; issues: string[] } => {
+export const validateLevels = (levels: Level[], cubeSize: CubeSize = DEFAULT_CUBE_SIZE): { valid: boolean; issues: string[] } => {
   const issues: string[] = [];
-  const solutions = analyzeLevels(levels);
+  const solutions = analyzeLevels(levels, cubeSize);
   
   for (const level of levels) {
     const solution = solutions[level.id];
@@ -145,7 +147,7 @@ export const validateLevels = (levels: Level[]): { valid: boolean; issues: strin
 /**
  * Gets a hint for the next best move from the current state
  */
-export const getHint = (_level: Level, currentState: CubeState): ColorIndex | null => {
+export const getHint = (_level: Level, currentState: CubeState, cubeSize: CubeSize = DEFAULT_CUBE_SIZE): ColorIndex | null => {
   // If already won, no hint needed
   if (isWin(currentState)) return null;
   
@@ -168,7 +170,7 @@ export const getHint = (_level: Level, currentState: CubeState): ColorIndex | nu
       const possibleMoves = getPossibleMoves(state);
       
       for (const color of possibleMoves) {
-        const newState = floodFill(state, color);
+        const newState = floodFill(state, color, cubeSize);
         const newFirstMove = firstMove || color;
         
         // Check if we've won

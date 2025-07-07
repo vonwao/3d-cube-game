@@ -1,18 +1,9 @@
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { InstancedMesh, Object3D, Color } from 'three';
+import type { CubeSize } from './types';
 
 type ColorIndex = number;
-
-const CUBE_SIZE = 3;
-const TOTAL_CELLS = CUBE_SIZE ** 3;
-
-const indexToVec3 = (index: number): [number, number, number] => {
-  const x = index % CUBE_SIZE;
-  const y = Math.floor(index / CUBE_SIZE) % CUBE_SIZE;
-  const z = Math.floor(index / (CUBE_SIZE * CUBE_SIZE));
-  return [x, y, z];
-};
 
 interface CubeMeshProps {
   cells: ColorIndex[];
@@ -22,6 +13,7 @@ interface CubeMeshProps {
   animationProgress?: number;
   onCellClick?: (index: number) => void;
   enableHover?: boolean;
+  cubeSize: CubeSize;
 }
 
 const tempObject = new Object3D();
@@ -30,12 +22,23 @@ const tempColor = new Color();
 export const CubeMesh: React.FC<CubeMeshProps> = ({
   cells,
   colors,
-  floodRegion = new Array(TOTAL_CELLS).fill(false),
+  floodRegion,
   spacing = 1.1,
   animationProgress = 1,
   onCellClick,
   enableHover = true,
+  cubeSize,
 }) => {
+  const totalCells = cubeSize ** 3;
+  const defaultFloodRegion = useMemo(() => new Array(totalCells).fill(false), [totalCells]);
+  const actualFloodRegion = floodRegion || defaultFloodRegion;
+  
+  const indexToVec3 = (index: number): [number, number, number] => {
+    const x = index % cubeSize;
+    const y = Math.floor(index / cubeSize) % cubeSize;
+    const z = Math.floor(index / (cubeSize * cubeSize));
+    return [x, y, z];
+  };
   const meshRef = useRef<InstancedMesh>(null);
   const highlightMeshRef = useRef<InstancedMesh>(null);
   const hoverMeshRef = useRef<InstancedMesh>(null);
@@ -43,16 +46,19 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
   
   const positions = useMemo(() => {
     const positions: [number, number, number][] = [];
-    for (let i = 0; i < TOTAL_CELLS; i++) {
+    const offset = (cubeSize - 1) / 2;
+    const adjustedSpacing = cubeSize > 4 ? spacing * 0.9 : spacing; // Tighter spacing for larger cubes
+    
+    for (let i = 0; i < totalCells; i++) {
       const [x, y, z] = indexToVec3(i);
       positions.push([
-        (x - 1) * spacing,
-        (y - 1) * spacing,
-        (z - 1) * spacing,
+        (x - offset) * adjustedSpacing,
+        (y - offset) * adjustedSpacing,
+        (z - offset) * adjustedSpacing,
       ]);
     }
     return positions;
-  }, [spacing]);
+  }, [spacing, cubeSize, totalCells, indexToVec3]);
   
   const colorArray = useMemo(() => {
     return colors.map(color => new Color(color));
@@ -61,7 +67,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
   useEffect(() => {
     if (!meshRef.current) return;
     
-    for (let i = 0; i < TOTAL_CELLS; i++) {
+    for (let i = 0; i < totalCells; i++) {
       const [x, y, z] = positions[i];
       
       tempObject.position.set(x, y, z);
@@ -79,14 +85,14 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     if (meshRef.current.instanceColor) {
       meshRef.current.instanceColor.needsUpdate = true;
     }
-  }, [cells, colorArray, positions]);
+  }, [cells, colorArray, positions, totalCells]);
   
   useEffect(() => {
     if (!highlightMeshRef.current) return;
     
-    for (let i = 0; i < TOTAL_CELLS; i++) {
+    for (let i = 0; i < totalCells; i++) {
       const [x, y, z] = positions[i];
-      const isHighlighted = floodRegion[i];
+      const isHighlighted = actualFloodRegion[i];
       
       tempObject.position.set(x, y, z);
       tempObject.scale.setScalar(isHighlighted ? 1.08 : 0.001);
@@ -102,13 +108,13 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     if (highlightMeshRef.current.instanceColor) {
       highlightMeshRef.current.instanceColor.needsUpdate = true;
     }
-  }, [floodRegion, positions]);
+  }, [actualFloodRegion, positions, totalCells]);
 
   // Update hover mesh
   useEffect(() => {
     if (!hoverMeshRef.current) return;
     
-    for (let i = 0; i < TOTAL_CELLS; i++) {
+    for (let i = 0; i < totalCells; i++) {
       const [x, y, z] = positions[i];
       const isHovered = hoveredCell === i;
       
@@ -133,7 +139,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     if (hoverMeshRef.current.instanceColor) {
       hoverMeshRef.current.instanceColor.needsUpdate = true;
     }
-  }, [hoveredCell, positions, cells, colorArray]);
+  }, [hoveredCell, positions, cells, colorArray, totalCells]);
   
   useFrame(() => {
     if (meshRef.current && animationProgress < 1) {
@@ -146,7 +152,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     }
   });
   
-  const handleClick = (event: any) => {
+  const handleClick = (event: { instanceId?: number }) => {
     if (!onCellClick) return;
     
     const instanceId = event.instanceId;
@@ -155,7 +161,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     }
   };
 
-  const handlePointerEnter = (event: any) => {
+  const handlePointerEnter = (event: { instanceId?: number }) => {
     if (!enableHover) return;
     
     const instanceId = event.instanceId;
@@ -176,7 +182,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     <>
       <instancedMesh
         ref={meshRef}
-        args={[undefined, undefined, TOTAL_CELLS]}
+        args={[undefined, undefined, totalCells]}
         onClick={handleClick}
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
@@ -193,7 +199,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       
       <instancedMesh
         ref={highlightMeshRef}
-        args={[undefined, undefined, TOTAL_CELLS]}
+        args={[undefined, undefined, totalCells]}
         renderOrder={1}
       >
         <boxGeometry args={[1.05, 1.05, 1.05]} />
@@ -209,7 +215,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       {enableHover && (
         <instancedMesh
           ref={hoverMeshRef}
-          args={[undefined, undefined, TOTAL_CELLS]}
+          args={[undefined, undefined, totalCells]}
           renderOrder={2}
         >
           <boxGeometry args={[1.02, 1.02, 1.02]} />

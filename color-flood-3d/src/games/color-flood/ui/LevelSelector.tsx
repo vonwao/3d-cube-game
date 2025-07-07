@@ -5,6 +5,7 @@ import { CubeMesh } from '../../../engine/CubeMesh';
 import { useCurrentPalette, useTotalStars, useLevelStars } from '../logic/simpleGameStore';
 import { createInitialState } from '../logic/flood';
 import type { Level } from '../logic/types';
+import { DEFAULT_CUBE_SIZE } from '../logic/config';
 
 interface MiniCubePreviewProps {
   level: Level;
@@ -15,7 +16,7 @@ const MiniCubePreview: React.FC<MiniCubePreviewProps> = ({ level, size = 80 }) =
   const palette = useCurrentPalette();
   
   const cubeState = useMemo(() => {
-    return createInitialState(level.cells, level.maxMoves);
+    return createInitialState(level.cells, level.maxMoves, DEFAULT_CUBE_SIZE);
   }, [level]);
 
   return (
@@ -40,6 +41,7 @@ const MiniCubePreview: React.FC<MiniCubePreviewProps> = ({ level, size = 80 }) =
             floodRegion={cubeState.floodRegion}
             spacing={0.9}
             animationProgress={1}
+            cubeSize={DEFAULT_CUBE_SIZE}
           />
         </group>
       </Canvas>

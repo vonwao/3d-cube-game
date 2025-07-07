@@ -1,9 +1,21 @@
 import type { CubeState, ColorIndex } from './types';
-import { CUBE_SIZE, TOTAL_CELLS, indexToVec3, vec3ToIndex } from './types';
+import type { Vec3, CubeSize } from '../../../engine/types';
 
-export const getNeighbors = (index: number): number[] => {
+// Position conversion functions with dynamic cube size
+export const indexToVec3 = (index: number, cubeSize: CubeSize): Vec3 => {
+  const x = index % cubeSize;
+  const y = Math.floor(index / cubeSize) % cubeSize;
+  const z = Math.floor(index / (cubeSize * cubeSize));
+  return [x, y, z];
+};
+
+export const vec3ToIndex = (vec: Vec3, cubeSize: CubeSize): number => {
+  return vec[0] + vec[1] * cubeSize + vec[2] * cubeSize * cubeSize;
+};
+
+export const getNeighbors = (index: number, cubeSize: CubeSize): number[] => {
   const neighbors: number[] = [];
-  const [x, y, z] = indexToVec3(index);
+  const [x, y, z] = indexToVec3(index, cubeSize);
   
   const directions = [
     [-1, 0, 0], [1, 0, 0], // left, right
@@ -16,15 +28,15 @@ export const getNeighbors = (index: number): number[] => {
     const ny = y + dy;
     const nz = z + dz;
     
-    if (nx >= 0 && nx < CUBE_SIZE && ny >= 0 && ny < CUBE_SIZE && nz >= 0 && nz < CUBE_SIZE) {
-      neighbors.push(vec3ToIndex([nx as 0 | 1 | 2, ny as 0 | 1 | 2, nz as 0 | 1 | 2]));
+    if (nx >= 0 && nx < cubeSize && ny >= 0 && ny < cubeSize && nz >= 0 && nz < cubeSize) {
+      neighbors.push(vec3ToIndex([nx, ny, nz], cubeSize));
     }
   }
   
   return neighbors;
 };
 
-export const floodFill = (state: CubeState, targetColor: ColorIndex): CubeState => {
+export const floodFill = (state: CubeState, targetColor: ColorIndex, cubeSize: CubeSize): CubeState => {
   const newCells = [...state.cells];
   const newFloodRegion = [...state.floodRegion];
   
@@ -38,7 +50,8 @@ export const floodFill = (state: CubeState, targetColor: ColorIndex): CubeState 
   }
   
   // First, change all cells in our current flood region to the target color
-  for (let i = 0; i < TOTAL_CELLS; i++) {
+  const totalCells = cubeSize ** 3;
+  for (let i = 0; i < totalCells; i++) {
     if (state.floodRegion[i]) {
       newCells[i] = targetColor;
     }
@@ -48,7 +61,7 @@ export const floodFill = (state: CubeState, targetColor: ColorIndex): CubeState 
   const visited = new Set<number>();
   
   // Start from all cells in our current flood region
-  for (let i = 0; i < TOTAL_CELLS; i++) {
+  for (let i = 0; i < totalCells; i++) {
     if (state.floodRegion[i]) {
       queue.push(i);
       visited.add(i);
@@ -58,7 +71,7 @@ export const floodFill = (state: CubeState, targetColor: ColorIndex): CubeState 
   // Expand into adjacent cells that already have the target color
   while (queue.length > 0) {
     const current = queue.shift()!;
-    const neighbors = getNeighbors(current);
+    const neighbors = getNeighbors(current, cubeSize);
     
     for (const neighbor of neighbors) {
       // If neighbor already has the target color and we haven't captured it yet
@@ -83,8 +96,9 @@ export const isWin = (state: CubeState): boolean => {
   return state.floodRegion.every(cell => cell === true);
 };
 
-export const createInitialState = (cells: ColorIndex[], maxMoves: number): CubeState => {
-  const floodRegion = new Array(TOTAL_CELLS).fill(false);
+export const createInitialState = (cells: ColorIndex[], maxMoves: number, cubeSize: CubeSize): CubeState => {
+  const totalCells = cubeSize ** 3;
+  const floodRegion = new Array(totalCells).fill(false);
   
   const queue: number[] = [0];
   const visited = new Set<number>([0]);
@@ -94,7 +108,7 @@ export const createInitialState = (cells: ColorIndex[], maxMoves: number): CubeS
   
   while (queue.length > 0) {
     const current = queue.shift()!;
-    const neighbors = getNeighbors(current);
+    const neighbors = getNeighbors(current, cubeSize);
     
     for (const neighbor of neighbors) {
       if (!visited.has(neighbor) && cells[neighbor] === startColor) {

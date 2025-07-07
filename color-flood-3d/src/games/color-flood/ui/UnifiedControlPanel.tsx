@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { useKeyboardManager, isActionKey } from '../../../engine/useKeyboardManager';
-import { useCubeState, useIsWon, useCanUndo, useCurrentPalette, useSimpleGameStore } from '../logic/simpleGameStore';
+import { useCubeState, useIsWon, useCanUndo, useCurrentPalette, useSimpleGameStore, useCubeSize } from '../logic/simpleGameStore';
 import type { ColorIndex } from '../logic/types';
 import { getHint } from '../logic/solver';
+import { CubeSizeSelector } from './CubeSizeSelector';
 
 interface UnifiedControlPanelProps {
   className?: string;
@@ -14,6 +15,7 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
   const isWon: boolean = useIsWon();
   const canUndo = useCanUndo();
   const palette = useCurrentPalette();
+  const cubeSize = useCubeSize();
   const [hoveredColor, setHoveredColor] = useState<ColorIndex | null>(null);
   const [hintColor, setHintColor] = useState<ColorIndex | null>(null);
   
@@ -36,12 +38,12 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
     const currentLevel = useSimpleGameStore.getState().currentLevel;
     if (!currentLevel) return;
     
-    const hint = getHint(currentLevel, cubeState);
+    const hint = getHint(currentLevel, cubeState, cubeSize);
     setHintColor(hint);
     
     // Clear hint after 3 seconds
     setTimeout(() => setHintColor(null), 3000);
-  }, [cubeState, isWon]);
+  }, [cubeState, isWon, cubeSize]);
 
   // Rotation handlers that dispatch keyboard events (same as keyboard shortcuts)
   const handleRotateUp = useCallback(() => {
@@ -228,6 +230,11 @@ export const UnifiedControlPanel: React.FC<UnifiedControlPanelProps> = ({ classN
           <span className="button-icon">💡</span>
           <span className="button-label">Help</span>
         </button>
+      </div>
+      
+      {/* Cube Size Selector */}
+      <div className="control-section">
+        <CubeSizeSelector className="cube-size-section" />
       </div>
       
       {/* Commented out difficulty section for potential future use

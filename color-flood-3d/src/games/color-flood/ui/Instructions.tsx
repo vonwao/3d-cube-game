@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCubeSize } from '../logic/simpleGameStore';
 
 interface InstructionsProps {
   onClose?: () => void;
@@ -6,6 +7,7 @@ interface InstructionsProps {
 
 export const Instructions: React.FC<InstructionsProps> = ({ onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const cubeSize = useCubeSize();
   
   const handleClose = () => {
     setIsVisible(false);
@@ -52,7 +54,7 @@ export const Instructions: React.FC<InstructionsProps> = ({ onClose }) => {
         <div className="instructions-content">
           <div className="goal">
             <h3>🎯 Goal</h3>
-            <p>Capture the entire 3x3x3 cube by flooding into different colored regions!</p>
+            <p>Capture the entire {cubeSize}×{cubeSize}×{cubeSize} cube by flooding into different colored regions!</p>
           </div>
           
           <div className="how-to-play">

@@ -1,4 +1,4 @@
-import type { Vec3 } from '../../../engine/types';
+// Vec3 type is defined in engine/types.ts
 
 export type ColorIndex = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -65,16 +65,4 @@ export const DEFAULT_PALETTES: ColorPalette[] = [
   },
 ];
 
-export const CUBE_SIZE = 3;
-export const TOTAL_CELLS = CUBE_SIZE ** 3;
-
-export const indexToVec3 = (index: number): Vec3 => {
-  const x = index % CUBE_SIZE;
-  const y = Math.floor(index / CUBE_SIZE) % CUBE_SIZE;
-  const z = Math.floor(index / (CUBE_SIZE * CUBE_SIZE));
-  return [x as 0 | 1 | 2, y as 0 | 1 | 2, z as 0 | 1 | 2];
-};
-
-export const vec3ToIndex = (vec: Vec3): number => {
-  return vec[0] + vec[1] * CUBE_SIZE + vec[2] * CUBE_SIZE * CUBE_SIZE;
-};
+// Position conversion functions moved to flood.ts to have access to cubeSize parameter
