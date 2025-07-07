@@ -1,15 +1,24 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useCubeState, useCanUndo, useSimpleGameStore, useCubeSize, useIsExploded } from '../logic/simpleGameStore';
+import { CubeSizeSelector } from './CubeSizeSelector';
 
 interface MinimalControlsProps {
   onShowInstructions?: () => void;
+  showColorPalette?: boolean;
+  onToggleColorPalette?: (show: boolean) => void;
 }
 
-export const MinimalControls: React.FC<MinimalControlsProps> = () => {
+export const MinimalControls: React.FC<MinimalControlsProps> = ({ 
+  showColorPalette = false, 
+  onToggleColorPalette 
+}) => {
   const cubeState = useCubeState();
   const canUndo = useCanUndo();
   const cubeSize = useCubeSize();
   const isExploded = useIsExploded();
+  const showDpad = useSimpleGameStore(state => state.showDpad);
+  const [showNewGameMenu, setShowNewGameMenu] = useState(false);
+  const newGameMenuRef = useRef<HTMLDivElement>(null);
 
   const handleUndo = () => {
     useSimpleGameStore.getState().undo();
@@ -22,6 +31,34 @@ export const MinimalControls: React.FC<MinimalControlsProps> = () => {
   const handleToggleExplode = () => {
     useSimpleGameStore.getState().toggleExplodedView();
   };
+
+  const handleToggleDpad = () => {
+    useSimpleGameStore.getState().toggleShowDpad();
+  };
+
+  const handleToggleColorPalette = () => {
+    const newValue = !showColorPalette;
+    onToggleColorPalette?.(newValue);
+    localStorage.setItem('showColorPalette', newValue.toString());
+  };
+
+  const handleNewGame = () => {
+    setShowNewGameMenu(!showNewGameMenu);
+  };
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (newGameMenuRef.current && !newGameMenuRef.current.contains(event.target as Node)) {
+        setShowNewGameMenu(false);
+      }
+    };
+
+    if (showNewGameMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showNewGameMenu]);
 
   return (
     <div className="minimal-controls">
@@ -69,6 +106,44 @@ export const MinimalControls: React.FC<MinimalControlsProps> = () => {
       </div>
 
       <div className="controls-right">
+        <button
+          className={`minimal-button icon-button ${showDpad ? 'active' : ''}`}
+          onClick={handleToggleDpad}
+          title="Toggle D-pad Controls"
+        >
+          🎮
+        </button>
+        
+        <button
+          className={`minimal-button icon-button ${showColorPalette ? 'active' : ''}`}
+          onClick={handleToggleColorPalette}
+          title="Toggle Color Palette"
+        >
+          🎨
+        </button>
+        
+        <div className="new-game-container" ref={newGameMenuRef}>
+          <button
+            className="minimal-button icon-button"
+            onClick={handleNewGame}
+            title="New Game"
+          >
+            ⭐
+          </button>
+          {showNewGameMenu && (
+            <div className="new-game-menu">
+              <div className="new-game-header">Choose Cube Size</div>
+              <CubeSizeSelector className="compact" />
+              <button 
+                className="close-menu-btn"
+                onClick={() => setShowNewGameMenu(false)}
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </div>
+        
         <button
           className="hamburger-button"
           onClick={() => window.dispatchEvent(new CustomEvent('openHamburgerMenu'))}

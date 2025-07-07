@@ -253,7 +253,11 @@ export const ColorFloodGame: React.FC = () => {
         </div>
         
         {/* Minimal bottom controls */}
-        <MinimalControls onShowInstructions={() => setShowInstructions(true)} />
+        <MinimalControls 
+          onShowInstructions={() => setShowInstructions(true)} 
+          showColorPalette={showColorPalette}
+          onToggleColorPalette={setShowColorPalette}
+        />
         
         {/* D-pad controls (toggleable) */}
         <DpadControls />
