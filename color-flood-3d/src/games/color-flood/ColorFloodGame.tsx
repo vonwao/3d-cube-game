@@ -12,13 +12,13 @@ import { useExplosionAnimation } from './hooks/useExplosionAnimation';
 import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore, useCubeSize, useExplosionProgress } from './logic/simpleGameStore';
 import { MinimalControls } from './ui/MinimalControls';
 import { DpadControls } from './ui/DpadControls';
+import { ColorPalette } from './ui/ColorPalette';
 import { Instructions } from './ui/Instructions';
 import { MoveToast } from './ui/MoveToast';
 import { WinDialog } from './ui/WinDialog';
 import { MoveEffects } from './ui/MoveEffects';
 import { ComboTracker } from './ui/ComboTracker';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
-import type { Level } from './logic/types';
 
 interface CubeSceneProps {
   onCellClick?: (index: number) => void;
@@ -123,7 +123,12 @@ const LoadingSpinner: React.FC = () => (
 export const ColorFloodGame: React.FC = () => {
   const currentLevel = useCurrentLevel();
   const cubeSize = useCubeSize();
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(() => {
+    return localStorage.getItem('showInstructionsOnStart') === 'true';
+  });
+  const [showColorPalette, setShowColorPalette] = useState(() => {
+    return localStorage.getItem('showColorPalette') === 'true';
+  });
   
   // Dynamic camera position based on cube size
   const cameraPosition = useMemo(() => {
@@ -163,6 +168,17 @@ export const ColorFloodGame: React.FC = () => {
       state.loadLevel(SAMPLE_LEVELS[0]);
     }
   }, [currentLevel]);
+  
+  // Listen for color palette toggle from hamburger menu
+  useEffect(() => {
+    const handleToggle = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      setShowColorPalette(customEvent.detail);
+    };
+    
+    window.addEventListener('toggleColorPalette', handleToggle);
+    return () => window.removeEventListener('toggleColorPalette', handleToggle);
+  }, []);
   
   const handleCellClick = (index: number) => {
     const state = useSimpleGameStore.getState();
@@ -207,6 +223,11 @@ export const ColorFloodGame: React.FC = () => {
         
         {/* D-pad controls (toggleable) */}
         <DpadControls />
+        
+        {/* Color Palette (toggleable) */}
+        {showColorPalette && (
+          <ColorPalette className="floating-palette" />
+        )}
         
         {/* Toast notifications */}
         <MoveToast />

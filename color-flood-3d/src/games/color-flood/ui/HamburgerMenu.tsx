@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useSimpleGameStore, useCubeSize, useShowDpad, useIsExploded } from '../logic/simpleGameStore';
-import { CubeSizeSelector } from './CubeSizeSelector';
+import { useSimpleGameStore, useCubeSize, useShowDpad, useAnimationConfig } from '../logic/simpleGameStore';
 import { generateLevelForSize } from '../logic/levelGenerator';
 import type { CubeSize } from '../../../engine/types';
+import type { AnimationPreset } from '../config/animationConfig';
 
 interface HamburgerMenuProps {
   onShowInstructions?: () => void;
@@ -12,7 +12,27 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ onShowInstructions
   const [isOpen, setIsOpen] = useState(false);
   const cubeSize = useCubeSize();
   const showDpad = useShowDpad();
-  const isExploded = useIsExploded();
+  const animationConfig = useAnimationConfig();
+  
+  // Local storage for UI preferences
+  const [showColorPalette, setShowColorPalette] = useState(() => {
+    return localStorage.getItem('showColorPalette') === 'true';
+  });
+  const [showInstructionsOnStart, setShowInstructionsOnStart] = useState(() => {
+    return localStorage.getItem('showInstructionsOnStart') === 'true';
+  });
+  
+  const updateShowColorPalette = (value: boolean) => {
+    setShowColorPalette(value);
+    localStorage.setItem('showColorPalette', value.toString());
+    // Dispatch custom event so ColorFloodGame can react
+    window.dispatchEvent(new CustomEvent('toggleColorPalette', { detail: value }));
+  };
+  
+  const updateShowInstructionsOnStart = (value: boolean) => {
+    setShowInstructionsOnStart(value);
+    localStorage.setItem('showInstructionsOnStart', value.toString());
+  };
 
   const handleNewPuzzle = () => {
     const level = generateLevelForSize(cubeSize, 5); // Medium difficulty
@@ -87,6 +107,44 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ onShowInstructions
                 />
                 <span>Show D-pad Controls</span>
               </label>
+              <label className="toggle-option">
+                <input
+                  type="checkbox"
+                  checked={showColorPalette}
+                  onChange={(e) => updateShowColorPalette(e.target.checked)}
+                />
+                <span>Show Color Palette</span>
+              </label>
+              <label className="toggle-option">
+                <input
+                  type="checkbox"
+                  checked={showInstructionsOnStart}
+                  onChange={(e) => updateShowInstructionsOnStart(e.target.checked)}
+                />
+                <span>Show Instructions on Start</span>
+              </label>
+            </div>
+
+            <div className="menu-section">
+              <h3>Animation Speed</h3>
+              <div className="animation-controls">
+                <select 
+                  className="animation-select"
+                  value={animationConfig.enabled ? 
+                    (animationConfig.moveAnimation.duration === 300 ? 'fast' :
+                     animationConfig.moveAnimation.duration === 600 ? 'normal' :
+                     animationConfig.moveAnimation.duration === 1000 ? 'slow' : 'normal') : 'off'}
+                  onChange={(e) => {
+                    const preset = e.target.value as AnimationPreset;
+                    useSimpleGameStore.getState().setAnimationPreset(preset);
+                  }}
+                >
+                  <option value="off">Off</option>
+                  <option value="fast">Fast</option>
+                  <option value="normal">Normal</option>
+                  <option value="slow">Slow</option>
+                </select>
+              </div>
             </div>
 
             <div className="menu-section">

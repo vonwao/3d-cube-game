@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCubeState, useIsWon, useCanUndo, useSimpleGameStore, useCubeSize, useIsExploded } from '../logic/simpleGameStore';
+import { useCubeState, useCanUndo, useSimpleGameStore, useCubeSize, useIsExploded } from '../logic/simpleGameStore';
 import { HamburgerMenu } from './HamburgerMenu';
 
 interface MinimalControlsProps {
@@ -11,7 +11,6 @@ export const MinimalControls: React.FC<MinimalControlsProps> = ({ onShowInstruct
   const canUndo = useCanUndo();
   const cubeSize = useCubeSize();
   const isExploded = useIsExploded();
-  const isWon = useIsWon();
 
   const handleUndo = () => {
     useSimpleGameStore.getState().undo();
