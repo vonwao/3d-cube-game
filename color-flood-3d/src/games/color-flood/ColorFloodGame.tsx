@@ -157,7 +157,10 @@ export const ColorFloodGame: React.FC = () => {
   };
   
   const handleCellClick = (index: number) => {
-    console.log(`Cell clicked: ${index}`);
+    const state = useSimpleGameStore.getState();
+    const cubeState = state.cubeState;
+    const clickedCellColor = cubeState.cells[index];
+    state.applyColor(clickedCellColor as 0 | 1 | 2 | 3 | 4 | 5);
   };
   
   if (!currentLevel) {
