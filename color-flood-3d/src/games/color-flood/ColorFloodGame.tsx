@@ -10,16 +10,15 @@ import { useKeyboardManager, isColorKey } from '../../engine/useKeyboardManager'
 import { useGameAnimation } from './hooks/useGameAnimation';
 import { useExplosionAnimation } from './hooks/useExplosionAnimation';
 import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress, useSimpleGameStore, useCubeSize, useExplosionProgress } from './logic/simpleGameStore';
-import { UnifiedControlPanel } from './ui/UnifiedControlPanel';
+import { MinimalControls } from './ui/MinimalControls';
+import { DpadControls } from './ui/DpadControls';
 import { Instructions } from './ui/Instructions';
-import { LevelSelector } from './ui/LevelSelector';
 import { MoveToast } from './ui/MoveToast';
 import { WinDialog } from './ui/WinDialog';
 import { MoveEffects } from './ui/MoveEffects';
 import { ComboTracker } from './ui/ComboTracker';
 import { SAMPLE_LEVELS } from './levels/sampleLevels';
 import type { Level } from './logic/types';
-import { CubeAnalyzer } from './ui/CubeAnalyzer';
 
 interface CubeSceneProps {
   onCellClick?: (index: number) => void;
@@ -124,8 +123,7 @@ const LoadingSpinner: React.FC = () => (
 export const ColorFloodGame: React.FC = () => {
   const currentLevel = useCurrentLevel();
   const cubeSize = useCubeSize();
-  const [showLevelSelector, setShowLevelSelector] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(true);
+  const [showInstructions, setShowInstructions] = useState(false);
   
   // Dynamic camera position based on cube size
   const cameraPosition = useMemo(() => {
@@ -166,28 +164,6 @@ export const ColorFloodGame: React.FC = () => {
     }
   }, [currentLevel]);
   
-  useEffect(() => {
-    const handleOpenLevelSelector = () => {
-      setShowLevelSelector(true);
-    };
-    
-    window.addEventListener('openLevelSelector', handleOpenLevelSelector);
-    
-    return () => {
-      window.removeEventListener('openLevelSelector', handleOpenLevelSelector);
-    };
-  }, []);
-  
-  const handleLevelSelect = (level: Level) => {
-    const state = useSimpleGameStore.getState();
-    state.loadLevel(level);
-    setShowLevelSelector(false);
-  };
-  
-  const handleCloseLevelSelector = () => {
-    setShowLevelSelector(false);
-  };
-  
   const handleCellClick = (index: number) => {
     const state = useSimpleGameStore.getState();
     const cubeState = state.cubeState;
@@ -224,14 +200,13 @@ export const ColorFloodGame: React.FC = () => {
           {/* Visual feedback overlays */}
           <MoveEffects />
           <ComboTracker />
-          {/* <CubeAnalyzer /> */}
         </div>
         
-        {/* Unified Control Panel */}
-        <UnifiedControlPanel 
-          className="unified-control-panel" 
-          onShowInstructions={() => setShowInstructions(true)}
-        />
+        {/* Minimal bottom controls */}
+        <MinimalControls onShowInstructions={() => setShowInstructions(true)} />
+        
+        {/* D-pad controls (toggleable) */}
+        <DpadControls />
         
         {/* Toast notifications */}
         <MoveToast />
@@ -241,13 +216,6 @@ export const ColorFloodGame: React.FC = () => {
         
         {showInstructions && (
           <Instructions onClose={() => setShowInstructions(false)} />
-        )}
-        
-        {showLevelSelector && (
-          <LevelSelector
-            onLevelSelect={handleLevelSelect}
-            onClose={handleCloseLevelSelector}
-          />
         )}
       </div>
     </div>

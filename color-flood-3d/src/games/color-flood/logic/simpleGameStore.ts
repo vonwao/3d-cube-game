@@ -20,6 +20,7 @@ interface SimpleGameStore extends GameState {
   // View state
   isExploded: boolean;
   explosionProgress: number;
+  showDpad: boolean;
   
   // Progress tracking
   levelProgress: Record<string, number>; // level id -> stars earned
@@ -32,6 +33,7 @@ interface SimpleGameStore extends GameState {
   changeCubeSize: (size: CubeSize) => void;
   toggleExplodedView: () => void;
   setExplosionProgress: (progress: number) => void;
+  toggleShowDpad: () => void;
   setAnimationPreset: (preset: AnimationPreset) => void;
   setAnimationConfig: (config: Partial<AnimationConfig>) => void;
   updateAnimationProgress: (progress: number) => void;
@@ -62,6 +64,7 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
       // View state
       isExploded: false,
       explosionProgress: 0,
+      showDpad: true,
       
       // Progress tracking
       levelProgress: {},
@@ -189,6 +192,11 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
         set({ explosionProgress: progress });
       },
       
+      toggleShowDpad: () => {
+        const state = get();
+        set({ showDpad: !state.showDpad });
+      },
+      
       updateAnimationProgress: (progress: number) => {
         const state = get();
         if (!state.isAnimating) return;
@@ -229,6 +237,7 @@ export const useSimpleGameStore = create<SimpleGameStore>()(
       partialize: (state) => ({ 
         levelProgress: state.levelProgress,
         totalStars: state.totalStars,
+        showDpad: state.showDpad,
       }),
     }
   )
@@ -258,3 +267,6 @@ export const useCubeSize = () => useSimpleGameStore(state => state.cubeSize);
 // Exploded view selectors
 export const useIsExploded = () => useSimpleGameStore(state => state.isExploded);
 export const useExplosionProgress = () => useSimpleGameStore(state => state.explosionProgress);
+
+// UI preference selectors
+export const useShowDpad = () => useSimpleGameStore(state => state.showDpad);
