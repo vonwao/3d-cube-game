@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSimpleGameStore, useCubeSize, useShowDpad, useAnimationConfig } from '../logic/simpleGameStore';
 import { generateLevelForSize } from '../logic/levelGenerator';
 import type { CubeSize } from '../../../engine/types';
@@ -33,6 +33,13 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ onShowInstructions
     setShowInstructionsOnStart(value);
     localStorage.setItem('showInstructionsOnStart', value.toString());
   };
+  
+  // Listen for open menu event
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true);
+    window.addEventListener('openHamburgerMenu', handleOpen);
+    return () => window.removeEventListener('openHamburgerMenu', handleOpen);
+  }, []);
 
   const handleNewPuzzle = () => {
     const level = generateLevelForSize(cubeSize, 5); // Medium difficulty
@@ -58,15 +65,6 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ onShowInstructions
 
   return (
     <>
-      {/* Hamburger Button */}
-      <button
-        className="hamburger-button"
-        onClick={() => setIsOpen(!isOpen)}
-        title="Menu"
-      >
-        ☰
-      </button>
-
       {/* Menu Overlay */}
       {isOpen && (
         <>

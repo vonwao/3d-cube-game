@@ -1,6 +1,5 @@
 import React from 'react';
 import { useCubeState, useCanUndo, useSimpleGameStore, useCubeSize, useIsExploded } from '../logic/simpleGameStore';
-import { HamburgerMenu } from './HamburgerMenu';
 
 interface MinimalControlsProps {
   onShowInstructions?: () => void;
@@ -70,7 +69,13 @@ export const MinimalControls: React.FC<MinimalControlsProps> = ({ onShowInstruct
       </div>
 
       <div className="controls-right">
-        <HamburgerMenu onShowInstructions={onShowInstructions} />
+        <button
+          className="hamburger-button"
+          onClick={() => window.dispatchEvent(new CustomEvent('openHamburgerMenu'))}
+          title="Menu"
+        >
+          ☰
+        </button>
       </div>
     </div>
   );

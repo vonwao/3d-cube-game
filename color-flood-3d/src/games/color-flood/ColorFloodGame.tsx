@@ -13,6 +13,7 @@ import { useCurrentLevel, useCubeState, useCurrentPalette, useAnimationProgress,
 import { MinimalControls } from './ui/MinimalControls';
 import { DpadControls } from './ui/DpadControls';
 import { ColorPalette } from './ui/ColorPalette';
+import { HamburgerMenu } from './ui/HamburgerMenu';
 import { Instructions } from './ui/Instructions';
 import { MoveToast } from './ui/MoveToast';
 import { WinDialog } from './ui/WinDialog';
@@ -239,6 +240,9 @@ export const ColorFloodGame: React.FC = () => {
           <Instructions onClose={() => setShowInstructions(false)} />
         )}
       </div>
+      
+      {/* Hamburger Menu - rendered outside of game-container */}
+      <HamburgerMenu onShowInstructions={() => setShowInstructions(true)} />
     </div>
   );
 };
