@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Vector2 } from 'three';
 import { useSpring, SpringValue } from '@react-spring/three';
@@ -63,7 +63,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
   };
   
   
-  const handlePointerDown = (event: PointerEvent) => {
+  const handlePointerDown = useCallback((event: PointerEvent) => {
     if (!enableMouse && event.pointerType === 'mouse') return;
     if (!enableTouch && event.pointerType === 'touch') return;
     
@@ -74,9 +74,9 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     
     // Set a flag that we're ready to start dragging (but not dragging yet)
     setPointerDown(true);
-  };
+  }, [enableMouse, enableTouch]);
   
-  const handlePointerMove = (event: PointerEvent) => {
+  const handlePointerMove = useCallback((event: PointerEvent) => {
     // Only process if pointer is down
     if (!pointerDown) return;
     
@@ -120,9 +120,9 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
     }
     
     lastPointer.current.set(event.clientX, event.clientY);
-  };
+  }, [pointerDown, isDragging, rotationSpeed, gl.domElement]);
   
-  const handlePointerUp = (event: PointerEvent) => {
+  const handlePointerUp = useCallback((event: PointerEvent) => {
     // Reset all states
     setPointerDown(false);
     setIsDragging(false);
@@ -149,7 +149,7 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
       setTimeout(() => setIsRotating(false), 800);
       event.preventDefault();
     }
-  };
+  }, [isDragging, hasMoved, gl.domElement]);
   
   // Keyboard handler using the centralized keyboard manager
   useKeyboardManager(
@@ -233,10 +233,18 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
       }
     };
     
+    // Reset state when window loses focus (e.g., clicking menu)
+    const handleWindowBlur = () => {
+      setPointerDown(false);
+      setIsDragging(false);
+      setHasMoved(false);
+    };
+    
     canvas.addEventListener('pointerdown', handlePointerDown);
     canvas.addEventListener('pointermove', handlePointerMove);
     canvas.addEventListener('pointerup', handlePointerUp);
     canvas.addEventListener('pointercancel', handlePointerUp);
+    window.addEventListener('blur', handleWindowBlur);
     
     // Add touch-specific event listeners to prevent scrolling
     canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -247,10 +255,11 @@ export const useCubeControls = (config: CubeControlsConfig = {}): CubeControlsRe
       canvas.removeEventListener('pointermove', handlePointerMove);
       canvas.removeEventListener('pointerup', handlePointerUp);
       canvas.removeEventListener('pointercancel', handlePointerUp);
+      window.removeEventListener('blur', handleWindowBlur);
       canvas.removeEventListener('touchstart', handleTouchStart);
       canvas.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [isDragging, enableMouse, enableTouch, hasMoved, pointerDown]);
+  }, [gl.domElement, enableMouse, enableTouch, handlePointerDown, handlePointerMove, handlePointerUp, isDragging]);
   
   
   const rotateTo = (axis: 'x' | 'y' | 'z', degrees: number) => {
