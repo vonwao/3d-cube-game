@@ -10,9 +10,17 @@ export const PatternSelector: React.FC = () => {
       setCubeSize(pattern.cubeSize)
     }
     loadPattern(pattern)
+    
+    // Auto-start simulation when selecting a pattern
+    // Small delay to let the pattern load first
+    setTimeout(() => {
+      if (!useSimulationStore.getState().isRunning) {
+        useSimulationStore.getState().setRunning(true)
+      }
+    }, 100)
   }
   
-  const cubeSizes = [3, 4, 5, 6]
+  const cubeSizes = [3, 4, 5, 6, 7, 8, 9]
   
   return (
     <div className="pattern-selector">

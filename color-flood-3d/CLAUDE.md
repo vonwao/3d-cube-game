@@ -159,3 +159,49 @@ This Color Flood 3D game demonstrates several key game design principles that sh
 - Pure functions for game logic enable easy testing
 - Animation state is separate from game state
 - Level data is static and easily modified
+
+## Known Issues and Solutions
+
+### Canvas Visibility Issue (CRITICAL - Recurring Problem)
+
+**Problem**: The 3D canvas sometimes doesn't render, showing only UI elements on a black background.
+
+**Root Cause**: CSS positioning issues with the canvas container. React Three Fiber creates a wrapper div that must be properly styled.
+
+**Solution**: The canvas container MUST have:
+1. `position: absolute` with all directional properties (top, left, right, bottom) set to 0
+2. Explicit width and height set to 100%
+3. The immediate child div (created by React Three Fiber) must also be set to 100% width/height
+4. The canvas element itself must have absolute positioning
+
+**Critical CSS (DO NOT MODIFY without testing)**:
+```css
+.canvas-container {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.canvas-container > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.canvas-container canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+```
+
+**Debug Steps**:
+1. Add temporary background color to canvas-container: `background: rgba(255, 0, 0, 0.1)`
+2. Check browser dev tools for the actual canvas element dimensions
+3. Verify no z-index conflicts with UI overlay

@@ -10,20 +10,33 @@
   overflow: hidden;
 }
 
+/* CRITICAL: Canvas visibility fix - DO NOT MODIFY without testing */
 .canvas-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
   overflow: hidden;
+  z-index: 1;
+}
+
+/* React Three Fiber creates a div wrapper - ensure it fills container */
+.canvas-container > div {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Ensure canvas fills the container */
 .canvas-container canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  display: block;
+  display: block !important;
 }
 
 .ui-overlay {
@@ -33,6 +46,7 @@
   right: 0;
   bottom: 0;
   pointer-events: none;
+  z-index: 2;
 }
 
 .ui-overlay > * {
@@ -382,6 +396,113 @@
 }
 
 .config-info p {
+  margin: 0.25rem 0;
+}
+
+/* Visual Settings */
+.visual-settings {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.visual-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.visual-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.visual-content {
+  margin-top: 1rem;
+}
+
+.visual-item {
+  margin-bottom: 1rem;
+}
+
+.visual-item label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #bbb;
+}
+
+.visual-item input[type="range"] {
+  width: 100%;
+  margin: 0.25rem 0;
+}
+
+.visual-item span {
+  font-weight: 600;
+  color: white;
+}
+
+.checkbox-label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem !important;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.visual-presets {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.visual-presets p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #888;
+}
+
+.visual-presets .preset-btn {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  margin: 0.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.visual-presets .preset-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.visual-info {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.visual-info p {
   margin: 0.25rem 0;
 }
 

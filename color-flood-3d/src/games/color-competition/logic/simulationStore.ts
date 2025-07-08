@@ -4,6 +4,7 @@ import type { SimulationState, SimulationConfig, Pattern } from './types'
 import { evolveGeneration, createRandomPattern, createGliderPattern, createColorWavePattern } from './automata'
 import { createWelcomePattern } from './patterns'
 import { createOscillatorPattern, createStillLifePattern } from './additionalPatterns'
+import { create3DLifePattern, createDiamondPattern, createHelixPattern, createPulsarPattern, createCrystalGrowthPattern } from './proven3DPatterns'
 
 interface SimulationStore extends SimulationState {
   config: SimulationConfig
@@ -200,5 +201,35 @@ export const PATTERNS: Pattern[] = [
     description: 'Diagonal color bands',
     cubeSize: 4,
     cells: createColorWavePattern(4),
+  },
+  {
+    name: '3D Life',
+    description: 'R-pentomino in 3D space',
+    cubeSize: 7,
+    cells: create3DLifePattern(7),
+  },
+  {
+    name: 'Diamond',
+    description: 'Octahedron crystal structure',
+    cubeSize: 5,
+    cells: createDiamondPattern(5),
+  },
+  {
+    name: 'Double Helix',
+    description: 'DNA-like spiral pattern',
+    cubeSize: 6,
+    cells: createHelixPattern(6),
+  },
+  {
+    name: 'Pulsar',
+    description: '3D oscillating pattern',
+    cubeSize: 7,
+    cells: createPulsarPattern(7),
+  },
+  {
+    name: 'Crystal Seeds',
+    description: 'Growing crystals from corners',
+    cubeSize: 8,
+    cells: createCrystalGrowthPattern(8),
   },
 ]

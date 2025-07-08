@@ -16,6 +16,10 @@ export const ConfigPanel: React.FC = () => {
     const preset = RULE_PRESETS[presetName]
     if (preset) {
       setConfig(preset)
+      // Auto-start simulation when selecting a preset
+      if (!useSimulationStore.getState().isRunning) {
+        useSimulationStore.getState().setRunning(true)
+      }
     }
   }
   

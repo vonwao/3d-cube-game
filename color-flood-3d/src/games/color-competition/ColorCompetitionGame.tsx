@@ -2,7 +2,7 @@ import { Suspense, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Group } from 'three'
 import type { SpringValue } from '@react-spring/three'
-import { CubeMesh } from '../../engine/CubeMesh'
+import { TransparentCubeMesh } from './components/TransparentCubeMesh'
 import { useCubeControls } from '../../engine/useCubeControls'
 import type { CubeSize } from '../../engine/types'
 import type { ColorIndex } from '../color-flood/logic/types'
@@ -19,6 +19,8 @@ import { GenerationDisplay } from './ui/GenerationDisplay'
 import { SpeedControl } from './ui/SpeedControl'
 import { ConfigPanel } from './ui/ConfigPanel'
 import { CellStats } from './ui/CellStats'
+import { VisualSettings } from './ui/VisualSettings'
+import { useCellOpacity, useShowEmptyCells, useEmptyOpacity } from './logic/visualStore'
 import './ColorCompetitionGame.css'
 
 // Default color palette for the simulation
@@ -70,7 +72,12 @@ const CubeScene: React.FC = () => {
   const cubeSize = useCubeSize()
   const { setCells } = useSimulationStore()
   
-  console.log('🎨 CubeScene render - cells:', cells.length, 'cubeSize:', cubeSize)
+  // Visual settings
+  const cellOpacity = useCellOpacity()
+  const showEmptyCells = useShowEmptyCells()
+  const emptyOpacity = useEmptyOpacity()
+  
+  console.log('🎨 CubeScene render - cells:', cells.length, 'cubeSize:', cubeSize, 'opacity:', cellOpacity)
   
   // Convert cells array to format expected by CubeMesh (null becomes 6 for empty)
   const meshCells = useMemo(() => {
@@ -123,15 +130,17 @@ const CubeScene: React.FC = () => {
         shadow-mapSize-height={2048}
       />
       
-      
       <group scale={groupScale}>
         <AnimatedGroup rotation={rotation}>
-          <CubeMesh
+          <TransparentCubeMesh
             cells={meshCells}
             colors={DEFAULT_PALETTE.colors}
             spacing={1.1}
             cubeSize={cubeSize as CubeSize}
             onCellClick={handleCellClick}
+            cellOpacity={cellOpacity}
+            showEmptyCells={showEmptyCells}
+            emptyOpacity={emptyOpacity}
           />
         </AnimatedGroup>
       </group>
@@ -169,6 +178,7 @@ export const ColorCompetitionGame: React.FC = () => {
           <SpeedControl />
           <PatternSelector />
           <ConfigPanel />
+          <VisualSettings />
         </div>
         
         <div className="right-panel">
