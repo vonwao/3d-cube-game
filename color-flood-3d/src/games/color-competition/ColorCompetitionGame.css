@@ -254,6 +254,28 @@
   flex-direction: column;
   gap: 0.25rem;
   margin-bottom: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Custom scrollbar for pattern list */
+.pattern-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.pattern-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.pattern-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.pattern-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .pattern-button {
@@ -1094,6 +1116,48 @@
   font-size: 0.8rem;
   color: #888;
   line-height: 1.6;
+}
+
+/* Gate Types Grid */
+.gate-types {
+  margin-top: 1rem;
+}
+
+.gate-types label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #ddd;
+}
+
+.gate-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.gate-type-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.gate-id {
+  font-weight: 600;
+  color: #f39c12;
+}
+
+.gate-name {
+  color: #ddd;
+}
+
+/* Info Processing Controls */
+.info-controls .config-section {
+  margin-top: 1rem;
 }
 
 /* Responsive Design */

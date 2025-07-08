@@ -14,6 +14,11 @@ export function vec3ToIndex(vec: Vec3, cubeSize: number): number {
   return z * cubeSize * cubeSize + y * cubeSize + x
 }
 
+// Get all 26 neighbors in 3D Moore neighborhood
+export function get3DNeighbors(index: number, cubeSize: number): number[] {
+  return getNeighbors(index, cubeSize)
+}
+
 export function getNeighbors(index: number, cubeSize: number): number[] {
   const [x, y, z] = indexToVec3(index, cubeSize)
   const neighbors: number[] = []

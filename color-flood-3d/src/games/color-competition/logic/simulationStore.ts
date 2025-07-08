@@ -7,7 +7,12 @@ import { createOscillatorPattern, createStillLifePattern } from './additionalPat
 import { create3DLifePattern, createDiamondPattern, createHelixPattern, createPulsarPattern, createCrystalGrowthPattern } from './proven3DPatterns'
 import { createLife3DSeedPattern, createLife3DCornerPattern, createLife3DLayeredPattern, createLife3DSpiralPattern } from './life3dPatterns'
 import { evolveLife3D, LIFE3D_PRESETS } from './life3d'
-import type { AlgorithmType, CellState, Life3DConfig } from './types'
+import { evolveEnergySystem, DEFAULT_ENERGY_CONFIG, ENERGY_PATTERNS, initializeEnergy } from './energySystem'
+import { evolveMagnetAutomata, DEFAULT_MAGNET_CONFIG, MAGNET_PATTERNS, initializeSpins } from './magnetAutomata'
+import { evolveInfoProcessing, DEFAULT_INFO_CONFIG, INFO_PATTERNS, initializeInfoStates } from './infoProcessing'
+import { MAGNET_SHOWCASE_PATTERNS } from './magnetPatterns'
+import { INFO_SHOWCASE_PATTERNS } from './infoPatterns'
+import type { AlgorithmType, CellState, Life3DConfig, EnergySystemConfig, MagnetAutomataConfig, InfoProcessingConfig } from './types'
 
 interface SimulationStore extends SimulationState {
   config: SimulationConfig
@@ -17,6 +22,9 @@ interface SimulationStore extends SimulationState {
   currentAlgorithm: AlgorithmType
   cellStates: CellState[]
   life3dConfig: Life3DConfig
+  energyConfig: EnergySystemConfig
+  magnetConfig: MagnetAutomataConfig
+  infoConfig: InfoProcessingConfig
   
   // Actions
   setCells: (cells: (ColorIndex | null)[]) => void
@@ -34,6 +42,12 @@ interface SimulationStore extends SimulationState {
   setAlgorithm: (algorithm: AlgorithmType) => void
   setLife3DConfig: (config: Partial<Life3DConfig>) => void
   loadLife3DPreset: (presetName: keyof typeof LIFE3D_PRESETS) => void
+  setEnergyConfig: (config: Partial<EnergySystemConfig>) => void
+  loadEnergyPreset: (presetName: keyof typeof ENERGY_PATTERNS) => void
+  setMagnetConfig: (config: Partial<MagnetAutomataConfig>) => void
+  loadMagnetPreset: (presetName: keyof typeof MAGNET_PATTERNS) => void
+  setInfoConfig: (config: Partial<InfoProcessingConfig>) => void
+  loadInfoPreset: (presetName: keyof typeof INFO_PATTERNS) => void
   
   // Automatic evolution
   startEvolution: () => void
@@ -60,6 +74,9 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   currentAlgorithm: 'competition',
   cellStates: [],
   life3dConfig: LIFE3D_PRESETS.classic,
+  energyConfig: DEFAULT_ENERGY_CONFIG,
+  magnetConfig: DEFAULT_MAGNET_CONFIG,
+  infoConfig: DEFAULT_INFO_CONFIG,
 
   // Actions
   setCells: (cells) => set({ cells, generation: 0 }),
@@ -98,7 +115,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   },
   
   step: () => {
-    const { cells, cubeSize, config, currentAlgorithm, cellStates, life3dConfig } = get()
+    const { cells, cubeSize, config, currentAlgorithm, cellStates, life3dConfig, energyConfig, magnetConfig, infoConfig } = get()
     console.log('🔄 Evolving generation', get().generation, 'with algorithm:', currentAlgorithm)
     
     let newCells: (ColorIndex | null)[]
@@ -106,9 +123,27 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
     
     switch (currentAlgorithm) {
       case 'life3d':
-        const result = evolveLife3D(cells, cellStates, cubeSize, life3dConfig)
-        newCells = result.cells
-        newCellStates = result.cellStates
+        const life3dResult = evolveLife3D(cells, cellStates, cubeSize, life3dConfig)
+        newCells = life3dResult.cells
+        newCellStates = life3dResult.cellStates
+        break
+      
+      case 'energy':
+        const energyResult = evolveEnergySystem(cells, cellStates, cubeSize, energyConfig)
+        newCells = energyResult.cells
+        newCellStates = energyResult.cellStates
+        break
+      
+      case 'magnet':
+        const magnetResult = evolveMagnetAutomata(cells, cellStates, cubeSize, magnetConfig)
+        newCells = magnetResult.cells
+        newCellStates = magnetResult.cellStates
+        break
+      
+      case 'info':
+        const infoResult = evolveInfoProcessing(cells, cellStates, cubeSize, infoConfig)
+        newCells = infoResult.cells
+        newCellStates = infoResult.cellStates
         break
       
       case 'competition':
@@ -141,6 +176,27 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   },
   
   loadPattern: (pattern) => {
+    // Auto-switch to appropriate algorithm based on pattern name
+    if (pattern.name.startsWith('Magnet')) {
+      get().setAlgorithm('magnet')
+      // Apply good settings for magnet patterns
+      if (pattern.name === 'Magnet Vortex') {
+        get().loadMagnetPreset('singleVortex')
+      } else if (pattern.name === 'Flow Field') {
+        get().loadMagnetPreset('turbulentFlow')
+      }
+    } else if (pattern.name.startsWith('Info')) {
+      get().setAlgorithm('info')
+      // Apply good settings for info patterns
+      if (pattern.name === 'Info Oscillator' || pattern.name === 'Signal Line') {
+        get().loadInfoPreset('fastSignals')
+      } else if (pattern.name === '3D Circuit') {
+        get().loadInfoPreset('digitalLogic')
+      }
+    } else if (pattern.name.startsWith('Life') || pattern.name.includes('3D Life')) {
+      get().setAlgorithm('life3d')
+    }
+    
     set({ 
       cells: [...pattern.cells],
       cubeSize: pattern.cubeSize,
@@ -148,6 +204,11 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       isRunning: false
     })
     get().stopEvolution()
+    
+    // Auto-start for showcase patterns
+    if (pattern.name.startsWith('Magnet') || pattern.name.startsWith('Info')) {
+      setTimeout(() => get().setRunning(true), 100)
+    }
   },
   
   randomize: (density = 0.3) => {
@@ -167,14 +228,48 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   // Algorithm actions
   setAlgorithm: (algorithm) => {
     const { cells } = get()
+    let cellStates: CellState[]
+    
+    switch (algorithm) {
+      case 'energy':
+        cellStates = initializeEnergy(cells, cells.map(color => ({
+          color,
+          age: 0,
+          isEdge: false
+        })), 0.5)
+        break
+      
+      case 'magnet':
+        cellStates = initializeSpins(cells, cells.map(color => ({
+          color,
+          age: 0,
+          energy: 1.0,
+          isEdge: false
+        })), 'random')
+        break
+      
+      case 'info':
+        cellStates = initializeInfoStates(cells, cells.map(color => ({
+          color,
+          age: 0,
+          energy: 1.0,
+          isEdge: false
+        })), 'random')
+        break
+      
+      default:
+        cellStates = cells.map((color) => ({
+          color,
+          age: 0,
+          energy: 1.0,
+          isEdge: false,
+        }))
+        break
+    }
+    
     set({ 
       currentAlgorithm: algorithm,
-      cellStates: cells.map((color) => ({
-        color,
-        age: 0,
-        energy: 100,
-        isEdge: false,
-      } as CellState))
+      cellStates
     })
   },
   
@@ -186,6 +281,56 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   
   loadLife3DPreset: (presetName) => {
     set({ life3dConfig: LIFE3D_PRESETS[presetName] })
+  },
+  
+  setEnergyConfig: (config) => {
+    set(state => ({
+      energyConfig: { ...state.energyConfig, ...config }
+    }))
+  },
+  
+  loadEnergyPreset: (presetName) => {
+    const { cubeSize } = get()
+    set({ energyConfig: ENERGY_PATTERNS[presetName](cubeSize) })
+  },
+  
+  setMagnetConfig: (config) => {
+    set(state => ({
+      magnetConfig: { ...state.magnetConfig, ...config }
+    }))
+  },
+  
+  loadMagnetPreset: (presetName) => {
+    const { cubeSize } = get()
+    let config: MagnetAutomataConfig
+    
+    switch (presetName) {
+      case 'uniformField':
+        config = MAGNET_PATTERNS.uniformField([0, 1, 0])
+        break
+      case 'singleVortex':
+      case 'doubleVortex':
+        config = MAGNET_PATTERNS[presetName](cubeSize)
+        break
+      case 'turbulentFlow':
+      case 'magneticDomains':
+        config = MAGNET_PATTERNS[presetName]()
+        break
+      default:
+        config = DEFAULT_MAGNET_CONFIG
+    }
+    
+    set({ magnetConfig: config })
+  },
+  
+  setInfoConfig: (config) => {
+    set(state => ({
+      infoConfig: { ...state.infoConfig, ...config }
+    }))
+  },
+  
+  loadInfoPreset: (presetName) => {
+    set({ infoConfig: INFO_PATTERNS[presetName]() })
   },
   
   startEvolution: () => {
@@ -225,6 +370,9 @@ export const useConfig = () => useSimulationStore(state => state.config)
 export const useCurrentAlgorithm = () => useSimulationStore(state => state.currentAlgorithm)
 export const useCellStates = () => useSimulationStore(state => state.cellStates)
 export const useLife3DConfig = () => useSimulationStore(state => state.life3dConfig)
+export const useEnergyConfig = () => useSimulationStore(state => state.energyConfig)
+export const useMagnetConfig = () => useSimulationStore(state => state.magnetConfig)
+export const useInfoConfig = () => useSimulationStore(state => state.infoConfig)
 
 // Predefined patterns
 export const PATTERNS: Pattern[] = [
@@ -324,4 +472,10 @@ export const PATTERNS: Pattern[] = [
     cubeSize: 6,
     cells: createLife3DSpiralPattern(6),
   },
+  
+  // Magnet Automata showcase patterns
+  ...MAGNET_SHOWCASE_PATTERNS,
+  
+  // Information Processing showcase patterns
+  ...INFO_SHOWCASE_PATTERNS,
 ]

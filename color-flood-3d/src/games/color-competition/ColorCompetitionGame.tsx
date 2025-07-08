@@ -12,7 +12,9 @@ import {
   useCubeSize, 
   useGeneration,
   useIsRunning,
-  useSimulationStore 
+  useSimulationStore,
+  useCellStates,
+  useCurrentAlgorithm
 } from './logic/simulationStore'
 import { SimulationControls } from './ui/SimulationControls'
 import { PatternSelector } from './ui/PatternSelector'
@@ -71,7 +73,9 @@ const AnimatedGroup: React.FC<AnimatedGroupProps> = ({ rotation, children }) => 
 
 const CubeScene: React.FC = () => {
   const cells = useCells()
+  const cellStates = useCellStates()
   const cubeSize = useCubeSize()
+  const currentAlgorithm = useCurrentAlgorithm()
   const { setCells } = useSimulationStore()
   
   // Visual settings
@@ -131,6 +135,7 @@ const CubeScene: React.FC = () => {
         <AnimatedGroup rotation={rotation}>
           <TransparentCubeMesh
             cells={meshCells}
+            cellStates={cellStates}
             colors={DEFAULT_PALETTE.colors}
             spacing={1.1}
             cubeSize={cubeSize as CubeSize}
@@ -138,6 +143,7 @@ const CubeScene: React.FC = () => {
             cellOpacity={cellOpacity}
             showEmptyCells={showEmptyCells}
             emptyOpacity={emptyOpacity}
+            currentAlgorithm={currentAlgorithm}
           />
         </AnimatedGroup>
       </group>

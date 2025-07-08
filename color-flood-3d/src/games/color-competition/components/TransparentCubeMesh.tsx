@@ -1,11 +1,13 @@
 import { useRef, useMemo, useEffect } from 'react'
 import { InstancedMesh, Object3D, Color, MeshStandardMaterial } from 'three'
 import type { CubeSize } from '../../../engine/types'
+import type { CellState } from '../logic/types'
 
 type ColorIndex = number
 
 interface TransparentCubeMeshProps {
   cells: ColorIndex[]
+  cellStates?: CellState[]
   colors: string[]
   spacing?: number
   onCellClick?: (index: number) => void
@@ -13,6 +15,7 @@ interface TransparentCubeMeshProps {
   cellOpacity: number
   showEmptyCells: boolean
   emptyOpacity: number
+  currentAlgorithm?: string
 }
 
 const tempObject = new Object3D()
@@ -20,6 +23,7 @@ const tempColor = new Color()
 
 export const TransparentCubeMesh: React.FC<TransparentCubeMeshProps> = ({
   cells,
+  cellStates,
   colors,
   spacing = 1.1,
   onCellClick,
@@ -27,6 +31,7 @@ export const TransparentCubeMesh: React.FC<TransparentCubeMeshProps> = ({
   cellOpacity,
   showEmptyCells,
   emptyOpacity,
+  currentAlgorithm,
 }) => {
   const totalCells = cubeSize ** 3
   const meshRef = useRef<InstancedMesh>(null)
@@ -87,8 +92,14 @@ export const TransparentCubeMesh: React.FC<TransparentCubeMeshProps> = ({
         tempObject.scale.set(0, 0, 0)
         tempObject.updateMatrix()
       } else {
-        // Normal scale
-        tempObject.scale.set(1, 1, 1)
+        // Scale based on energy for energy algorithm
+        let scale = 1
+        if (currentAlgorithm === 'energy' && cellStates && cellStates[i]) {
+          const energy = cellStates[i].energy || 0
+          // Scale from 0.3 to 1.2 based on energy
+          scale = 0.3 + energy * 0.9
+        }
+        tempObject.scale.set(scale, scale, scale)
         tempObject.updateMatrix()
       }
       
@@ -97,6 +108,13 @@ export const TransparentCubeMesh: React.FC<TransparentCubeMeshProps> = ({
       // Set color
       if (cellValue < colorArray.length) {
         tempColor.copy(colorArray[cellValue])
+        
+        // Modify brightness based on energy for energy algorithm
+        if (currentAlgorithm === 'energy' && cellStates && cellStates[i]) {
+          const energy = cellStates[i].energy || 0
+          // Darken low-energy cells
+          tempColor.multiplyScalar(0.3 + energy * 0.7)
+        }
       } else {
         tempColor.setRGB(0.1, 0.1, 0.1) // Dark gray for empty
       }
@@ -108,7 +126,7 @@ export const TransparentCubeMesh: React.FC<TransparentCubeMeshProps> = ({
     if (meshRef.current.instanceColor) {
       meshRef.current.instanceColor.needsUpdate = true
     }
-  }, [positions, cells, colorArray, totalCells, showEmptyCells])
+  }, [positions, cells, colorArray, totalCells, showEmptyCells, cellStates, currentAlgorithm])
   
   const handleClick = (event: { instanceId?: number }) => {
     if (!onCellClick) return
