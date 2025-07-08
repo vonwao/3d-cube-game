@@ -1,6 +1,7 @@
 import { Settings } from 'lucide-react'
 import { useState } from 'react'
 import { useConfig, useSimulationStore } from '../logic/simulationStore'
+import { RULE_PRESETS } from '../config/presets'
 
 export const ConfigPanel: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -9,6 +10,13 @@ export const ConfigPanel: React.FC = () => {
   
   const handleConfigChange = (key: keyof typeof config, value: number) => {
     setConfig({ [key]: value })
+  }
+  
+  const handlePresetChange = (presetName: string) => {
+    const preset = RULE_PRESETS[presetName]
+    if (preset) {
+      setConfig(preset)
+    }
   }
   
   return (
@@ -24,12 +32,28 @@ export const ConfigPanel: React.FC = () => {
       {isOpen && (
         <div className="config-content">
           <div className="config-item">
+            <label>Rule Preset:</label>
+            <div className="preset-buttons">
+              {Object.keys(RULE_PRESETS).map(presetName => (
+                <button
+                  key={presetName}
+                  onClick={() => handlePresetChange(presetName)}
+                  className="preset-button"
+                  title={`Apply ${presetName} rules`}
+                >
+                  {presetName}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="config-item">
             <label>
               Min neighbors to survive:
               <input
                 type="range"
                 min="0"
-                max="10"
+                max="15"
                 value={config.minNeighborsToSurvive}
                 onChange={(e) => handleConfigChange('minNeighborsToSurvive', parseInt(e.target.value))}
               />
@@ -43,7 +67,7 @@ export const ConfigPanel: React.FC = () => {
               <input
                 type="range"
                 min="1"
-                max="10"
+                max="15"
                 value={config.minNeighborsToBirth}
                 onChange={(e) => handleConfigChange('minNeighborsToBirth', parseInt(e.target.value))}
               />
@@ -57,7 +81,7 @@ export const ConfigPanel: React.FC = () => {
               <input
                 type="range"
                 min="1"
-                max="15"
+                max="20"
                 value={config.competitionThreshold}
                 onChange={(e) => handleConfigChange('competitionThreshold', parseInt(e.target.value))}
               />

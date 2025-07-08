@@ -3,6 +3,7 @@ import type { ColorIndex } from '../../color-flood/logic/types'
 import type { SimulationState, SimulationConfig, Pattern } from './types'
 import { evolveGeneration, createRandomPattern, createGliderPattern, createColorWavePattern } from './automata'
 import { createWelcomePattern } from './patterns'
+import { createOscillatorPattern, createStillLifePattern } from './additionalPatterns'
 
 interface SimulationStore extends SimulationState {
   config: SimulationConfig
@@ -26,9 +27,9 @@ interface SimulationStore extends SimulationState {
 }
 
 const DEFAULT_CONFIG: SimulationConfig = {
-  minNeighborsToSurvive: 2,
-  minNeighborsToBirth: 3,
-  competitionThreshold: 4,
+  minNeighborsToSurvive: 4,
+  minNeighborsToBirth: 5,
+  competitionThreshold: 7,
 }
 
 export const useSimulationStore = create<SimulationStore>((set, get) => ({
@@ -171,10 +172,28 @@ export const PATTERNS: Pattern[] = [
     cells: createRandomPattern(4, 0.3),
   },
   {
-    name: 'Glider',
-    description: 'A simple 3D glider pattern',
+    name: 'Sparse',
+    description: 'Sparse random pattern',
+    cubeSize: 5,
+    cells: createRandomPattern(5, 0.15),
+  },
+  {
+    name: 'Clusters',
+    description: 'Small stable clusters',
     cubeSize: 5,
     cells: createGliderPattern(5),
+  },
+  {
+    name: 'Oscillator',
+    description: 'Patterns that change periodically',
+    cubeSize: 5,
+    cells: createOscillatorPattern(5),
+  },
+  {
+    name: 'Still Life',
+    description: 'Stable block patterns',
+    cubeSize: 6,
+    cells: createStillLifePattern(6),
   },
   {
     name: 'Color Wave',

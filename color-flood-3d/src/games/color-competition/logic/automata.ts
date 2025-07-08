@@ -162,22 +162,36 @@ export function createRandomPattern(
 export function createGliderPattern(cubeSize: number): (ColorIndex | null)[] {
   const cells = new Array(cubeSize * cubeSize * cubeSize).fill(null)
   
-  // Create a simple 3D glider in the corner
-  const patterns = [
-    { pos: [1, 0, 0], color: 0 },
-    { pos: [2, 1, 0], color: 0 },
-    { pos: [0, 2, 0], color: 0 },
-    { pos: [1, 2, 0], color: 0 },
-    { pos: [2, 2, 0], color: 0 },
-    // Add some depth
-    { pos: [1, 1, 1], color: 1 },
-    { pos: [2, 1, 1], color: 1 },
+  // Create several small, stable configurations that might move or oscillate
+  // These are 3D adaptations of classic 2D patterns
+  
+  // Pattern 1: Small cluster in one corner
+  const patterns: Array<{ pos: Vec3; color: ColorIndex }> = [
+    // Red cluster - minimal stable configuration
+    { pos: [1, 1, 1], color: 0 },
+    { pos: [2, 1, 1], color: 0 },
+    { pos: [1, 2, 1], color: 0 },
+    { pos: [1, 1, 2], color: 0 },
+    
+    // Blue cluster - offset position
+    { pos: [cubeSize-2, cubeSize-2, 1], color: 1 },
+    { pos: [cubeSize-3, cubeSize-2, 1], color: 1 },
+    { pos: [cubeSize-2, cubeSize-3, 1], color: 1 },
+    { pos: [cubeSize-2, cubeSize-2, 2], color: 1 },
+    
+    // Green oscillator in the middle
+    { pos: [Math.floor(cubeSize/2), Math.floor(cubeSize/2), Math.floor(cubeSize/2)], color: 2 },
+    { pos: [Math.floor(cubeSize/2)+1, Math.floor(cubeSize/2), Math.floor(cubeSize/2)], color: 2 },
+    { pos: [Math.floor(cubeSize/2), Math.floor(cubeSize/2)+1, Math.floor(cubeSize/2)], color: 2 },
+    { pos: [Math.floor(cubeSize/2), Math.floor(cubeSize/2), Math.floor(cubeSize/2)+1], color: 2 },
   ]
   
   for (const { pos, color } of patterns) {
-    if (pos[0] < cubeSize && pos[1] < cubeSize && pos[2] < cubeSize) {
-      const index = vec3ToIndex(pos as Vec3, cubeSize)
-      cells[index] = color as ColorIndex
+    if (pos[0] >= 0 && pos[0] < cubeSize &&
+        pos[1] >= 0 && pos[1] < cubeSize &&
+        pos[2] >= 0 && pos[2] < cubeSize) {
+      const index = vec3ToIndex(pos, cubeSize)
+      cells[index] = color
     }
   }
   
