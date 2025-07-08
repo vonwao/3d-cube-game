@@ -1,6 +1,7 @@
 import { Suspense, useMemo, useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
+import * as THREE from 'three'
 import { 
   useCells, 
   useCubeSize, 
@@ -16,6 +17,7 @@ import { ConfigPanel } from './ui/ConfigPanel'
 import { DebugPanel } from './components/DebugPanel'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { SimpleCubeMesh } from './components/SimpleCubeMesh'
+import { TestCubeGrid } from './components/TestCubeGrid'
 import './ColorCompetitionGame.css'
 
 // Default color palette for the simulation
@@ -47,9 +49,15 @@ const CameraSetup: React.FC = () => {
 }
 
 const CubeScene: React.FC = () => {
-  console.log('🎮 CubeScene rendering...')
   const cells = useCells()
   const cubeSize = useCubeSize()
+  console.log('🎮 CubeScene rendering...', { cellsLength: cells.length, cubeSize })
+  
+  // Force a visible element
+  useEffect(() => {
+    console.log('CubeScene mounted!')
+    return () => console.log('CubeScene unmounted!')
+  }, [])
   
   // Dynamic scale based on cube size
   const groupScale = useMemo(() => {
@@ -57,13 +65,14 @@ const CubeScene: React.FC = () => {
     return [scale, scale, scale] as [number, number, number]
   }, [cubeSize])
   
-  // Add a test cube to ensure rendering works
-  if (cells.length === 0) {
-    console.error('🔴 No cells to render!')
-  }
+  // Log current state
+  useEffect(() => {
+    console.log('📊 Cells state:', cells.slice(0, 10), '...')
+  }, [cells])
   
   return (
     <>
+      <color attach="background" args={['#222222']} />
       <CameraSetup />
       <OrbitControls enableDamping dampingFactor={0.05} />
       <ambientLight intensity={0.5} />
@@ -74,25 +83,30 @@ const CubeScene: React.FC = () => {
       />
       <directionalLight position={[-5, -5, -5]} intensity={0.5} />
       
-      {/* Test cube to verify rendering */}
-      <mesh position={[0, 5, 0]}>
-        <boxGeometry args={[2, 2, 2]} />
-        <meshStandardMaterial color="red" wireframe />
+      {/* Test cube at origin */}
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="red" />
       </mesh>
       
       {/* Add axes helper */}
       <axesHelper args={[5]} />
       
-      <group scale={groupScale}>
-        <group>
-          {/* Use SimpleCubeMesh for now */}
-          <SimpleCubeMesh
-            cubeSize={cubeSize}
-            cells={cells}
-            colors={DEFAULT_PALETTE.colors}
-          />
+      {/* Temporarily use TestCubeGrid to verify rendering */}
+      <TestCubeGrid size={3} />
+      
+      {/* Original cube mesh - hidden for now */}
+      {false && (
+        <group scale={groupScale}>
+          <group>
+            <SimpleCubeMesh
+              cubeSize={cubeSize}
+              cells={cells}
+              colors={DEFAULT_PALETTE.colors}
+            />
+          </group>
         </group>
-      </group>
+      )}
       
       {/* Grid helper */}
       <gridHelper args={[10, 10]} />
@@ -106,20 +120,36 @@ export const ColorCompetitionGame: React.FC = () => {
   
   console.log('🎯 ColorCompetitionGame render - Generation:', generation, 'Running:', isRunning)
   
+  // Test if WebGL is supported
+  useEffect(() => {
+    const canvas = document.createElement('canvas')
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+    console.log('WebGL support:', !!gl)
+    if (!gl) {
+      console.error('WebGL is not supported in this browser!')
+    }
+  }, [])
+  
   return (
     <ErrorBoundary>
     <div className="color-competition-game">
-      <div className="canvas-container">
-        <Canvas 
-          camera={{ position: [10, 10, 10], fov: 50, near: 0.1, far: 1000 }}
-          onCreated={({ gl, camera }) => {
-            console.log('🎨 Canvas created!', { gl, camera })
-          }}
-        >
+      <div className="game-container">
+        <div className="game-scene">
+          <Canvas 
+            camera={{ position: [10, 10, 10], fov: 50, near: 0.1, far: 1000 }}
+            gl={{ outputColorSpace: THREE.SRGBColorSpace }}
+            onCreated={(state) => {
+              console.log('🎨 Canvas created!', state)
+              console.log('WebGL context:', state.gl.getContext())
+              console.log('Scene children:', state.scene.children.length)
+            }}
+            onPointerMissed={() => console.log('Canvas clicked!')}
+          >
           <Suspense fallback={null}>
             <CubeScene />
           </Suspense>
         </Canvas>
+        </div>
       </div>
       
       <div className="ui-overlay">
