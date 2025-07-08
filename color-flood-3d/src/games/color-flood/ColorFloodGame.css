@@ -1684,6 +1684,18 @@
   justify-content: center;
 }
 
+/* Lucide icon styles */
+.minimal-button svg,
+.dpad-button svg,
+.hamburger-button svg,
+.close-button svg,
+.close-menu-button svg,
+.win-dialog-close svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+}
+
 .new-game-container {
   position: relative;
 }
@@ -1791,6 +1803,48 @@
 .cube-size-indicator {
   font-size: 0.9rem;
   opacity: 0.7;
+}
+
+/* Floating Top Right Buttons */
+.floating-top-right-buttons {
+  position: fixed;
+  top: 1rem;
+  right: 4rem; /* Offset to avoid help button */
+  display: flex;
+  gap: 0.5rem;
+  z-index: 200;
+}
+
+.floating-top-right-buttons .new-game-container {
+  position: relative;
+}
+
+.floating-top-right-buttons .minimal-button {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.floating-top-right-buttons .minimal-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.floating-top-right-buttons .new-game-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  min-width: 200px;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Hamburger Menu */

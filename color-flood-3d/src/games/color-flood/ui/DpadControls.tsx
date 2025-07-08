@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useShowDpad, useSimpleGameStore } from '../logic/simpleGameStore';
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, ZoomIn, ZoomOut } from 'lucide-react';
 
 export const DpadControls: React.FC = () => {
   const showDpad = useShowDpad();
@@ -38,7 +39,7 @@ export const DpadControls: React.FC = () => {
         onClick={handleRotateUp}
         title="Rotate up (↑)"
       >
-        ↑
+        <ArrowUp size={20} />
       </button>
       <div className="dpad-horizontal">
         <button
@@ -46,7 +47,7 @@ export const DpadControls: React.FC = () => {
           onClick={handleRotateLeft}
           title="Rotate left (←)"
         >
-          ←
+          <ArrowLeft size={20} />
         </button>
         <button
           className="dpad-button dpad-center"
@@ -59,7 +60,7 @@ export const DpadControls: React.FC = () => {
           onClick={handleRotateRight}
           title="Rotate right (→)"
         >
-          →
+          <ArrowRight size={20} />
         </button>
       </div>
       <div className="dpad-zoom-row">
@@ -68,21 +69,21 @@ export const DpadControls: React.FC = () => {
           onClick={handleZoomOut}
           title="Zoom out (-)"
         >
-          −
+          <ZoomOut size={16} />
         </button>
         <button
           className="dpad-button dpad-down"
           onClick={handleRotateDown}
           title="Rotate down (↓)"
         >
-          ↓
+          <ArrowDown size={20} />
         </button>
         <button
           className="dpad-button dpad-zoom"
           onClick={handleZoomIn}
           title="Zoom in (+)"
         >
-          +
+          <ZoomIn size={16} />
         </button>
       </div>
     </div>

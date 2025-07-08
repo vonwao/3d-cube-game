@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCubeSize } from '../logic/simpleGameStore';
+import { X } from 'lucide-react';
 
 interface InstructionsProps {
   onClose?: () => void;
@@ -47,7 +48,7 @@ export const Instructions: React.FC<InstructionsProps> = ({ onClose }) => {
             className="close-button"
             onClick={handleClose}
           >
-            ×
+            <X size={24} />
           </button>
         </div>
         

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useCubeState, useCanUndo, useSimpleGameStore, useCubeSize, useIsExploded } from '../logic/simpleGameStore';
 import { CubeSizeSelector } from './CubeSizeSelector';
+import { Undo, RefreshCw, Expand, Palette, Gamepad, RotateCcw, Menu } from 'lucide-react';
 
 interface MinimalControlsProps {
   onShowInstructions?: () => void;
@@ -61,77 +62,82 @@ export const MinimalControls: React.FC<MinimalControlsProps> = ({
   }, [showNewGameMenu]);
 
   return (
-    <div className="minimal-controls">
-      <div className="controls-left">
-        <button
-          className="minimal-button icon-button"
-          onClick={handleUndo}
-          disabled={!canUndo}
-          title="Undo (U)"
-        >
-          ↩️
-        </button>
-        
-        <button
-          className="minimal-button icon-button"
-          onClick={handleReset}
-          title="Reset (R)"
-        >
-          🔄
-        </button>
-        
-        <button
-          className={`minimal-button ${isExploded ? 'active' : ''}`}
-          onClick={handleToggleExplode}
-          title="Explode (E)"
-        >
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <span>⤴️</span>
-            <span>Explode</span>
-          </span>
-        </button>
-      </div>
+    <>
+      <div className="minimal-controls">
+        <div className="controls-left">
+          <button
+            className="minimal-button icon-button"
+            onClick={handleUndo}
+            disabled={!canUndo}
+            title="Undo (U)"
+          >
+            <Undo size={20} />
+          </button>
+          
+          <button
+            className="minimal-button icon-button"
+            onClick={handleReset}
+            title="Reset (R)"
+          >
+            <RefreshCw size={20} />
+          </button>
+          
+          <button
+            className={`minimal-button ${isExploded ? 'active' : ''}`}
+            onClick={handleToggleExplode}
+            title="Explode (E)"
+          >
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <Expand size={20} />
+              <span>Explode</span>
+            </span>
+          </button>
+        </div>
 
-      <div className="controls-center">
-        <span className="move-counter">
-          <span className={`moves-value ${
-            cubeState.moves / cubeState.maxMoves < 0.8 ? 'good' :
-            cubeState.moves / cubeState.maxMoves <= 1.0 ? 'warning' :
-            'over'
-          }`}>
-            {cubeState.moves}/{cubeState.maxMoves} moves
+        <div className="controls-center">
+          <span className="move-counter">
+            <span className={`moves-value ${
+              cubeState.moves / cubeState.maxMoves < 0.8 ? 'good' :
+              cubeState.moves / cubeState.maxMoves <= 1.0 ? 'warning' :
+              'over'
+            }`}>
+              {cubeState.moves}/{cubeState.maxMoves} moves
+            </span>
           </span>
-        </span>
-        
-        <span className="cube-size-indicator">
-          {cubeSize}×{cubeSize}
-        </span>
-      </div>
+          
+          <span className="cube-size-indicator">
+            {cubeSize}×{cubeSize}
+          </span>
+        </div>
 
-      <div className="controls-right">
-        <button
-          className={`minimal-button icon-button ${showColorPalette ? 'active' : ''}`}
-          onClick={handleToggleColorPalette}
-          title="Toggle Color Palette"
-        >
-          🎨
-        </button>
-        
-        <button
-          className={`minimal-button icon-button ${showDpad ? 'active' : ''}`}
-          onClick={handleToggleDpad}
-          title="Toggle D-pad Controls"
-        >
-          🎮
-        </button>
-        
+        <div className="controls-right">
+          <button
+            className={`minimal-button icon-button ${showColorPalette ? 'active' : ''}`}
+            onClick={handleToggleColorPalette}
+            title="Toggle Color Palette"
+          >
+            <Palette size={20} />
+          </button>
+          
+          <button
+            className={`minimal-button icon-button ${showDpad ? 'active' : ''}`}
+            onClick={handleToggleDpad}
+            title="Toggle D-pad Controls"
+          >
+            <Gamepad size={20} />
+          </button>
+        </div>
+      </div>
+      
+      {/* Floating buttons in upper right corner */}
+      <div className="floating-top-right-buttons">
         <div className="new-game-container" ref={newGameMenuRef}>
           <button
             className="minimal-button icon-button"
             onClick={handleNewGame}
             title="New Game"
           >
-            ⭐
+            <RotateCcw size={20} />
           </button>
           {showNewGameMenu && (
             <div className="new-game-menu">
@@ -152,9 +158,9 @@ export const MinimalControls: React.FC<MinimalControlsProps> = ({
           onClick={() => window.dispatchEvent(new CustomEvent('openHamburgerMenu'))}
           title="Menu (M or Esc)"
         >
-          ☰
+          <Menu size={20} />
         </button>
       </div>
-    </div>
+    </>
   );
 };

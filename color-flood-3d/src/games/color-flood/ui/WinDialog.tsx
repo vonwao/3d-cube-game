@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCubeState, useIsWon, useSimpleGameStore } from '../logic/simpleGameStore';
 import { SAMPLE_LEVELS, type ExtendedLevel } from '../levels/sampleLevels';
+import { X } from 'lucide-react';
 
 interface WinDialogProps {
   onClose?: () => void;
@@ -64,7 +65,7 @@ export const WinDialog: React.FC<WinDialogProps> = ({ onClose }) => {
     <div className="win-dialog-overlay">
       <div className="win-dialog">
         <button className="win-dialog-close" onClick={handleClose} title="Close">
-          ×
+          <X size={20} />
         </button>
         <div className="win-dialog-content">
           <h2 className="win-title">{message}</h2>

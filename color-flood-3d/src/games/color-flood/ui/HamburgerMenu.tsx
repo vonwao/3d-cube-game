@@ -4,6 +4,7 @@ import { generateLevelForSize } from '../logic/levelGenerator';
 import { useTutorialStore } from '../logic/tutorialStore';
 import type { CubeSize } from '../../../engine/types';
 import type { AnimationPreset } from '../config/animationConfig';
+import { X } from 'lucide-react';
 
 interface HamburgerMenuProps {
   onShowInstructions?: () => void;
@@ -78,7 +79,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ onShowInstructions
                 className="close-menu-button"
                 onClick={() => setIsOpen(false)}
               >
-                ×
+                <X size={24} />
               </button>
             </div>
 
