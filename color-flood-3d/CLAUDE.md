@@ -12,6 +12,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm test:watch` - Run Jest tests in watch mode
 - `pnpm test:coverage` - Run Jest tests with coverage report
 - `pnpm preview` - Preview production build locally
+- `pnpm test:sanity` - Run critical Playwright tests (smoke tests only)
+- `pnpm test:sanity-full` - Run all sanity checks including visual regression
+- `pnpm test:e2e` - Run full Playwright test suite
+- `pnpm test:e2e:ui` - Run Playwright tests with UI mode
 
 ## Project Architecture
 
@@ -205,3 +209,21 @@ This Color Flood 3D game demonstrates several key game design principles that sh
 1. Add temporary background color to canvas-container: `background: rgba(255, 0, 0, 0.1)`
 2. Check browser dev tools for the actual canvas element dimensions
 3. Verify no z-index conflicts with UI overlay
+
+**Prevention**: Always run `pnpm test:sanity` before committing changes to catch canvas visibility issues early.
+
+## Testing Strategy
+
+### Playwright End-to-End Tests
+- **Smoke Tests**: Critical functionality checks (app loads, WebGL works, UI present)
+- **Visual Regression**: Screenshot comparisons to detect unexpected visual changes
+- **Component Interaction**: User workflow testing (clicking patterns, play/pause)
+
+### Test Commands
+- `pnpm test:sanity` - Quick smoke tests for development workflow
+- `pnpm test:sanity-full` - Full sanity checks with visual regression
+- `pnpm test:e2e` - Complete test suite
+- `pnpm test:e2e:ui` - Interactive test runner with debugging
+
+### Integration with Build Process
+The `build:check` command now includes sanity tests to prevent deployment of broken visual states.

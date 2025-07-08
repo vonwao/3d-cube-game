@@ -6,12 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:check": "tsc -b --noEmit && eslint . && jest --passWithNoTests && vite build",
+    "build:check": "tsc -b --noEmit && eslint . && jest --passWithNoTests && pnpm test:sanity && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:sanity": "playwright test tests/smoke-test.spec.ts --project=chromium",
+    "test:sanity-full": "playwright test tests/smoke-test.spec.ts tests/cube-visibility.spec.ts",
     "deploy": "pnpm build && netlify deploy --dir=dist --config=../netlify.toml --prod"
   },
   "dependencies": {
@@ -27,6 +32,7 @@
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "@jest/globals": "^30.0.0",
+    "@playwright/test": "^1.53.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",

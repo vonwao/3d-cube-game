@@ -1,5 +1,4 @@
 import { useRef, useMemo, useEffect } from 'react'
-import { useFrame } from '@react-three/fiber'
 import { InstancedMesh, Object3D, Color, MeshStandardMaterial } from 'three'
 import type { CubeSize } from '../../../engine/types'
 
@@ -131,10 +130,11 @@ export const TransparentCubeMesh: React.FC<TransparentCubeMeshProps> = ({
       <boxGeometry args={[0.8, 0.8, 0.8]} />
       <meshStandardMaterial 
         ref={materialRef}
-        vertexColors
         transparent={cellOpacity < 1}
         opacity={cellOpacity}
         depthWrite={cellOpacity >= 0.9} // Disable depth write for very transparent objects
+        roughness={0.4}
+        metalness={0.15}
       />
     </instancedMesh>
   )
