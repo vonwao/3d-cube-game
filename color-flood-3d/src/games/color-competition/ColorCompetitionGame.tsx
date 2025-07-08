@@ -21,6 +21,7 @@ import { SpeedControl } from './ui/SpeedControl'
 import { ConfigPanel } from './ui/ConfigPanel'
 import { CellStats } from './ui/CellStats'
 import { VisualSettings } from './ui/VisualSettings'
+import { AlgorithmSelector } from './ui/AlgorithmSelector'
 import { useCellOpacity, useShowEmptyCells, useEmptyOpacity } from './logic/visualStore'
 import './ColorCompetitionGame.css'
 
@@ -170,6 +171,7 @@ export const ColorCompetitionGame: React.FC = () => {
         </div>
         
         <div className="controls-container">
+          <AlgorithmSelector />
           <SimulationControls />
           <SpeedControl />
           <PatternSelector />

@@ -506,6 +506,151 @@
   margin: 0.25rem 0;
 }
 
+/* Algorithm Selector */
+.algorithm-selector {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.algorithm-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  background: rgba(52, 152, 219, 0.2);
+  border: 1px solid rgba(52, 152, 219, 0.4);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.algorithm-toggle:hover {
+  background: rgba(52, 152, 219, 0.3);
+}
+
+.algorithm-content {
+  margin-top: 1rem;
+}
+
+.algorithm-list h4,
+.life3d-controls h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.algorithm-list {
+  margin-bottom: 1rem;
+}
+
+.algorithm-button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.algorithm-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.algorithm-button.active {
+  background: rgba(52, 152, 219, 0.3);
+  border-color: rgba(52, 152, 219, 0.5);
+}
+
+.algorithm-button strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.algorithm-button small {
+  color: #ccc;
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.life3d-controls {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+
+.preset-section,
+.config-section {
+  margin-bottom: 1rem;
+}
+
+.preset-section label {
+  display: block;
+  font-size: 0.875rem;
+  color: #bbb;
+  margin-bottom: 0.5rem;
+}
+
+.preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem;
+}
+
+.config-item {
+  margin-bottom: 0.75rem;
+}
+
+.config-item label {
+  display: block;
+  font-size: 0.875rem;
+  color: #bbb;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.config-item input[type="range"] {
+  width: 100%;
+  margin: 0.25rem 0;
+}
+
+.config-item small {
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 0.25rem;
+  line-height: 1.3;
+}
+
+.checkbox-item .checkbox-label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem !important;
+  cursor: pointer;
+  margin-bottom: 0.25rem;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
 /* Right Panel */
 .right-panel {
   position: absolute;

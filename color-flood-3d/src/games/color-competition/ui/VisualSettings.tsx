@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye } from 'lucide-react'
 import { useState } from 'react'
 import { useVisualStore, useCellOpacity, useShowEmptyCells, useEmptyOpacity } from '../logic/visualStore'
 

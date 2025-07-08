@@ -5,10 +5,18 @@ import { evolveGeneration, createRandomPattern, createGliderPattern, createColor
 import { createWelcomePattern } from './patterns'
 import { createOscillatorPattern, createStillLifePattern } from './additionalPatterns'
 import { create3DLifePattern, createDiamondPattern, createHelixPattern, createPulsarPattern, createCrystalGrowthPattern } from './proven3DPatterns'
+import { createLife3DSeedPattern, createLife3DCornerPattern, createLife3DLayeredPattern, createLife3DSpiralPattern } from './life3dPatterns'
+import { evolveLife3D, LIFE3D_PRESETS } from './life3d'
+import type { AlgorithmType, CellState, Life3DConfig } from './types'
 
 interface SimulationStore extends SimulationState {
   config: SimulationConfig
   intervalId: number | null
+  
+  // Algorithm state
+  currentAlgorithm: AlgorithmType
+  cellStates: CellState[]
+  life3dConfig: Life3DConfig
   
   // Actions
   setCells: (cells: (ColorIndex | null)[]) => void
@@ -21,6 +29,11 @@ interface SimulationStore extends SimulationState {
   loadPattern: (pattern: Pattern) => void
   randomize: (density?: number) => void
   setConfig: (config: Partial<SimulationConfig>) => void
+  
+  // Algorithm actions
+  setAlgorithm: (algorithm: AlgorithmType) => void
+  setLife3DConfig: (config: Partial<Life3DConfig>) => void
+  loadLife3DPreset: (presetName: keyof typeof LIFE3D_PRESETS) => void
   
   // Automatic evolution
   startEvolution: () => void
@@ -42,6 +55,11 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   speed: 500,
   config: DEFAULT_CONFIG,
   intervalId: null,
+  
+  // Algorithm state
+  currentAlgorithm: 'competition',
+  cellStates: [],
+  life3dConfig: LIFE3D_PRESETS.classic,
 
   // Actions
   setCells: (cells) => set({ cells, generation: 0 }),
@@ -80,13 +98,34 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   },
   
   step: () => {
-    const { cells, cubeSize, config } = get()
-    console.log('🔄 Evolving generation', get().generation)
-    const newCells = evolveGeneration(cells, cubeSize, config)
+    const { cells, cubeSize, config, currentAlgorithm, cellStates, life3dConfig } = get()
+    console.log('🔄 Evolving generation', get().generation, 'with algorithm:', currentAlgorithm)
+    
+    let newCells: (ColorIndex | null)[]
+    let newCellStates: CellState[]
+    
+    switch (currentAlgorithm) {
+      case 'life3d':
+        const result = evolveLife3D(cells, cellStates, cubeSize, life3dConfig)
+        newCells = result.cells
+        newCellStates = result.cellStates
+        break
+      
+      case 'competition':
+      default:
+        newCells = evolveGeneration(cells, cubeSize, config)
+        newCellStates = cellStates.map((state, i) => ({
+          ...state,
+          color: newCells[i]
+        }))
+        break
+    }
+    
     const changed = newCells.some((cell, i) => cell !== cells[i])
     console.log('🎲 Generation evolved, changed cells:', changed)
     set(state => ({ 
-      cells: newCells, 
+      cells: newCells,
+      cellStates: newCellStates,
       generation: state.generation + 1 
     }))
   },
@@ -125,6 +164,30 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
     }))
   },
   
+  // Algorithm actions
+  setAlgorithm: (algorithm) => {
+    const { cells } = get()
+    set({ 
+      currentAlgorithm: algorithm,
+      cellStates: cells.map((color) => ({
+        color,
+        age: 0,
+        energy: 100,
+        isEdge: false,
+      } as CellState))
+    })
+  },
+  
+  setLife3DConfig: (config) => {
+    set(state => ({
+      life3dConfig: { ...state.life3dConfig, ...config }
+    }))
+  },
+  
+  loadLife3DPreset: (presetName) => {
+    set({ life3dConfig: LIFE3D_PRESETS[presetName] })
+  },
+  
   startEvolution: () => {
     const { intervalId } = get()
     if (intervalId !== null) {
@@ -157,6 +220,11 @@ export const useGeneration = () => useSimulationStore(state => state.generation)
 export const useIsRunning = () => useSimulationStore(state => state.isRunning)
 export const useSpeed = () => useSimulationStore(state => state.speed)
 export const useConfig = () => useSimulationStore(state => state.config)
+
+// Algorithm selectors
+export const useCurrentAlgorithm = () => useSimulationStore(state => state.currentAlgorithm)
+export const useCellStates = () => useSimulationStore(state => state.cellStates)
+export const useLife3DConfig = () => useSimulationStore(state => state.life3dConfig)
 
 // Predefined patterns
 export const PATTERNS: Pattern[] = [
@@ -231,5 +299,29 @@ export const PATTERNS: Pattern[] = [
     description: 'Growing crystals from corners',
     cubeSize: 8,
     cells: createCrystalGrowthPattern(8),
+  },
+  {
+    name: 'Life Seed',
+    description: '3D Life central cross pattern',
+    cubeSize: 5,
+    cells: createLife3DSeedPattern(5),
+  },
+  {
+    name: 'Life Corners',
+    description: '3D Life corner clusters',
+    cubeSize: 6,
+    cells: createLife3DCornerPattern(6),
+  },
+  {
+    name: 'Life Layers',
+    description: '3D Life alternating layers',
+    cubeSize: 5,
+    cells: createLife3DLayeredPattern(5),
+  },
+  {
+    name: 'Life Spiral',
+    description: '3D Life vertical spiral',
+    cubeSize: 6,
+    cells: createLife3DSpiralPattern(6),
   },
 ]
