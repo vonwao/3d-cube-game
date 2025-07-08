@@ -2,7 +2,8 @@ import { Suspense, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Group } from 'three'
 import type { SpringValue } from '@react-spring/three'
-import { TransparentCubeMesh } from './components/TransparentCubeMesh'
+import { CubeMesh } from '../../engine/CubeMesh'
+// import { TransparentCubeMesh } from './components/TransparentCubeMesh'
 import { useCubeControls } from '../../engine/useCubeControls'
 import type { CubeSize } from '../../engine/types'
 import type { ColorIndex } from '../color-flood/logic/types'
@@ -132,15 +133,12 @@ const CubeScene: React.FC = () => {
       
       <group scale={groupScale}>
         <AnimatedGroup rotation={rotation}>
-          <TransparentCubeMesh
+          <CubeMesh
             cells={meshCells}
             colors={DEFAULT_PALETTE.colors}
             spacing={1.1}
             cubeSize={cubeSize as CubeSize}
             onCellClick={handleCellClick}
-            cellOpacity={cellOpacity}
-            showEmptyCells={showEmptyCells}
-            emptyOpacity={emptyOpacity}
           />
         </AnimatedGroup>
       </group>
