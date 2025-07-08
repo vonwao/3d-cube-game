@@ -59,7 +59,7 @@ export const DebugPanel: React.FC = () => {
     <div style={{
       position: 'fixed',
       bottom: '1rem',
-      left: '1rem',
+      right: '1rem',  // Move to right side to avoid overlap
       background: 'rgba(0, 0, 0, 0.9)',
       color: '#0f0',
       fontFamily: 'monospace',

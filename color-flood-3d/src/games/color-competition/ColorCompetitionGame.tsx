@@ -1,11 +1,6 @@
-import { Suspense, useMemo, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Group } from 'three'
-import type { SpringValue } from '@react-spring/three'
-import { CubeMesh } from '../../engine/CubeMesh'
-import { useCubeControls } from '../../engine/useCubeControls'
-import type { CubeSize } from '../../engine/types'
-import type { ColorIndex } from '../color-flood/logic/types'
+import { Suspense, useMemo, useEffect } from 'react'
+import { Canvas, useThree } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
 import { 
   useCells, 
   useCubeSize, 
@@ -20,6 +15,7 @@ import { SpeedControl } from './ui/SpeedControl'
 import { ConfigPanel } from './ui/ConfigPanel'
 import { DebugPanel } from './components/DebugPanel'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { SimpleCubeMesh } from './components/SimpleCubeMesh'
 import './ColorCompetitionGame.css'
 
 // Default color palette for the simulation
@@ -35,82 +31,31 @@ const DEFAULT_PALETTE = {
   ],
 }
 
-interface AnimatedGroupProps {
-  rotation: [SpringValue<number>, SpringValue<number>, SpringValue<number>]
-  children: React.ReactNode
-}
-
-const AnimatedGroup: React.FC<AnimatedGroupProps> = ({ rotation, children }) => {
-  const groupRef = useRef<Group>(null)
-  const lastValues = useRef({ x: 0, y: 0, z: 0 })
+// Camera setup component
+const CameraSetup: React.FC = () => {
+  const { camera } = useThree()
+  const cubeSize = useCubeSize()
   
-  useFrame(() => {
-    if (groupRef.current) {
-      const x = rotation[0].get()
-      const y = rotation[1].get()
-      const z = rotation[2].get()
-      
-      if (Math.abs(x - lastValues.current.x) > 0.001 || 
-          Math.abs(y - lastValues.current.y) > 0.001 || 
-          Math.abs(z - lastValues.current.z) > 0.001) {
-        
-        groupRef.current.rotation.x = x
-        groupRef.current.rotation.y = y
-        groupRef.current.rotation.z = z
-        
-        lastValues.current = { x, y, z }
-      }
-    }
-  })
+  useEffect(() => {
+    const distance = cubeSize * 3
+    camera.position.set(distance, distance, distance)
+    camera.lookAt(0, 0, 0)
+    console.log('📷 Camera setup - distance:', distance)
+  }, [camera, cubeSize])
   
-  return <group ref={groupRef}>{children}</group>
+  return null
 }
 
 const CubeScene: React.FC = () => {
   console.log('🎮 CubeScene rendering...')
   const cells = useCells()
   const cubeSize = useCubeSize()
-  const { setCells } = useSimulationStore()
-  
-  // Convert cells array to format expected by CubeMesh (null becomes 6 for empty)
-  const meshCells = useMemo(() => {
-    console.log('📊 Converting cells:', cells.filter(c => c !== null).length, 'colored cells')
-    return cells.map(cell => cell !== null ? cell : 6)
-  }, [cells])
-  
-  const { rotation } = useCubeControls({
-    rotationSpeed: 1.2,
-    keyboardSpeed: 45,
-    enableKeyboard: true,
-    enableMouse: true,
-    enableTouch: true
-  })
-  
-  // Dynamic camera position based on cube size
-  const cameraPosition = useMemo(() => {
-    const distance = cubeSize * 2.7
-    return [distance, distance, distance] as [number, number, number]
-  }, [cubeSize])
   
   // Dynamic scale based on cube size
   const groupScale = useMemo(() => {
     const scale = cubeSize <= 4 ? 1.5 : 1.5 * (4 / cubeSize)
     return [scale, scale, scale] as [number, number, number]
   }, [cubeSize])
-  
-  // Handle cell click to toggle cell state
-  const handleCellClick = (index: number) => {
-    const newCells = [...cells]
-    if (newCells[index] === null) {
-      // Add a random color
-      newCells[index] = Math.floor(Math.random() * 6) as ColorIndex
-    } else {
-      // Cycle to next color or back to empty
-      const nextValue = (newCells[index]! + 1) % 7
-      newCells[index] = nextValue === 0 ? null : (nextValue - 1) as ColorIndex
-    }
-    setCells(newCells)
-  }
   
   // Add a test cube to ensure rendering works
   if (cells.length === 0) {
@@ -119,35 +64,38 @@ const CubeScene: React.FC = () => {
   
   return (
     <>
-      <color attach="background" args={['#0a0a0a']} />
-      <ambientLight intensity={0.3} />
+      <CameraSetup />
+      <OrbitControls enableDamping dampingFactor={0.05} />
+      <ambientLight intensity={0.5} />
       <directionalLight
-        position={[5, 10, 5]}
-        intensity={2.5}
+        position={[10, 10, 5]}
+        intensity={1.5}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
       />
+      <directionalLight position={[-5, -5, -5]} intensity={0.5} />
       
       {/* Test cube to verify rendering */}
-      <mesh position={[-5, 0, 0]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="red" />
+      <mesh position={[0, 5, 0]}>
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial color="red" wireframe />
       </mesh>
       
+      {/* Add axes helper */}
+      <axesHelper args={[5]} />
+      
       <group scale={groupScale}>
-        <AnimatedGroup rotation={rotation}>
-          <CubeMesh
-            cells={meshCells}
+        <group>
+          {/* Use SimpleCubeMesh for now */}
+          <SimpleCubeMesh
+            cubeSize={cubeSize}
+            cells={cells}
             colors={DEFAULT_PALETTE.colors}
-            spacing={1.1}
-            cubeSize={cubeSize as CubeSize}
-            onCellClick={handleCellClick}
           />
-        </AnimatedGroup>
+        </group>
       </group>
       
-      <perspectiveCamera position={cameraPosition} fov={50} />
+      {/* Grid helper */}
+      <gridHelper args={[10, 10]} />
     </>
   )
 }
@@ -162,7 +110,12 @@ export const ColorCompetitionGame: React.FC = () => {
     <ErrorBoundary>
     <div className="color-competition-game">
       <div className="canvas-container">
-        <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
+        <Canvas 
+          camera={{ position: [10, 10, 10], fov: 50, near: 0.1, far: 1000 }}
+          onCreated={({ gl, camera }) => {
+            console.log('🎨 Canvas created!', { gl, camera })
+          }}
+        >
           <Suspense fallback={null}>
             <CubeScene />
           </Suspense>

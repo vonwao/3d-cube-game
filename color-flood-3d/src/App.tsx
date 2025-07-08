@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ColorFloodGame } from './games/color-flood/ColorFloodGame'
 import './games/color-flood/ColorFloodGame.css'
 import { ColorCompetitionGame } from './games/color-competition/ColorCompetitionGame'
+import { ColorCompetitionMinimal } from './games/color-competition/ColorCompetitionMinimal'
 
 type GameType = 'color-flood' | 'color-competition'
 
@@ -52,6 +53,18 @@ function App() {
       
       {/* Game Component */}
       {currentGame === 'color-flood' ? <ColorFloodGame /> : <ColorCompetitionGame />}
+      
+      {/* Temporary: Show minimal test in corner */}
+      <div style={{ 
+        position: 'absolute', 
+        bottom: 0, 
+        left: 0, 
+        width: '300px', 
+        height: '300px',
+        border: '2px solid red'
+      }}>
+        <ColorCompetitionMinimal />
+      </div>
     </>
   )
 }
