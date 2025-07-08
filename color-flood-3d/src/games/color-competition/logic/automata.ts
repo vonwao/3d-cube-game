@@ -115,13 +115,25 @@ export function evolveGeneration(
   config: SimulationConfig
 ): (ColorIndex | null)[] {
   const newCells = new Array(cells.length)
+  let changedCount = 0
 
   for (let i = 0; i < cells.length; i++) {
     const neighbors = getNeighbors(i, cubeSize)
     const neighborCount = countNeighborsByColor(cells, neighbors)
-    newCells[i] = getNextCellState(cells[i], neighborCount, config)
+    const oldState = cells[i]
+    const newState = getNextCellState(oldState, neighborCount, config)
+    
+    if (oldState !== newState) {
+      changedCount++
+      if (changedCount <= 5) { // Log first few changes
+        console.log(`Cell ${i}: ${oldState} → ${newState}, neighbors:`, neighborCount)
+      }
+    }
+    
+    newCells[i] = newState
   }
 
+  console.log(`Evolution complete: ${changedCount} cells changed`)
   return newCells
 }
 
@@ -163,8 +175,10 @@ export function createGliderPattern(cubeSize: number): (ColorIndex | null)[] {
   ]
   
   for (const { pos, color } of patterns) {
-    const index = vec3ToIndex(pos as Vec3, cubeSize)
-    cells[index] = color as ColorIndex
+    if (pos[0] < cubeSize && pos[1] < cubeSize && pos[2] < cubeSize) {
+      const index = vec3ToIndex(pos as Vec3, cubeSize)
+      cells[index] = color as ColorIndex
+    }
   }
   
   return cells

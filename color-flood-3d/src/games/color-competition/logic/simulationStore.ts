@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { ColorIndex } from '../../color-flood/logic/types'
 import type { SimulationState, SimulationConfig, Pattern } from './types'
 import { evolveGeneration, createRandomPattern, createGliderPattern, createColorWavePattern } from './automata'
+import { createWelcomePattern } from './patterns'
 
 interface SimulationStore extends SimulationState {
   config: SimulationConfig
@@ -33,7 +34,7 @@ const DEFAULT_CONFIG: SimulationConfig = {
 export const useSimulationStore = create<SimulationStore>((set, get) => ({
   // Initial state
   cubeSize: 4,
-  cells: createRandomPattern(4, 0.3),
+  cells: createWelcomePattern(4),
   generation: 0,
   isRunning: false,
   speed: 500,
@@ -129,7 +130,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       return
     }
     
-    console.log('▶️ Starting evolution with speed:', get().speed, 'ms')
+      console.log('▶️ Starting evolution with speed:', get().speed)
     const id = window.setInterval(() => {
       get().step()
     }, get().speed)
@@ -140,6 +141,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   stopEvolution: () => {
     const { intervalId } = get()
     if (intervalId !== null) {
+      console.log('⏸️ Stopping evolution')
       window.clearInterval(intervalId)
       set({ intervalId: null })
     }
@@ -156,6 +158,12 @@ export const useConfig = () => useSimulationStore(state => state.config)
 
 // Predefined patterns
 export const PATTERNS: Pattern[] = [
+  {
+    name: 'Welcome',
+    description: 'Interactive demo pattern',
+    cubeSize: 4,
+    cells: createWelcomePattern(4),
+  },
   {
     name: 'Random',
     description: 'Random distribution of all colors',

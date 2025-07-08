@@ -5,12 +5,22 @@ export const SimulationControls: React.FC = () => {
   const isRunning = useIsRunning()
   const { toggleRunning, step, reset, randomize } = useSimulationStore()
   
+  const handleToggle = () => {
+    console.log('🎮 Toggle running:', !isRunning)
+    toggleRunning()
+  }
+  
+  const handleStep = () => {
+    console.log('⏭️ Step forward')
+    step()
+  }
+  
   return (
     <div className="simulation-controls">
       <h3>Controls</h3>
       <div className="button-group">
         <button
-          onClick={toggleRunning}
+          onClick={handleToggle}
           className={`control-button ${isRunning ? 'pause' : 'play'}`}
           title={isRunning ? 'Pause' : 'Play'}
         >
@@ -19,7 +29,7 @@ export const SimulationControls: React.FC = () => {
         </button>
         
         <button
-          onClick={step}
+          onClick={handleStep}
           className="control-button"
           disabled={isRunning}
           title="Step forward one generation"
