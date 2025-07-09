@@ -22,6 +22,7 @@ import { GameHUD } from './ui/GameHUD'
 import { LevelSelector } from './ui/LevelSelector'
 import { WinDialog } from './ui/WinDialog'
 import { GameInstructions } from './ui/GameInstructions'
+import { GameControls } from './ui/GameControls'
 import { DebugInfo } from './ui/DebugInfo'
 import styles from './GravityCascade.module.css'
 
@@ -60,6 +61,7 @@ const GameScene: React.FC = () => {
   const blocks = useBlocks()
   const selectedBlockId = useSelectedBlockId()
   const currentLevel = useCurrentLevel()
+  const gameStatus = useGameStatus()
   const { selectBlock, swapBlocks, updatePhysics } = useGameStore()
   
   const { rotation } = useCubeControls({
@@ -72,15 +74,23 @@ const GameScene: React.FC = () => {
   
   // Update physics every frame
   useFrame((state, delta) => {
-    updatePhysics()
+    if (gameStatus === 'playing') {
+      updatePhysics()
+    }
   })
   
   const handleBlockClick = (blockId: string) => {
+    console.log('GameScene handleBlockClick called with:', blockId)
+    console.log('Current selectedBlockId:', selectedBlockId)
+    
     if (selectedBlockId === null) {
+      console.log('Selecting block:', blockId)
       selectBlock(blockId)
     } else if (selectedBlockId === blockId) {
+      console.log('Deselecting block:', blockId)
       selectBlock(null)
     } else {
+      console.log('Swapping blocks:', selectedBlockId, 'and', blockId)
       swapBlocks(selectedBlockId, blockId)
     }
   }
@@ -143,18 +153,20 @@ export const GravityCascadeGame: React.FC = () => {
   
   // Spawn blocks periodically
   useEffect(() => {
-    if (!currentLevel || gameStatus !== 'playing') return
+    if (!currentLevel) return
     
     // Spawn some initial blocks
     setTimeout(() => {
       spawnBlocks(5)
     }, 500)
     
-    const interval = setInterval(() => {
-      spawnBlocks(Math.ceil(currentLevel.spawnRate))
-    }, 2000)
-    
-    return () => clearInterval(interval)
+    if (gameStatus === 'playing') {
+      const interval = setInterval(() => {
+        spawnBlocks(Math.ceil(currentLevel.spawnRate))
+      }, 3000)
+      
+      return () => clearInterval(interval)
+    }
   }, [currentLevel, gameStatus, spawnBlocks])
   
   const handleLevelSelect = (level: typeof LEVELS[0]) => {
@@ -192,6 +204,8 @@ export const GravityCascadeGame: React.FC = () => {
           level={currentLevel?.id || 1}
           targetScore={currentLevel?.targetScore || 0}
         />
+        
+        <GameControls />
         
         <LevelSelector
           levels={LEVELS}

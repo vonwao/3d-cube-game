@@ -81,9 +81,16 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
   }, [selectedBlockId, blocks, cubeSize])
   
   const handleCellClick = (index: number) => {
+    console.log('Cell clicked at index:', index)
+    console.log('BlockIdMap size:', blockIdMap.size)
+    console.log('BlockId at index:', blockIdMap.get(index))
+    
     const blockId = blockIdMap.get(index)
     if (blockId) {
+      console.log('Calling onBlockClick with:', blockId)
       onBlockClick(blockId)
+    } else {
+      console.log('No block found at this index')
     }
   }
   
