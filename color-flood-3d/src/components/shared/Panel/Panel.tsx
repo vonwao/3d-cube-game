@@ -189,5 +189,4 @@ export const Panel: React.FC<PanelProps> = ({
   );
 };
 
-// Export types
-export type { PanelProps };
+// Component and types are exported inline above

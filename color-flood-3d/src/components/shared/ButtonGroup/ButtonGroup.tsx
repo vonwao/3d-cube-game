@@ -20,7 +20,7 @@
 
 import React, { createContext, useContext, useCallback } from 'react';
 import { clsx } from 'clsx';
-import { Button, ButtonProps } from '../Button';
+import { Button, type ButtonProps } from '../Button';
 import styles from './ButtonGroup.module.css';
 
 interface ButtonGroupContextValue {
@@ -177,5 +177,4 @@ const ButtonGroupItem: React.FC<ButtonGroupItemProps> = ({
 // Attach Item component
 ButtonGroup.Item = ButtonGroupItem;
 
-// Export types
-export type { ButtonGroupProps, ButtonGroupItemProps };
+// Component and types are exported inline above

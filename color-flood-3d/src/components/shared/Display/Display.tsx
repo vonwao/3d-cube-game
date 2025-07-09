@@ -140,5 +140,4 @@ export const Display: React.FC<DisplayProps> = ({
   );
 };
 
-// Export types
-export type { DisplayProps };
+// Component and types are exported inline above

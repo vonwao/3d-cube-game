@@ -186,5 +186,4 @@ export const ModalFooter: React.FC<ModalFooterProps> = ({
   );
 };
 
-// Export types
-export type { ModalProps, ModalContentProps, ModalFooterProps };
+// Component and types are exported inline above

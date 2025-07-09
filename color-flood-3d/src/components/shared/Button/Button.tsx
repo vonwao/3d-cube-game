@@ -127,5 +127,4 @@ export const Button: React.FC<ButtonProps> = ({
   );
 };
 
-// Export types for use in other components
-export type { ButtonProps };
+// Component and types are exported inline above

@@ -194,5 +194,4 @@ export const Card: React.FC<CardProps> = ({
   );
 };
 
-// Export types
-export type { CardProps };
+// Component and types are exported inline above
