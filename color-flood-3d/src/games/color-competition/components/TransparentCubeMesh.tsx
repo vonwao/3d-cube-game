@@ -106,7 +106,7 @@ export const TransparentCubeMesh: React.FC<TransparentCubeMeshProps> = ({
       meshRef.current.setMatrixAt(i, tempObject.matrix)
       
       // Set color
-      if (cellValue < colorArray.length) {
+      if (cellValue < colorArray.length && colorArray[cellValue]) {
         tempColor.copy(colorArray[cellValue])
         
         // Modify brightness based on energy for energy algorithm

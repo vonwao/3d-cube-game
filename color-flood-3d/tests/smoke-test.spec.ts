@@ -14,8 +14,9 @@ test.describe('Smoke Tests - Critical Functionality', () => {
     // Navigate to the app
     await page.goto('/');
     
-    // Wait for main container to be visible
-    await expect(page.locator('.color-competition-game')).toBeVisible();
+    // Wait for main container to be visible (either version)
+    const mainContainer = page.locator('.color-competition-game, .color-competition-simple');
+    await expect(mainContainer.first()).toBeVisible();
     
     // Check that no critical errors occurred
     const criticalErrors = errors.filter(error => 
@@ -48,12 +49,17 @@ test.describe('Smoke Tests - Critical Functionality', () => {
   test('essential UI components should be present', async ({ page }) => {
     await page.goto('/');
     
-    // Critical UI elements that must be present
-    await expect(page.locator('.color-competition-game')).toBeVisible();
+    // Critical UI elements that must be present (check both UI versions)
+    const mainContainer = page.locator('.color-competition-game, .color-competition-simple');
+    await expect(mainContainer.first()).toBeVisible();
+    
     await expect(page.locator('.canvas-container')).toBeVisible();
     await expect(page.locator('.ui-overlay')).toBeVisible();
     await expect(page.locator('.top-bar')).toBeVisible();
-    await expect(page.locator('.controls-container')).toBeVisible();
+    
+    // Controls container exists in original UI, left-panel in simplified UI
+    const controlsContainer = page.locator('.controls-container, .left-panel');
+    await expect(controlsContainer.first()).toBeVisible();
   });
 
 });
