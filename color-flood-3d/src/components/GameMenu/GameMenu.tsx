@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 import styles from './GameMenu.module.css'
 
-export type GameType = 'color-flood' | 'color-competition' | 'color-competition-simple'
+export type GameType = 'color-flood' | 'color-competition' | 'color-competition-simple' | 'gravity-cascade'
 
 interface GameMenuItem {
   id: GameType
@@ -19,6 +19,7 @@ const gameItems: GameMenuItem[] = [
   { id: 'color-flood', label: 'Color Flood', description: 'Flood the 3D cube with colors' },
   { id: 'color-competition', label: 'Color Competition', description: 'Compete with AI agents' },
   { id: 'color-competition-simple', label: 'CA Explorer (Simple)', description: 'Explore cellular automata' },
+  { id: 'gravity-cascade', label: 'Gravity Cascade', description: 'Match blocks in a gravity well' },
 ]
 
 export const GameMenu: React.FC<GameMenuProps> = ({ currentGame, onGameChange }) => {

@@ -1,0 +1,113 @@
+.levelSelector {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.toggleButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.toggleButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.icon {
+  font-size: 20px;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(20px);
+  min-width: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+  animation: dropdownIn 0.2s ease-out;
+}
+
+.levelGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.levelButton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.levelButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(58, 134, 255, 0.5);
+  transform: translateX(4px);
+}
+
+.levelButton.active {
+  background: rgba(58, 134, 255, 0.2);
+  border-color: #3A86FF;
+}
+
+.levelNumber {
+  font-size: 24px;
+  font-weight: bold;
+  color: #3A86FF;
+}
+
+.levelName {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.levelInfo {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .dropdown {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

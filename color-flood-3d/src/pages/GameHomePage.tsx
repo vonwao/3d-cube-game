@@ -5,10 +5,11 @@ import { ColorFloodGame } from '../games/color-flood/ColorFloodGame'
 import '../games/color-flood/ColorFloodGame.css'
 import { ColorCompetitionGame } from '../games/color-competition/ColorCompetitionGame'
 import { ColorCompetitionSimple } from '../games/color-competition/ColorCompetitionSimple'
+import { GravityCascadeGame } from '../games/gravity-cascade/GravityCascadeGame'
 import { GameMenu, type GameType } from '../components/GameMenu/GameMenu'
 
 export const GameHomePage: React.FC = () => {
-  const [currentGame, setCurrentGame] = useState<GameType>('color-competition-simple')
+  const [currentGame, setCurrentGame] = useState<GameType>('gravity-cascade')
   
   return (
     <>
@@ -56,6 +57,8 @@ export const GameHomePage: React.FC = () => {
         <ColorFloodGame />
       ) : currentGame === 'color-competition' ? (
         <ColorCompetitionGame />
+      ) : currentGame === 'gravity-cascade' ? (
+        <GravityCascadeGame />
       ) : (
         <ColorCompetitionSimple />
       )}
