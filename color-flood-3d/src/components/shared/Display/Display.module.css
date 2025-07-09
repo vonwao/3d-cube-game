@@ -1,0 +1,212 @@
+/**
+ * Display Component Styles
+ * 
+ * For showing stats, scores, and other numeric/text displays.
+ * Glassmorphic style with optional icons and labels.
+ * 
+ * @potential-issue: May need different styles for game-specific displays
+ */
+
+.display {
+  /* Glass effect */
+  background: hsl(var(--color-glass-background));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  border: 1px solid hsl(var(--color-glass-border));
+  border-radius: var(--radius-base);
+  
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  
+  /* Typography */
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-tight);
+  
+  /* Prevent text selection */
+  user-select: none;
+  
+  /* Animation */
+  transition: all var(--duration-fast) var(--easing-default);
+}
+
+/* =================================================================
+ * LAYOUT VARIANTS
+ * =================================================================
+ */
+
+/* Horizontal layout (default) */
+.horizontal {
+  flex-direction: row;
+}
+
+/* Vertical layout */
+.vertical {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+/* Centered alignment */
+.centered {
+  justify-content: center;
+  text-align: center;
+}
+
+.centered.vertical {
+  align-items: center;
+}
+
+/* =================================================================
+ * CONTENT
+ * =================================================================
+ */
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: hsl(var(--color-text-secondary));
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  color: hsl(var(--color-text-secondary));
+  font-weight: var(--font-weight-normal);
+  white-space: nowrap;
+}
+
+.value {
+  font-size: var(--font-size-lg);
+  color: hsl(var(--color-text-primary));
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums; /* Align numbers */
+}
+
+/* Monospace variant for numbers */
+.mono .value {
+  font-family: var(--font-family-mono);
+}
+
+/* =================================================================
+ * SIZE VARIANTS
+ * =================================================================
+ */
+
+.small {
+  padding: var(--space-1) var(--space-2);
+}
+
+.small .icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.small .label {
+  font-size: var(--font-size-xs);
+}
+
+.small .value {
+  font-size: var(--font-size-base);
+}
+
+.large {
+  padding: var(--space-3) var(--space-4);
+}
+
+.large .icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.large .label {
+  font-size: var(--font-size-base);
+}
+
+.large .value {
+  font-size: var(--font-size-2xl);
+}
+
+/* =================================================================
+ * STYLE VARIANTS
+ * =================================================================
+ */
+
+/* Prominent display */
+.prominent {
+  background: hsl(var(--color-surface-elevated) / 0.8);
+  border-color: hsl(var(--color-primary) / 0.3);
+  box-shadow: var(--shadow-md);
+}
+
+.prominent .value {
+  color: hsl(var(--color-primary));
+}
+
+/* Minimal display */
+.minimal {
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 0;
+}
+
+/* Inline display */
+.inline {
+  display: inline-flex;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+/* =================================================================
+ * STATE VARIANTS
+ * =================================================================
+ */
+
+/* Success state */
+.success .value {
+  color: hsl(var(--color-success));
+}
+
+/* Warning state */
+.warning .value {
+  color: hsl(var(--color-warning));
+}
+
+/* Danger state */
+.danger .value {
+  color: hsl(var(--color-danger));
+}
+
+/* Animated value change */
+.animateChange .value {
+  animation: valueChange var(--duration-normal) var(--easing-bounce);
+}
+
+@keyframes valueChange {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* =================================================================
+ * RESPONSIVE
+ * =================================================================
+ */
+
+@media (max-width: 768px) {
+  /* Stack vertical on small screens if needed */
+  .responsive.horizontal {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+}

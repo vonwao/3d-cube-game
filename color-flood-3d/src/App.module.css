@@ -1,0 +1,115 @@
+/**
+ * App Component Styles
+ * 
+ * Root application layout using CSS Modules.
+ * Provides the main container for the game and handles responsive layout.
+ * 
+ * @potential-issue: Full-screen layout may conflict with browser UI on mobile
+ */
+
+.app {
+  /* Full viewport layout */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  
+  /* Ensure proper stacking context */
+  position: relative;
+  z-index: 0;
+  
+  /* Background color from design system */
+  background-color: hsl(var(--color-background));
+  
+  /* Smooth transitions for theme changes */
+  transition: background-color var(--duration-slow) var(--easing-default);
+}
+
+/* =================================================================
+ * LANDING PAGE STYLES
+ * =================================================================
+ */
+
+.landing {
+  /* Center content */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6);
+  
+  /* Text alignment */
+  text-align: center;
+}
+
+.header {
+  margin-bottom: var(--space-8);
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem); /* Responsive font size */
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-4);
+  
+  /* Gradient text effect */
+  background: linear-gradient(135deg, hsl(var(--color-primary)), hsl(var(--color-secondary)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: var(--font-size-xl);
+  color: hsl(var(--color-text-secondary));
+  margin-bottom: var(--space-8);
+}
+
+.gameGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: var(--space-8);
+}
+
+.footer {
+  color: hsl(var(--color-text-tertiary));
+  font-size: var(--font-size-sm);
+}
+
+/* =================================================================
+ * GAME CONTAINER
+ * =================================================================
+ */
+
+.gameContainer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* =================================================================
+ * RESPONSIVE ADJUSTMENTS
+ * =================================================================
+ */
+
+@media (max-width: 768px) {
+  .landing {
+    padding: var(--space-4);
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: var(--font-size-lg);
+  }
+  
+  .gameGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+}

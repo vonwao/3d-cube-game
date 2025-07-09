@@ -1,0 +1,1334 @@
+/* Color Competition Game CSS Module */
+
+.colorCompetitionGame {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  overflow: hidden;
+}
+
+/* Canvas Container - Critical for Three.js rendering */
+.canvasContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* React Three Fiber creates a div wrapper - ensure it fills container */
+.canvasContainer > div {
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure canvas fills the container using CSS Modules specificity */
+.canvasContainer :global(canvas) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.uiOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.uiOverlay > * {
+  pointer-events: auto;
+}
+
+/* Top Bar */
+.topBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 2rem;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topBar h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Generation Display */
+.generationDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.runningIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #2ecc71;
+  margin-left: 0.5rem;
+}
+
+.runningIndicator .pulse {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+/* Controls Container */
+.controlsContainer {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  top: 5rem; /* Add top constraint to prevent cutoff */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 300px;
+  max-height: calc(100vh - 7rem); /* Leave space for top bar */
+  overflow-y: auto; /* Enable scrolling */
+  padding-right: 0.5rem; /* Space for scrollbar */
+}
+
+/* Custom scrollbar for controls */
+.controlsContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.controlsContainer::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.controlsContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.controlsContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Scroll indicators */
+.scrollIndicator {
+  display: none;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #2ecc71;
+  padding: 0.5rem;
+  background: rgba(46, 204, 113, 0.1);
+  border-radius: 0.5rem;
+  animation: pulse 2s infinite;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.scrollIndicatorTop {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: -2.5rem;
+}
+
+.scrollIndicatorBottom {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  margin-top: -2.5rem;
+}
+
+/* Show indicators when scrollable */
+.controlsContainerHasScroll .scrollIndicator {
+  display: block;
+}
+
+/* Simulation Controls */
+.simulationControls {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.simulationControls h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.buttonGroup {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.controlButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.controlButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.controlButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.controlButtonPlay {
+  background: rgba(46, 204, 113, 0.2);
+  border-color: rgba(46, 204, 113, 0.4);
+}
+
+.controlButtonPause {
+  background: rgba(231, 76, 60, 0.2);
+  border-color: rgba(231, 76, 60, 0.4);
+}
+
+/* Speed Control */
+.speedControl {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.speedControl h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.speedButtons {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.speedButton {
+  flex: 1;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.speedButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.speedButtonActive {
+  background: rgba(52, 152, 219, 0.4);
+  border-color: rgba(52, 152, 219, 0.6);
+}
+
+.speedInfo {
+  font-size: 0.75rem;
+  color: #666;
+  text-align: center;
+}
+
+/* Pattern Selector */
+.patternSelector {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.patternSelector h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.patternList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Custom scrollbar for pattern list */
+.patternList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.patternList::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.patternList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.patternList::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.patternButton {
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.patternButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sizeSelector {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sizeSelector label {
+  display: block;
+  font-size: 0.875rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.sizeButtons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.sizeButton {
+  flex: 1;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sizeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sizeButtonActive {
+  background: rgba(155, 89, 182, 0.4);
+  border-color: rgba(155, 89, 182, 0.6);
+}
+
+/* Config Panel */
+.configPanel {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.configToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.configToggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.configContent {
+  margin-top: 1rem;
+}
+
+.configItem {
+  margin-bottom: 1rem;
+}
+
+.configItem label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #bbb;
+}
+
+.configItem input[type="range"] {
+  width: 100%;
+  margin: 0.25rem 0;
+}
+
+.configItem span {
+  font-weight: 600;
+  color: white;
+}
+
+.presetButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.presetButton {
+  padding: 0.4rem 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.presetButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.configInfo {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.configInfo p {
+  margin: 0.25rem 0;
+}
+
+/* Visual Settings */
+.visualSettings {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.visualToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.visualToggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.visualContent {
+  margin-top: 1rem;
+}
+
+.visualItem {
+  margin-bottom: 1rem;
+}
+
+.visualItem label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #bbb;
+}
+
+.visualItem input[type="range"] {
+  width: 100%;
+  margin: 0.25rem 0;
+}
+
+.visualItem span {
+  font-weight: 600;
+  color: white;
+}
+
+.checkboxLabel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.visualPresets {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.visualPresets p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #888;
+}
+
+.visualPresets .presetBtn {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  margin: 0.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.visualPresets .presetBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.visualInfo {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.visualInfo p {
+  margin: 0.25rem 0;
+}
+
+/* Algorithm Selector */
+.algorithmSelector {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(52, 152, 219, 0.3);
+  flex-shrink: 0; /* Prevent squishing */
+}
+
+.algorithmToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  background: rgba(52, 152, 219, 0.2);
+  border: 1px solid rgba(52, 152, 219, 0.4);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.algorithmToggle:hover {
+  background: rgba(52, 152, 219, 0.3);
+}
+
+.algorithmToggleHasSettings {
+  border-color: rgba(46, 204, 113, 0.4);
+}
+
+.settingsHint {
+  font-size: 0.75rem;
+  color: #2ecc71;
+  margin-left: 0.5rem;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.algorithmContent {
+  margin-top: 1rem;
+}
+
+.algorithmList h4,
+.life3dControls h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.algorithmList {
+  margin-bottom: 1rem;
+}
+
+.algorithmButton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.algorithmButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.algorithmButtonActive {
+  background: rgba(52, 152, 219, 0.3);
+  border-color: rgba(52, 152, 219, 0.5);
+}
+
+.algorithmButton strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.algorithmButton small {
+  color: #ccc;
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.life3dControls {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+
+.presetSection,
+.configSection {
+  margin-bottom: 1rem;
+}
+
+.presetSection label {
+  display: block;
+  font-size: 0.875rem;
+  color: #bbb;
+  margin-bottom: 0.5rem;
+}
+
+.configItem label {
+  display: block;
+  font-size: 0.875rem;
+  color: #bbb;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.configItem small {
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 0.25rem;
+  line-height: 1.3;
+}
+
+.checkboxItem .checkboxLabel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  margin-bottom: 0.25rem;
+}
+
+.checkboxItem input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+/* Simulation Analysis */
+.simulationAnalysis {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.analysisToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid rgba(231, 76, 60, 0.4);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.analysisToggle:hover {
+  background: rgba(231, 76, 60, 0.3);
+}
+
+.analysisContent {
+  margin-top: 1rem;
+}
+
+.analysisHeader h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.analysisHeader p {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: #bbb;
+  line-height: 1.4;
+}
+
+.configSection h5 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  color: #ddd;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.configGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.configGrid .configItem {
+  margin-bottom: 0;
+}
+
+.configGrid .configItem label {
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.configGrid select {
+  width: 100%;
+  padding: 0.4rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.checkboxOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkboxOptions .checkboxLabel {
+  font-size: 0.875rem;
+}
+
+.simulationControlsButtons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.runSimulationBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(46, 204, 113, 0.2);
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.runSimulationBtn:hover:not(:disabled) {
+  background: rgba(46, 204, 113, 0.3);
+}
+
+.runSimulationBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.downloadBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(52, 152, 219, 0.2);
+  border: 1px solid rgba(52, 152, 219, 0.4);
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.downloadBtn:hover {
+  background: rgba(52, 152, 219, 0.3);
+}
+
+.progressSection {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.progressText {
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.progressNote {
+  font-size: 0.875rem;
+  color: #bbb;
+}
+
+.resultsSection {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.resultsSummary {
+  margin-bottom: 1rem;
+}
+
+.resultsSummary h5 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.summaryStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: #bbb;
+  margin-bottom: 0.25rem;
+}
+
+.statValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.bestRuleset {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: rgba(46, 204, 113, 0.1);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  border-radius: 0.5rem;
+}
+
+.bestRuleset h5 {
+  margin: 0 0 0.5rem 0;
+  color: #2ecc71;
+}
+
+.bestRulesetDetails .rulesetName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.bestRulesetDetails .rulesetScore {
+  font-size: 0.875rem;
+  color: #2ecc71;
+  margin-bottom: 0.25rem;
+}
+
+.bestRulesetDetails .rulesetSummary {
+  font-size: 0.875rem;
+  color: #bbb;
+}
+
+.classifications {
+  margin-bottom: 1rem;
+}
+
+.classifications h5 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #ddd;
+}
+
+.classificationGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.classificationItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.25rem;
+}
+
+.classificationDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.classificationName {
+  font-size: 0.875rem;
+  color: #ddd;
+  flex: 1;
+  text-transform: capitalize;
+}
+
+.classificationCount {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.topRulesets h5 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #ddd;
+}
+
+.rulesetsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rulesetItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.25rem;
+  transition: background 0.2s;
+}
+
+.rulesetItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.rulesetRank {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #f39c12;
+  min-width: 2rem;
+}
+
+.rulesetInfo {
+  flex: 1;
+}
+
+.rulesetInfo .rulesetName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.rulesetDetails {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+}
+
+.rulesetDetails .score {
+  color: #2ecc71;
+  font-weight: 500;
+}
+
+.rulesetDetails .classification {
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.rulesetDetails .generations {
+  color: #bbb;
+}
+
+/* Right Panel */
+.rightPanel {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 300px;
+}
+
+/* Cell Stats */
+.cellStats {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.cellStats h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statsSummary {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.statItem {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.colorBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.colorStat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.colorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.colorName {
+  color: #888;
+  min-width: 60px;
+}
+
+.colorCount {
+  margin-left: auto;
+  font-weight: 500;
+}
+
+/* Info Panel */
+.infoPanel {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+}
+
+.infoPanel p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.infoPanel .instructions {
+  font-size: 0.8rem;
+  color: #888;
+  line-height: 1.6;
+}
+
+/* Gate Types Grid */
+.gateTypes {
+  margin-top: 1rem;
+}
+
+.gateTypes label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #ddd;
+}
+
+.gateTypeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.gateTypeItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.gateId {
+  font-weight: 600;
+  color: #f39c12;
+}
+
+.gateName {
+  color: #ddd;
+}
+
+/* Info Processing Controls */
+.infoControls .configSection {
+  margin-top: 1rem;
+}
+
+/* Debug Panel */
+.debugPanel {
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.debugPanel h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2ecc71;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.debugMetrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.debugMetric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.metricLabel {
+  color: #bbb;
+}
+
+.metricValue {
+  font-weight: 600;
+  color: #fff;
+  font-family: monospace;
+}
+
+.debugIndicators {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.indicatorBar label,
+.flowIndicator label,
+.signalIndicator label {
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.energyBar {
+  display: flex;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.flowArrows {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.signalPulse {
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .controlsContainer {
+    left: 1rem;
+    bottom: 1rem;
+    max-width: calc(100% - 2rem);
+  }
+  
+  .rightPanel {
+    display: none;
+  }
+  
+  .topBar {
+    padding: 0.75rem 1rem;
+  }
+  
+  .topBar h1 {
+    font-size: 1.25rem;
+  }
+  
+  .buttonGroup {
+    grid-template-columns: 1fr;
+  }
+  
+  .generationDisplay {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .controlsContainer,
+  .rightPanel {
+    transform: scale(0.9);
+    transform-origin: bottom left;
+  }
+  
+  .rightPanel {
+    transform-origin: bottom right;
+  }
+}
+
+/* Accessibility - maintain reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+  }
+}

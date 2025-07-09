@@ -1,0 +1,237 @@
+/**
+ * Design System CSS Variables
+ * 
+ * This file establishes the foundation for our glassmorphic, minimalist design system.
+ * All values are carefully chosen to work with both light and dark themes.
+ * 
+ * @deprecated This file uses CSS custom properties. In the future, consider migrating
+ * to CSS-in-JS or CSS Modules for better component encapsulation.
+ */
+
+:root {
+  /* =================================================================
+   * COLOR SYSTEM
+   * =================================================================
+   * Using HSL for better color manipulation and theming flexibility
+   */
+  
+  /* Base Colors */
+  --color-background: 220 13% 8%;          /* Deep dark background */
+  --color-surface: 220 13% 12%;            /* Slightly lighter surface */
+  --color-surface-elevated: 220 13% 16%;   /* Elevated surfaces (cards, panels) */
+  
+  /* Text Colors */
+  --color-text-primary: 0 0% 95%;          /* High contrast text */
+  --color-text-secondary: 0 0% 70%;        /* Muted text */
+  --color-text-tertiary: 0 0% 50%;         /* Very muted text */
+  
+  /* Interactive Colors */
+  --color-primary: 200 100% 50%;           /* Bright blue accent */
+  --color-primary-hover: 200 100% 60%;     /* Lighter on hover */
+  --color-secondary: 280 100% 50%;         /* Purple accent */
+  --color-success: 120 100% 40%;           /* Green for success states */
+  --color-warning: 40 100% 50%;            /* Orange for warnings */
+  --color-danger: 0 100% 50%;              /* Red for errors/danger */
+  
+  /* Glass Effect Colors */
+  --color-glass-background: 0 0% 100% / 0.05;  /* White with low opacity */
+  --color-glass-border: 0 0% 100% / 0.1;       /* Slightly more opaque border */
+  --color-glass-shadow: 0 0% 0% / 0.2;         /* Soft black shadow */
+  
+  /* Game-Specific Colors */
+  --color-cube-highlight: 0 0% 100% / 0.8;     /* White wireframe highlight */
+  --color-cube-shadow: 0 0% 0% / 0.4;          /* Cube shadows */
+  
+  /* =================================================================
+   * SPACING SYSTEM
+   * =================================================================
+   * Based on 4px unit for consistent rhythm
+   * @deprecated Consider using rem units for better accessibility
+   */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  
+  /* =================================================================
+   * TYPOGRAPHY SYSTEM
+   * =================================================================
+   */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono: "SF Mono", Monaco, "Cascadia Code", monospace;
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* =================================================================
+   * Z-INDEX SCALE
+   * =================================================================
+   * Organized in layers to prevent z-index conflicts
+   * @potential-issue: Three.js canvas may need special handling
+   */
+  --z-base: 0;              /* Base layer */
+  --z-dropdown: 100;        /* Dropdowns, tooltips */
+  --z-sticky: 200;          /* Sticky elements */
+  --z-modal: 300;           /* Modals, dialogs */
+  --z-toast: 400;           /* Toast notifications */
+  --z-tooltip: 500;         /* Tooltips (highest) */
+  
+  /* Game-specific z-index values */
+  --z-game-canvas: 1;       /* Three.js canvas */
+  --z-game-ui: 10;          /* Game UI overlay */
+  --z-game-hud: 20;         /* HUD elements */
+  
+  /* =================================================================
+   * RESPONSIVE BREAKPOINTS
+   * =================================================================
+   * Mobile-first approach
+   */
+  --breakpoint-sm: 640px;   /* Small devices */
+  --breakpoint-md: 768px;   /* Medium devices */
+  --breakpoint-lg: 1024px;  /* Large devices */
+  --breakpoint-xl: 1280px;  /* Extra large devices */
+  --breakpoint-2xl: 1536px; /* 2X large devices */
+  
+  /* =================================================================
+   * ANIMATION & TRANSITION
+   * =================================================================
+   */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+  
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* =================================================================
+   * EFFECTS
+   * =================================================================
+   */
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;     /* 4px */
+  --radius-base: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;     /* 12px */
+  --radius-xl: 1rem;        /* 16px */
+  --radius-full: 9999px;    /* Fully rounded */
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 hsl(var(--color-glass-shadow));
+  --shadow-base: 0 1px 3px 0 hsl(var(--color-glass-shadow)), 0 1px 2px 0 hsl(var(--color-glass-shadow));
+  --shadow-md: 0 4px 6px -1px hsl(var(--color-glass-shadow)), 0 2px 4px -1px hsl(var(--color-glass-shadow));
+  --shadow-lg: 0 10px 15px -3px hsl(var(--color-glass-shadow)), 0 4px 6px -2px hsl(var(--color-glass-shadow));
+  --shadow-xl: 0 20px 25px -5px hsl(var(--color-glass-shadow)), 0 10px 10px -5px hsl(var(--color-glass-shadow));
+  
+  /* Glass Effect */
+  --glass-blur: 12px;
+  --glass-saturation: 180%;
+  --glass-opacity: 0.8;
+  
+  /* =================================================================
+   * COMPONENT-SPECIFIC TOKENS
+   * =================================================================
+   */
+  
+  /* Buttons */
+  --button-padding-x: var(--space-4);
+  --button-padding-y: var(--space-2);
+  --button-radius: var(--radius-base);
+  --button-font-weight: var(--font-weight-medium);
+  
+  /* Cards/Panels */
+  --card-padding: var(--space-6);
+  --card-radius: var(--radius-lg);
+  --card-shadow: var(--shadow-md);
+  
+  /* Forms */
+  --input-padding-x: var(--space-3);
+  --input-padding-y: var(--space-2);
+  --input-radius: var(--radius-base);
+  --input-border-width: 1px;
+}
+
+/* =================================================================
+ * UTILITY CLASSES
+ * =================================================================
+ * Common patterns to reduce CSS duplication
+ * @deprecated These will be replaced by component-specific CSS modules
+ */
+
+/* Glass Effect Base */
+.glass {
+  background: hsl(var(--color-glass-background));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  border: 1px solid hsl(var(--color-glass-border));
+}
+
+/* Prevent FOUC (Flash of Unstyled Content) */
+.no-fouc {
+  visibility: hidden;
+}
+.no-fouc.loaded {
+  visibility: visible;
+}
+
+/* Focus Visible Utilities */
+.focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.focus-ring:focus-visible {
+  outline-color: hsl(var(--color-primary));
+}
+
+/* Responsive Hide/Show Utilities */
+@media (max-width: 767px) {
+  .hide-mobile { display: none !important; }
+}
+@media (min-width: 768px) {
+  .hide-desktop { display: none !important; }
+}
+
+/* Animation Performance Optimization */
+.will-transform {
+  will-change: transform;
+}
+.will-opacity {
+  will-change: opacity;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

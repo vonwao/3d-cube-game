@@ -1,0 +1,228 @@
+/**
+ * Card Component Styles
+ * 
+ * Interactive card component for displaying items like levels, patterns, etc.
+ * Builds on Panel component with specific card-like behaviors.
+ * 
+ * @potential-issue: Hover animations may cause reflow on mobile
+ */
+
+.card {
+  /* Base styles - extend panel */
+  background: hsl(var(--color-glass-background));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  border: 1px solid hsl(var(--color-glass-border));
+  border-radius: var(--card-radius);
+  padding: var(--space-4);
+  
+  /* Interactive by default */
+  cursor: pointer;
+  user-select: none;
+  
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  
+  /* Effects */
+  box-shadow: var(--shadow-base);
+  
+  /* Animation */
+  transition: all var(--duration-normal) var(--easing-default);
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* Hover state */
+.card:hover:not(.disabled) {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-lg);
+  border-color: hsl(var(--color-glass-border) / 0.5);
+  background: hsl(var(--color-glass-background) / 0.8);
+}
+
+/* Active state */
+.card:active:not(.disabled) {
+  transform: translateY(-2px) scale(1);
+}
+
+/* Selected state */
+.selected {
+  border-color: hsl(var(--color-primary));
+  background: hsl(var(--color-primary) / 0.1);
+  box-shadow: 0 0 0 2px hsl(var(--color-primary) / 0.3);
+}
+
+.selected:hover:not(.disabled) {
+  border-color: hsl(var(--color-primary-hover));
+  box-shadow: 0 0 0 2px hsl(var(--color-primary) / 0.5);
+}
+
+/* Disabled state */
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  filter: grayscale(0.3);
+}
+
+.disabled:hover {
+  transform: none;
+  box-shadow: var(--shadow-base);
+}
+
+/* =================================================================
+ * CONTENT SECTIONS
+ * =================================================================
+ */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: hsl(var(--color-text-primary));
+  margin: 0;
+  line-height: var(--line-height-tight);
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: hsl(var(--color-text-secondary));
+  margin: 0;
+  margin-top: var(--space-1);
+}
+
+.badge {
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-2);
+  background: hsl(var(--color-primary) / 0.2);
+  color: hsl(var(--color-primary));
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.description {
+  font-size: var(--font-size-sm);
+  color: hsl(var(--color-text-secondary));
+  line-height: var(--line-height-relaxed);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: hsl(var(--color-text-tertiary));
+}
+
+.metaItem svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* =================================================================
+ * VISUAL CONTENT
+ * =================================================================
+ */
+
+.image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius-base);
+  margin: calc(var(--space-4) * -1);
+  margin-bottom: var(--space-3);
+  
+  /* Ensure image doesn't break card padding */
+  max-width: calc(100% + var(--space-4) * 2);
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--color-primary) / 0.1);
+  color: hsl(var(--color-primary));
+  border-radius: var(--radius-base);
+  flex-shrink: 0;
+}
+
+.icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* =================================================================
+ * LAYOUT VARIANTS
+ * =================================================================
+ */
+
+/* Horizontal layout */
+.horizontal {
+  flex-direction: row;
+  align-items: center;
+}
+
+.horizontal .content {
+  gap: var(--space-1);
+}
+
+.horizontal .meta {
+  padding-top: 0;
+}
+
+/* Compact variant */
+.compact {
+  padding: var(--space-3);
+  gap: var(--space-2);
+}
+
+.compact .title {
+  font-size: var(--font-size-base);
+}
+
+/* =================================================================
+ * RESPONSIVE
+ * =================================================================
+ */
+
+@media (max-width: 768px) {
+  .card {
+    padding: var(--space-3);
+  }
+  
+  .card:hover:not(.disabled) {
+    /* Reduce hover effects on mobile */
+    transform: translateY(-2px) scale(1.01);
+  }
+  
+  .horizontal {
+    /* Stack on mobile */
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

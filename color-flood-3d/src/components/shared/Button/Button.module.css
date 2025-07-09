@@ -1,0 +1,228 @@
+/**
+ * Button Component Styles
+ * 
+ * Glassmorphic button with multiple variants and states.
+ * Uses CSS Modules for component encapsulation.
+ * 
+ * @potential-issue: The glass effect may not work in older browsers
+ * @deprecated: Consider using CSS-in-JS for dynamic theming in future
+ */
+
+.button {
+  /* Base styles */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  
+  /* Typography */
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--button-font-weight);
+  line-height: var(--line-height-normal);
+  text-decoration: none;
+  white-space: nowrap;
+  
+  /* Spacing */
+  padding: var(--button-padding-y) var(--button-padding-x);
+  
+  /* Borders & Radius */
+  border: 1px solid transparent;
+  border-radius: var(--button-radius);
+  
+  /* Interaction */
+  cursor: pointer;
+  user-select: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  
+  /* Animation */
+  transition: all var(--duration-normal) var(--easing-default);
+  transform: translateZ(0); /* Force GPU acceleration */
+  
+  /* Prevent text selection on double click */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Focus states - accessibility first! */
+.button:focus-visible {
+  outline-color: hsl(var(--color-primary));
+  outline-offset: 2px;
+}
+
+/* Hover state */
+.button:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.02);
+}
+
+/* Active state */
+.button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Disabled state */
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* =================================================================
+ * VARIANTS
+ * =================================================================
+ */
+
+/* Primary variant - main CTA */
+.primary {
+  background: hsl(var(--color-primary));
+  color: white;
+  border-color: hsl(var(--color-primary));
+  box-shadow: 0 2px 8px hsl(var(--color-primary) / 0.3);
+}
+
+.primary:hover:not(:disabled) {
+  background: hsl(var(--color-primary-hover));
+  border-color: hsl(var(--color-primary-hover));
+  box-shadow: 0 4px 12px hsl(var(--color-primary) / 0.4);
+}
+
+/* Secondary variant - less prominent */
+.secondary {
+  background: hsl(var(--color-surface-elevated));
+  color: hsl(var(--color-text-primary));
+  border-color: hsl(var(--color-glass-border));
+}
+
+.secondary:hover:not(:disabled) {
+  background: hsl(var(--color-surface-elevated) / 0.8);
+  border-color: hsl(var(--color-glass-border) / 0.5);
+}
+
+/* Ghost variant - minimal, text-only appearance */
+.ghost {
+  background: transparent;
+  color: hsl(var(--color-text-secondary));
+  border-color: transparent;
+}
+
+.ghost:hover:not(:disabled) {
+  background: hsl(var(--color-glass-background));
+  color: hsl(var(--color-text-primary));
+  border-color: hsl(var(--color-glass-border));
+}
+
+/* Glass variant - glassmorphic effect */
+.glass {
+  background: hsl(var(--color-glass-background));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  color: hsl(var(--color-text-primary));
+  border-color: hsl(var(--color-glass-border));
+  box-shadow: 0 4px 12px hsl(var(--color-glass-shadow));
+}
+
+.glass:hover:not(:disabled) {
+  background: hsl(var(--color-glass-background) / 0.8);
+  border-color: hsl(var(--color-glass-border) / 0.7);
+  box-shadow: 0 6px 16px hsl(var(--color-glass-shadow));
+}
+
+/* Danger variant - destructive actions */
+.danger {
+  background: hsl(var(--color-danger));
+  color: white;
+  border-color: hsl(var(--color-danger));
+}
+
+.danger:hover:not(:disabled) {
+  background: hsl(var(--color-danger) / 0.9);
+  box-shadow: 0 4px 12px hsl(var(--color-danger) / 0.4);
+}
+
+/* =================================================================
+ * SIZES
+ * =================================================================
+ */
+
+.small {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  gap: var(--space-1);
+}
+
+.medium {
+  /* Default size - no additional styles needed */
+}
+
+.large {
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--font-size-lg);
+  gap: var(--space-3);
+}
+
+/* =================================================================
+ * SPECIAL STATES
+ * =================================================================
+ */
+
+/* Icon-only button */
+.iconOnly {
+  padding: var(--button-padding-y);
+  aspect-ratio: 1;
+}
+
+.iconOnly.small {
+  padding: var(--space-1);
+}
+
+.iconOnly.large {
+  padding: var(--space-3);
+}
+
+/* Full width button */
+.fullWidth {
+  width: 100%;
+}
+
+/* Loading state */
+.loading {
+  color: transparent;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  margin: auto;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: button-loading-spinner 0.6s linear infinite;
+}
+
+@keyframes button-loading-spinner {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* =================================================================
+ * RESPONSIVE ADJUSTMENTS
+ * =================================================================
+ */
+
+@media (max-width: 768px) {
+  .button {
+    /* Larger touch targets on mobile */
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Adjust padding for better mobile UX */
+  .small {
+    padding: var(--space-2) var(--space-3);
+  }
+}
