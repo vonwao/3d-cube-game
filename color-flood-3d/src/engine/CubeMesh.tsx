@@ -178,10 +178,11 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     }
   });
   
-  const handleClick = (event: { instanceId?: number }) => {
+  const handleClick = (event: any) => {
     if (!onCellClick) return;
     
     const instanceId = event.instanceId;
+    
     if (instanceId !== undefined && cells[instanceId] !== 6) {
       onCellClick(instanceId);
     }
@@ -207,7 +208,6 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
   return (
     <>
       <instancedMesh
-        key={`main-mesh-${totalCells}`}
         ref={meshRef}
         args={[undefined, undefined, totalCells]}
         onClick={handleClick}
@@ -215,6 +215,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
         onPointerLeave={handlePointerLeave}
         castShadow
         receiveShadow
+        frustumCulled={false}
       >
         <boxGeometry args={[0.9, 0.9, 0.9]} />
         <meshStandardMaterial
@@ -225,7 +226,6 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       </instancedMesh>
       
       <instancedMesh
-        key={`highlight-mesh-${totalCells}`}
         ref={highlightMeshRef}
         args={[undefined, undefined, totalCells]}
         renderOrder={1}
@@ -243,7 +243,6 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       
       {enableHover && (
         <instancedMesh
-          key={`hover-mesh-${totalCells}`}
           ref={hoverMeshRef}
           args={[undefined, undefined, totalCells]}
           renderOrder={2}

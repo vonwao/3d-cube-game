@@ -78,6 +78,44 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   selectBlock: (blockId: string | null) => {
     set((state) => {
       if (state.isAnimating || state.gameStatus !== 'playing') return state
+      
+      // If selecting a block, check if it has only one neighbor for auto-swap
+      if (blockId && !state.selectedBlockId) {
+        const block = state.blocks.get(blockId)
+        if (!block) return { selectedBlockId: blockId }
+        
+        // Find neighbors
+        const neighbors: string[] = []
+        const directions = [
+          { x: 1, y: 0, z: 0 },
+          { x: -1, y: 0, z: 0 },
+          { x: 0, y: 1, z: 0 },
+          { x: 0, y: -1, z: 0 },
+          { x: 0, y: 0, z: 1 },
+          { x: 0, y: 0, z: -1 },
+        ]
+        
+        directions.forEach(dir => {
+          state.blocks.forEach((otherBlock, otherId) => {
+            if (otherId === blockId) return
+            
+            const dx = Math.round(otherBlock.position.x) - Math.round(block.position.x)
+            const dy = Math.round(otherBlock.position.y) - Math.round(block.position.y)
+            const dz = Math.round(otherBlock.position.z) - Math.round(block.position.z)
+            
+            if (dx === dir.x && dy === dir.y && dz === dir.z) {
+              neighbors.push(otherId)
+            }
+          })
+        })
+        
+        // If only one neighbor, auto-swap
+        if (neighbors.length === 1) {
+          get().swapBlocks(blockId, neighbors[0])
+          return state // Don't select, just swap
+        }
+      }
+      
       return { selectedBlockId: blockId }
     })
   },

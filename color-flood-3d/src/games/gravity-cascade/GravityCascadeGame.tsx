@@ -24,6 +24,9 @@ import { WinDialog } from './ui/WinDialog'
 import { GameInstructions } from './ui/GameInstructions'
 import { GameControls } from './ui/GameControls'
 import { DebugInfo } from './ui/DebugInfo'
+import { SelectedBlockEffect } from './ui/SelectedBlockEffect'
+import { TestRaycaster } from './ui/TestRaycaster'
+import { DebugOverlay } from './ui/DebugOverlay'
 import styles from './GravityCascade.module.css'
 
 interface AnimatedGroupProps {
@@ -80,17 +83,11 @@ const GameScene: React.FC = () => {
   })
   
   const handleBlockClick = (blockId: string) => {
-    console.log('GameScene handleBlockClick called with:', blockId)
-    console.log('Current selectedBlockId:', selectedBlockId)
-    
     if (selectedBlockId === null) {
-      console.log('Selecting block:', blockId)
       selectBlock(blockId)
     } else if (selectedBlockId === blockId) {
-      console.log('Deselecting block:', blockId)
       selectBlock(null)
     } else {
-      console.log('Swapping blocks:', selectedBlockId, 'and', blockId)
       swapBlocks(selectedBlockId, blockId)
     }
   }
@@ -131,9 +128,13 @@ const GameScene: React.FC = () => {
           onBlockClick={handleBlockClick}
           cubeSize={currentLevel.cubeSize as CubeSize}
         />
+        
+        {/* Selected block effect */}
+        <SelectedBlockEffect selectedBlock={selectedBlockId ? blocks.get(selectedBlockId) || null : null} />
       </AnimatedGroup>
       
       <Environment preset="sunset" />
+      <TestRaycaster />
     </>
   )
 }
@@ -216,6 +217,8 @@ export const GravityCascadeGame: React.FC = () => {
         <GameInstructions />
         
         <DebugInfo />
+        
+        <DebugOverlay />
       </div>
       
       {gameStatus === 'won' && currentLevel && (

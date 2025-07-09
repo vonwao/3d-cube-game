@@ -1,0 +1,52 @@
+.debugOverlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #3A86FF;
+  border-radius: 8px;
+  padding: 16px;
+  color: white;
+  font-size: 12px;
+  max-width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+.debugOverlay h3 {
+  margin: 0 0 8px 0;
+  color: #3A86FF;
+}
+
+.debugOverlay h4 {
+  margin: 8px 0 4px 0;
+  color: #3A86FF;
+}
+
+.debugOverlay p {
+  margin: 4px 0;
+}
+
+.blockList {
+  margin-top: 12px;
+  font-family: monospace;
+}
+
+.blockInfo {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.blockInfo span {
+  margin: 2px 0;
+}
+
+.selected {
+  color: #FFD700;
+  font-weight: bold;
+}
