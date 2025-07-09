@@ -126,5 +126,6 @@ export const COLOR_PALETTE = {
     '#FFBE0B', // Solar Yellow
     '#C77DFF', // Cosmic Purple
     '#FB5607', // Nebula Orange
+    '#000000', // Empty/transparent cells (index 6)
   ]
 }

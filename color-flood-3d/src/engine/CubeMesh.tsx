@@ -88,7 +88,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       meshRef.current.setMatrixAt(i, tempObject.matrix);
       
       const colorIndex = cells[i];
-      const color = colorArray[colorIndex];
+      const color = colorArray[colorIndex] || tempColor.setRGB(0, 0, 0);
       meshRef.current.setColorAt(i, color);
     }
     
@@ -146,7 +146,11 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       if (isHovered) {
         const colorIndex = cells[i];
         const cellColor = colorArray[colorIndex];
-        tempColor.copy(cellColor).multiplyScalar(1.2); // Subtle brightness increase
+        if (cellColor) {
+          tempColor.copy(cellColor).multiplyScalar(1.2); // Subtle brightness increase
+        } else {
+          tempColor.setRGB(0.5, 0.5, 0.5); // Gray for empty cells
+        }
       } else {
         tempColor.setRGB(0, 0, 0);
       }
