@@ -24,6 +24,7 @@ import { ConfigPanel } from './ui/ConfigPanel'
 import { CellStats } from './ui/CellStats'
 import { VisualSettings } from './ui/VisualSettings'
 import { AlgorithmSelector } from './ui/AlgorithmSelector'
+import { DebugPanel } from './ui/DebugPanel'
 import { useCellOpacity, useShowEmptyCells, useEmptyOpacity } from './logic/visualStore'
 import './ColorCompetitionGame.css'
 
@@ -187,6 +188,7 @@ export const ColorCompetitionGame: React.FC = () => {
         
         <div className="right-panel">
           <CellStats />
+          <DebugPanel />
           <div className="info-panel">
             <p>
               Watch as colors compete for territory in this 3D cellular automaton.
