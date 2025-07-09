@@ -44,9 +44,14 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
       const z = Math.round(block.position.z)
       const index = posToIndex(x, y, z)
       
-      if (index >= 0 && index < maxIndex && !block.isExploding) {
-        cells[index] = block.color
-        blockIdMap.set(index, block.id)
+      if (index >= 0 && index < maxIndex) {
+        // Don't render exploding blocks with very low opacity
+        if (block.isExploding && block.opacity < 0.1) {
+          cells[index] = 6; // Empty
+        } else {
+          cells[index] = block.color
+          blockIdMap.set(index, block.id)
+        }
       }
     })
     

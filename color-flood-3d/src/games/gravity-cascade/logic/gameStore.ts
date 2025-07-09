@@ -42,6 +42,26 @@ export const useGameStore = create<GameStore>()((set, get) => ({
       )
       newBlocks.set(centerBlock.id, centerBlock)
       
+      // Add a few more test blocks
+      const testPositions = [
+        { x: 1, y: 0, z: 0 },
+        { x: -1, y: 0, z: 0 },
+        { x: 0, y: 1, z: 0 },
+        { x: 0, y: -1, z: 0 },
+        { x: 0, y: 0, z: 1 },
+        { x: 0, y: 0, z: -1 }
+      ]
+      
+      testPositions.forEach((pos, i) => {
+        const block = generateBlock(
+          pos,
+          Math.floor(Math.random() * config.colorCount),
+          config.cubeSize
+        )
+        newBlocks.set(block.id, block)
+      })
+      
+      
       return {
         blocks: newBlocks,
         score: 0,
@@ -128,7 +148,6 @@ export const useGameStore = create<GameStore>()((set, get) => ({
           newBlocks.set(block.id, block)
         }
       }
-      
       return { blocks: newBlocks }
     })
   },

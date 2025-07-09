@@ -8,8 +8,8 @@ export const LEVELS: LevelConfig[] = [
     cubeSize: 5,
     colorCount: 3,
     targetScore: 500,
-    maxBlocks: 15,
-    spawnRate: 0.5,
+    maxBlocks: 20,
+    spawnRate: 2,
     spawnPattern: 'edge',
     gravity: 1.0
   },

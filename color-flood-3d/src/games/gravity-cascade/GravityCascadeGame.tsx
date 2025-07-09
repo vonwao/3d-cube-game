@@ -1,7 +1,8 @@
 import { Suspense, useEffect, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Environment } from '@react-three/drei'
-import { Group } from 'three'
+import { Group, BoxGeometry } from 'three'
+import * as THREE from 'three'
 import type { SpringValue } from '@react-spring/three'
 import { useCubeControls } from '../../engine/useCubeControls'
 import type { CubeSize } from '../../engine/types'
@@ -20,6 +21,8 @@ import { BlockRenderer } from './ui/BlockRenderer'
 import { GameHUD } from './ui/GameHUD'
 import { LevelSelector } from './ui/LevelSelector'
 import { WinDialog } from './ui/WinDialog'
+import { GameInstructions } from './ui/GameInstructions'
+import { DebugInfo } from './ui/DebugInfo'
 import styles from './GravityCascade.module.css'
 
 interface AnimatedGroupProps {
@@ -68,7 +71,7 @@ const GameScene: React.FC = () => {
   })
   
   // Update physics every frame
-  useFrame(() => {
+  useFrame((state, delta) => {
     updatePhysics()
   })
   
@@ -91,22 +94,24 @@ const GameScene: React.FC = () => {
       <directionalLight position={[-10, -10, -5]} intensity={0.5} />
       
       <AnimatedGroup rotation={rotation}>
-        {/* Grid helper to visualize cube bounds */}
-        <gridHelper 
-          args={[currentLevel.cubeSize, currentLevel.cubeSize]} 
-          rotation={[Math.PI / 2, 0, 0]}
-          position={[0, 0, 0]}
-        />
+        {/* Bounding box to visualize play area */}
+        <lineSegments>
+          <edgesGeometry args={[new THREE.BoxGeometry(currentLevel.cubeSize, currentLevel.cubeSize, currentLevel.cubeSize)]} />
+          <lineBasicMaterial color="#3A86FF" opacity={0.3} transparent />
+        </lineSegments>
         
         {/* Gravity well at center */}
         <mesh position={[0, 0, 0]}>
-          <sphereGeometry args={[0.3, 32, 32]} />
+          <sphereGeometry args={[0.4, 32, 32]} />
           <meshStandardMaterial 
             color="#ffffff"
             emissive="#3A86FF"
-            emissiveIntensity={2}
+            emissiveIntensity={3}
           />
         </mesh>
+        
+        {/* Gravity well glow */}
+        <pointLight position={[0, 0, 0]} color="#3A86FF" intensity={2} distance={10} />
         
         {/* Render blocks */}
         <BlockRenderer
@@ -138,14 +143,19 @@ export const GravityCascadeGame: React.FC = () => {
   
   // Spawn blocks periodically
   useEffect(() => {
-    if (!currentLevel || gameStatus !== 'playing' || isAnimating) return
+    if (!currentLevel || gameStatus !== 'playing') return
+    
+    // Spawn some initial blocks
+    setTimeout(() => {
+      spawnBlocks(5)
+    }, 500)
     
     const interval = setInterval(() => {
       spawnBlocks(Math.ceil(currentLevel.spawnRate))
     }, 2000)
     
     return () => clearInterval(interval)
-  }, [currentLevel, gameStatus, isAnimating, spawnBlocks])
+  }, [currentLevel, gameStatus, spawnBlocks])
   
   const handleLevelSelect = (level: typeof LEVELS[0]) => {
     initLevel(level)
@@ -188,6 +198,10 @@ export const GravityCascadeGame: React.FC = () => {
           currentLevelId={currentLevel?.id || 1}
           onSelectLevel={handleLevelSelect}
         />
+        
+        <GameInstructions />
+        
+        <DebugInfo />
       </div>
       
       {gameStatus === 'won' && currentLevel && (

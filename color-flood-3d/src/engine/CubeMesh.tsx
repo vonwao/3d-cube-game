@@ -82,12 +82,16 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       const [x, y, z] = positions[i];
       
       tempObject.position.set(x, y, z);
-      tempObject.scale.setScalar(1);
+      
+      const colorIndex = cells[i];
+      const isEmpty = colorIndex === 6; // Empty cells
+      
+      // Make empty cells invisible by scaling to 0
+      tempObject.scale.setScalar(isEmpty ? 0.001 : 1);
       tempObject.updateMatrix();
       
       meshRef.current.setMatrixAt(i, tempObject.matrix);
       
-      const colorIndex = cells[i];
       const color = colorArray[colorIndex] || tempColor.setRGB(0, 0, 0);
       meshRef.current.setColorAt(i, color);
     }
@@ -178,7 +182,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     if (!onCellClick) return;
     
     const instanceId = event.instanceId;
-    if (instanceId !== undefined) {
+    if (instanceId !== undefined && cells[instanceId] !== 6) {
       onCellClick(instanceId);
     }
   };
@@ -187,7 +191,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     if (!enableHover) return;
     
     const instanceId = event.instanceId;
-    if (instanceId !== undefined) {
+    if (instanceId !== undefined && cells[instanceId] !== 6) {
       setHoveredCell(instanceId);
       document.body.style.cursor = 'pointer';
     }
