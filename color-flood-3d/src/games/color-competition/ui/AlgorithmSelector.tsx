@@ -8,8 +8,10 @@ import { INFO_PATTERNS } from '../logic/infoProcessing'
 import type { AlgorithmType } from '../logic/types'
 
 export const AlgorithmSelector: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false)
   const currentAlgorithm = useCurrentAlgorithm()
+  // Start open if using an algorithm with settings
+  const hasSettings = currentAlgorithm !== 'competition'
+  const [isOpen, setIsOpen] = useState(hasSettings)
   const life3dConfig = useLife3DConfig()
   const energyConfig = useEnergyConfig()
   const magnetConfig = useMagnetConfig()
@@ -66,11 +68,12 @@ export const AlgorithmSelector: React.FC = () => {
     <div className="algorithm-selector">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="algorithm-toggle"
-        title={`Current: ${currentAlgorithmName}`}
+        className={`algorithm-toggle ${hasSettings ? 'has-settings' : ''}`}
+        title={`Current: ${currentAlgorithmName}${hasSettings ? ' (Click for settings)' : ''}`}
       >
         <Zap size={20} />
         Algorithm: {currentAlgorithmName}
+        {hasSettings && !isOpen && <span className="settings-hint"> (Settings available)</span>}
       </button>
       
       {isOpen && (

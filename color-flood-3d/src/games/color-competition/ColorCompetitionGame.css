@@ -111,10 +111,66 @@
   position: absolute;
   bottom: 2rem;
   left: 2rem;
+  top: 5rem; /* Add top constraint to prevent cutoff */
   display: flex;
   flex-direction: column;
   gap: 1rem;
   max-width: 300px;
+  max-height: calc(100vh - 7rem); /* Leave space for top bar */
+  overflow-y: auto; /* Enable scrolling */
+  padding-right: 0.5rem; /* Space for scrollbar */
+}
+
+/* Custom scrollbar for controls */
+.controls-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.controls-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.controls-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.controls-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Scroll indicators */
+.scroll-indicator {
+  display: none;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #2ecc71;
+  padding: 0.5rem;
+  background: rgba(46, 204, 113, 0.1);
+  border-radius: 0.5rem;
+  animation: pulse 2s infinite;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.scroll-indicator.top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: -2.5rem;
+}
+
+.scroll-indicator.bottom {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  margin-top: -2.5rem;
+}
+
+/* Show indicators when scrollable */
+.controls-container.has-scroll .scroll-indicator {
+  display: block;
 }
 
 /* Simulation Controls */
@@ -534,6 +590,8 @@
   padding: 1rem;
   border-radius: 0.75rem;
   backdrop-filter: blur(10px);
+  border: 2px solid rgba(52, 152, 219, 0.3);
+  flex-shrink: 0; /* Prevent squishing */
 }
 
 .algorithm-toggle {
@@ -554,6 +612,18 @@
 
 .algorithm-toggle:hover {
   background: rgba(52, 152, 219, 0.3);
+}
+
+.algorithm-toggle.has-settings {
+  border-color: rgba(46, 204, 113, 0.4);
+}
+
+.settings-hint {
+  font-size: 0.75rem;
+  color: #2ecc71;
+  margin-left: 0.5rem;
+  opacity: 0.8;
+  font-style: italic;
 }
 
 .algorithm-content {

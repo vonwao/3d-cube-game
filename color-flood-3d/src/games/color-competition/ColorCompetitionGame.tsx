@@ -178,12 +178,14 @@ export const ColorCompetitionGame: React.FC = () => {
         </div>
         
         <div className="controls-container">
+          <div className="scroll-indicator top">↑ Algorithm Settings Above ↑</div>
           <AlgorithmSelector />
           <SimulationControls />
           <SpeedControl />
           <PatternSelector />
           <ConfigPanel />
           <VisualSettings />
+          <div className="scroll-indicator bottom">↓ More Controls Below ↓</div>
         </div>
         
         <div className="right-panel">

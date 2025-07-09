@@ -4,11 +4,12 @@ import { BarChart3 } from 'lucide-react'
 import { ColorFloodGame } from '../games/color-flood/ColorFloodGame'
 import '../games/color-flood/ColorFloodGame.css'
 import { ColorCompetitionGame } from '../games/color-competition/ColorCompetitionGame'
+import { ColorCompetitionSimple } from '../games/color-competition/ColorCompetitionSimple'
 
-type GameType = 'color-flood' | 'color-competition'
+type GameType = 'color-flood' | 'color-competition' | 'color-competition-simple'
 
 export const GameHomePage: React.FC = () => {
-  const [currentGame, setCurrentGame] = useState<GameType>('color-competition')
+  const [currentGame, setCurrentGame] = useState<GameType>('color-competition-simple')
   
   return (
     <>
@@ -50,6 +51,19 @@ export const GameHomePage: React.FC = () => {
         >
           Color Competition
         </button>
+        <button
+          onClick={() => setCurrentGame('color-competition-simple')}
+          style={{
+            padding: '0.5rem 1rem',
+            background: currentGame === 'color-competition-simple' ? '#2ecc71' : '#333',
+            color: 'white',
+            border: 'none',
+            borderRadius: '0.25rem',
+            cursor: 'pointer',
+          }}
+        >
+          CA Explorer (Simple)
+        </button>
       </div>
       
       {/* Analysis Link */}
@@ -82,7 +96,13 @@ export const GameHomePage: React.FC = () => {
       </Link>
       
       {/* Game Component */}
-      {currentGame === 'color-flood' ? <ColorFloodGame /> : <ColorCompetitionGame />}
+      {currentGame === 'color-flood' ? (
+        <ColorFloodGame />
+      ) : currentGame === 'color-competition' ? (
+        <ColorCompetitionGame />
+      ) : (
+        <ColorCompetitionSimple />
+      )}
     </>
   )
 }
