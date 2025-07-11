@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect, useState } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { InstancedMesh, Object3D, Color } from 'three';
 import type { CubeSize } from './types';
@@ -43,8 +43,6 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
   };
   const meshRef = useRef<InstancedMesh>(null);
   const highlightMeshRef = useRef<InstancedMesh>(null);
-  const hoverMeshRef = useRef<InstancedMesh>(null);
-  const [hoveredCell, setHoveredCell] = useState<number | null>(null);
   
   const positions = useMemo(() => {
     const positions: [number, number, number][] = [];
@@ -82,6 +80,7 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       const [x, y, z] = positions[i];
       
       tempObject.position.set(x, y, z);
+      tempObject.rotation.set(0, 0, 0);
       
       const colorIndex = cells[i];
       const isEmpty = colorIndex === 6; // Empty cells
@@ -101,12 +100,12 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       meshRef.current.instanceColor.needsUpdate = true;
     }
     
-    // Force update geometry bounds for proper raycasting
-    meshRef.current.geometry.computeBoundingSphere();
-    meshRef.current.geometry.computeBoundingBox();
-    
-    // Force update the instanced mesh itself
+    // Critical: Force update matrices for raycasting
     meshRef.current.updateMatrixWorld(true);
+    meshRef.current.matrixWorldNeedsUpdate = true;
+    
+    // Update bounding for raycasting
+    meshRef.current.geometry.computeBoundingSphere();
   }, [cells, colorArray, positions, totalCells]);
   
   useEffect(() => {
@@ -132,40 +131,6 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     }
   }, [actualFloodRegion, positions, totalCells]);
 
-  // Update hover mesh
-  useEffect(() => {
-    if (!hoverMeshRef.current) return;
-    
-    for (let i = 0; i < totalCells; i++) {
-      const [x, y, z] = positions[i];
-      const isHovered = hoveredCell === i;
-      
-      tempObject.position.set(x, y, z);
-      tempObject.scale.setScalar(isHovered ? 1.08 : 0.001);
-      tempObject.updateMatrix();
-      
-      hoverMeshRef.current.setMatrixAt(i, tempObject.matrix);
-      
-      // Use the cell's color but slightly brighter for hover
-      if (isHovered) {
-        const colorIndex = cells[i];
-        const cellColor = colorArray[colorIndex];
-        if (cellColor) {
-          tempColor.copy(cellColor).multiplyScalar(1.2); // Subtle brightness increase
-        } else {
-          tempColor.setRGB(0.5, 0.5, 0.5); // Gray for empty cells
-        }
-      } else {
-        tempColor.setRGB(0, 0, 0);
-      }
-      hoverMeshRef.current.setColorAt(i, tempColor);
-    }
-    
-    hoverMeshRef.current.instanceMatrix.needsUpdate = true;
-    if (hoverMeshRef.current.instanceColor) {
-      hoverMeshRef.current.instanceColor.needsUpdate = true;
-    }
-  }, [hoveredCell, positions, cells, colorArray, totalCells]);
   
   useFrame(() => {
     if (meshRef.current && animationProgress < 1) {
@@ -178,31 +143,49 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
     }
   });
   
-  const handleClick = (event: any) => {
-    if (!onCellClick) return;
+  const handlePointerDown = (event: any) => {
+    console.log('[CubeMesh] handlePointerDown event:', {
+      instanceId: event.instanceId,
+      point: event.point,
+      distance: event.distance,
+      face: event.face,
+      object: event.object?.type
+    });
+    
+    if (!onCellClick) {
+      console.log('[CubeMesh] No onCellClick handler');
+      return;
+    }
+    
+    // Stop event propagation to prevent conflicts
+    event.stopPropagation();
     
     const instanceId = event.instanceId;
     
-    if (instanceId !== undefined && cells[instanceId] !== 6) {
-      onCellClick(instanceId);
+    if (instanceId !== undefined && instanceId >= 0 && instanceId < totalCells) {
+      const cellValue = cells[instanceId];
+      console.log(`[CubeMesh] Instance ${instanceId} clicked, cell value: ${cellValue}`);
+      
+      if (cellValue !== 6) { // Not empty
+        console.log(`[CubeMesh] Calling onCellClick with instanceId: ${instanceId}`);
+        onCellClick(instanceId);
+      } else {
+        console.log('[CubeMesh] Cell is empty (value 6), ignoring click');
+      }
+    } else {
+      console.log(`[CubeMesh] Invalid instanceId: ${instanceId}, totalCells: ${totalCells}`);
     }
   };
 
-  const handlePointerEnter = (event: { instanceId?: number }) => {
+  const handlePointerMove = (event: any) => {
     if (!enableHover) return;
     
     const instanceId = event.instanceId;
     if (instanceId !== undefined && cells[instanceId] !== 6) {
-      setHoveredCell(instanceId);
       document.body.style.cursor = 'pointer';
+    } else {
+      document.body.style.cursor = 'default';
     }
-  };
-
-  const handlePointerLeave = () => {
-    if (!enableHover) return;
-    
-    setHoveredCell(null);
-    document.body.style.cursor = 'default';
   };
   
   return (
@@ -210,49 +193,37 @@ export const CubeMesh: React.FC<CubeMeshProps> = ({
       <instancedMesh
         ref={meshRef}
         args={[undefined, undefined, totalCells]}
-        onClick={handleClick}
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={() => { if (enableHover) document.body.style.cursor = 'default'; }}
         castShadow
         receiveShadow
         frustumCulled={false}
+        matrixAutoUpdate={false}
       >
         <boxGeometry args={[0.9, 0.9, 0.9]} />
         <meshStandardMaterial
           roughness={0.4}
           metalness={0.15}
-          transparent={false}
         />
       </instancedMesh>
       
-      <instancedMesh
-        ref={highlightMeshRef}
-        args={[undefined, undefined, totalCells]}
-        renderOrder={1}
-        raycast={() => null} // Disable raycasting for highlight mesh
-      >
-        <boxGeometry args={[1.05, 1.05, 1.05]} />
-        <meshBasicMaterial
-          transparent
-          opacity={0.6}
-          color="white"
-          wireframe={true}
-          wireframeLinewidth={2}
-        />
-      </instancedMesh>
-      
-      {enableHover && (
+      {/* Highlight mesh for selected blocks */}
+      {floodRegion && (
         <instancedMesh
-          ref={hoverMeshRef}
+          ref={highlightMeshRef}
           args={[undefined, undefined, totalCells]}
-          renderOrder={2}
-          raycast={() => null} // Disable raycasting for hover mesh
+          renderOrder={1}
+          raycast={() => null} // Disable raycasting
+          frustumCulled={false}
+          matrixAutoUpdate={false}
         >
-          <boxGeometry args={[1.02, 1.02, 1.02]} />
+          <boxGeometry args={[1.05, 1.05, 1.05]} />
           <meshBasicMaterial
             transparent
-            opacity={0.2}
-            wireframe={false}
+            opacity={0.6}
+            color="white"
+            wireframe={true}
           />
         </instancedMesh>
       )}

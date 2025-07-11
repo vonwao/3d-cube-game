@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Environment } from '@react-three/drei'
-import { Group, BoxGeometry } from 'three'
+import { Group } from 'three'
 import * as THREE from 'three'
 import type { SpringValue } from '@react-spring/three'
 import { useCubeControls } from '../../engine/useCubeControls'
@@ -13,8 +13,7 @@ import {
   useScore,
   useCombo,
   useGameStatus,
-  useCurrentLevel,
-  useIsAnimating
+  useCurrentLevel
 } from './logic/gameStore'
 import { LEVELS, COLOR_PALETTE } from './config/levels'
 import { BlockRenderer } from './ui/BlockRenderer'
@@ -25,8 +24,8 @@ import { GameInstructions } from './ui/GameInstructions'
 import { GameControls } from './ui/GameControls'
 import { DebugInfo } from './ui/DebugInfo'
 import { SelectedBlockEffect } from './ui/SelectedBlockEffect'
-import { TestRaycaster } from './ui/TestRaycaster'
 import { DebugOverlay } from './ui/DebugOverlay'
+import { ClickDebugOverlay } from './ui/ClickDebugOverlay'
 import styles from './GravityCascade.module.css'
 
 interface AnimatedGroupProps {
@@ -53,6 +52,9 @@ const AnimatedGroup: React.FC<AnimatedGroupProps> = ({ rotation, children }) => 
         groupRef.current.rotation.z = z
         
         lastValues.current = { x, y, z }
+        
+        // Critical: Update matrix world when rotation changes
+        groupRef.current.updateMatrixWorld(true)
       }
     }
   })
@@ -76,18 +78,24 @@ const GameScene: React.FC = () => {
   })
   
   // Update physics every frame
-  useFrame((state, delta) => {
+  useFrame(() => {
     if (gameStatus === 'playing') {
       updatePhysics()
     }
   })
   
   const handleBlockClick = (blockId: string) => {
+    console.log('[GameScene] handleBlockClick called with blockId:', blockId);
+    console.log('[GameScene] Current selectedBlockId:', selectedBlockId);
+    
     if (selectedBlockId === null) {
+      console.log('[GameScene] Selecting block:', blockId);
       selectBlock(blockId)
     } else if (selectedBlockId === blockId) {
+      console.log('[GameScene] Deselecting block:', blockId);
       selectBlock(null)
     } else {
+      console.log('[GameScene] Swapping blocks:', selectedBlockId, 'and', blockId);
       swapBlocks(selectedBlockId, blockId)
     }
   }
@@ -134,7 +142,6 @@ const GameScene: React.FC = () => {
       </AnimatedGroup>
       
       <Environment preset="sunset" />
-      <TestRaycaster />
     </>
   )
 }
@@ -145,7 +152,6 @@ export const GravityCascadeGame: React.FC = () => {
   const combo = useCombo()
   const gameStatus = useGameStatus()
   const currentLevel = useCurrentLevel()
-  const isAnimating = useIsAnimating()
   
   // Initialize first level
   useEffect(() => {
@@ -220,6 +226,8 @@ export const GravityCascadeGame: React.FC = () => {
         
         <DebugOverlay />
       </div>
+      
+      <ClickDebugOverlay />
       
       {gameStatus === 'won' && currentLevel && (
         <WinDialog

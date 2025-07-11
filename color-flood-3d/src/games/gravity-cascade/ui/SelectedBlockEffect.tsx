@@ -27,13 +27,12 @@ export const SelectedBlockEffect: React.FC<SelectedBlockEffectProps> = ({ select
   
   if (!selectedBlock) return null
   
-  console.log('Rendering SelectedBlockEffect at position:', selectedBlock.position)
-  
   return (
     <>
       <mesh
         ref={meshRef}
         position={[selectedBlock.position.x, selectedBlock.position.y, selectedBlock.position.z]}
+        renderOrder={3}
       >
         <boxGeometry args={[1.15, 1.15, 1.15]} />
         <meshBasicMaterial 
@@ -41,6 +40,7 @@ export const SelectedBlockEffect: React.FC<SelectedBlockEffectProps> = ({ select
           wireframe={true}
           transparent={true}
           opacity={0.9}
+          depthWrite={false}
         />
       </mesh>
       
@@ -48,12 +48,14 @@ export const SelectedBlockEffect: React.FC<SelectedBlockEffectProps> = ({ select
       <mesh
         ref={glowRef}
         position={[selectedBlock.position.x, selectedBlock.position.y, selectedBlock.position.z]}
+        renderOrder={2}
       >
         <boxGeometry args={[1.0, 1.0, 1.0]} />
         <meshBasicMaterial 
           color="#FFD700"
           transparent={true}
           opacity={0.3}
+          depthWrite={false}
         />
       </mesh>
     </>

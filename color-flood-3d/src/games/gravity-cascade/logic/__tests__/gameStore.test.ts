@@ -102,15 +102,13 @@ describe('GameStore - Selection and Clicking', () => {
         opacity: 1
       }
       
-      useGameStore.setState(state => ({
+      useGameStore.setState({
         blocks: new Map([
           ['block1', block1],
           ['block2', block2]
         ])
-      }))
+      })
     })
-    
-    const initialBlocks = new Map(result.current.blocks)
     
     // Click on block1 which has only one neighbor
     act(() => {

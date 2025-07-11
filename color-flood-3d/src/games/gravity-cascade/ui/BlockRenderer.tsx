@@ -24,25 +24,24 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
     const cells = new Array(maxIndex).fill(6) // 6 = empty/transparent
     const blockIdMap = new Map<number, string>()
     
-    // Create position to index mapping
+    // Create position to index mapping - must match CubeMesh's indexToVec3
     const posToIndex = (x: number, y: number, z: number): number => {
       const halfSize = Math.floor(cubeSize / 2)
-      const nx = x + halfSize
-      const ny = y + halfSize
-      const nz = z + halfSize
+      const nx = Math.round(x) + halfSize
+      const ny = Math.round(y) + halfSize
+      const nz = Math.round(z) + halfSize
       
       if (nx < 0 || nx >= cubeSize || ny < 0 || ny >= cubeSize || nz < 0 || nz >= cubeSize) {
         return -1
       }
       
+      // This must match the inverse of CubeMesh's indexToVec3
       return nx + ny * cubeSize + nz * cubeSize * cubeSize
     }
     
+    // Clear and rebuild the mapping
     blocks.forEach((block) => {
-      const x = Math.round(block.position.x)
-      const y = Math.round(block.position.y)
-      const z = Math.round(block.position.z)
-      const index = posToIndex(x, y, z)
+      const index = posToIndex(block.position.x, block.position.y, block.position.z)
       
       if (index >= 0 && index < maxIndex) {
         // Don't render exploding blocks with very low opacity
@@ -81,9 +80,18 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
   }, [selectedBlockId, blocks, cubeSize])
   
   const handleCellClick = (index: number) => {
+    console.log('[BlockRenderer] handleCellClick called with index:', index);
+    console.log('[BlockRenderer] blockIdMap size:', blockIdMap.size);
+    console.log('[BlockRenderer] blockIdMap entries:', Array.from(blockIdMap.entries()));
+    
     const blockId = blockIdMap.get(index)
+    console.log('[BlockRenderer] Found blockId:', blockId);
+    
     if (blockId) {
+      console.log('[BlockRenderer] Calling onBlockClick with blockId:', blockId);
       onBlockClick(blockId)
+    } else {
+      console.log('[BlockRenderer] No block found at index:', index);
     }
   }
   

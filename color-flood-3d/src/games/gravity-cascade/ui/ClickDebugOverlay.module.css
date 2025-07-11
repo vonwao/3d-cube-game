@@ -1,0 +1,53 @@
+.clickMarker {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+
+.clickRing {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 2px solid #ff0000;
+  border-radius: 50%;
+  animation: clickRingExpand 0.5s ease-out;
+}
+
+.clickDot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #ff0000;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes clickRingExpand {
+  from {
+    width: 10px;
+    height: 10px;
+    opacity: 1;
+  }
+  to {
+    width: 30px;
+    height: 30px;
+    opacity: 0.3;
+  }
+}
+
+.canvasInfo {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: monospace;
+  pointer-events: none;
+  z-index: 1000;
+}

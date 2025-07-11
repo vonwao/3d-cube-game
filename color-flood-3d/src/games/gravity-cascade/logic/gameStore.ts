@@ -52,7 +52,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
         { x: 0, y: 0, z: -1 }
       ]
       
-      testPositions.forEach((pos, i) => {
+      testPositions.forEach((pos) => {
         const block = generateBlock(
           pos,
           Math.floor(Math.random() * config.colorCount),

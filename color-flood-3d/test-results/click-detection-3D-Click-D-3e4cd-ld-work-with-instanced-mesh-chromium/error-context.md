@@ -1,0 +1,56 @@
+# Page snapshot
+
+```yaml
+- button "Gravity Cascade"
+- link "CA Analysis":
+  - /url: /analysis
+- text: Score 100 Level 1 100 / 500
+- heading "Game Controls" [level=3]
+- button "🔄 Reset Level"
+- button "⏸️ Pause"
+- button "➕ Spawn Blocks"
+- heading "Quick Start" [level=4]
+- button "Level 1"
+- button "Level 2"
+- button "Level 3"
+- button "Level 4"
+- button "Level 5"
+- button "Level 6"
+- text: "Status: playing"
+- button "🎮 Levels"
+- heading "How to Play" [level=3]
+- list:
+  - listitem:
+    - text: ▸
+    - strong: Click
+    - text: a block to select it
+  - listitem:
+    - text: ▸
+    - strong: Click
+    - text: an adjacent block to swap
+  - listitem:
+    - text: ▸ Match
+    - strong: 3 or more
+    - text: blocks in a line
+  - listitem:
+    - text: ▸ Blocks fall towards the
+    - strong: center gravity well
+  - listitem:
+    - text: ▸ Create
+    - strong: cascades
+    - text: for combo points!
+- paragraph:
+  - strong: "Rotate:"
+  - text: Mouse drag or Arrow keys
+- paragraph:
+  - strong: "Zoom:"
+  - text: Mouse wheel
+- heading "Debug Info" [level=4]
+- text: "Blocks: 11 Animating: No Max Blocks: 20 Spawn Rate: 2"
+- group: Block Positions
+- heading "Debug Info" [level=3]
+- paragraph: "Selected Block ID: None"
+- paragraph: "Total Blocks: 11"
+- heading "All Blocks:" [level=4]
+- text: "block-175215129... Pos: (0, 0, 0) Color: 0 block-175215129... Pos: (1, 0, 0) Color: 2 block-175215129... Pos: (0, 0, 0) Color: 0 block-175215129... Pos: (0, 0, 1) Color: 2 block-175215129... Pos: (0, 1, 0) Color: 0 block-175215129... Pos: (-1, 0, 0) Color: 2 block-175215129... Pos: (0, 0, -1) Color: 2 block-175215129... Pos: (0, 0, -1) Color: 1 block-175215129... Pos: (1, 0, -1) Color: 0 block-175215129... Pos: (-1, 1, 0) Color: 1 block-175215129... Pos: (0, 1, -1) Color: 2 Canvas: 1280×720"
+```
